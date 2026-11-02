@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-11-02T00:00:00Z",
+  "catalog_url": "https://raw.githubusercontent.com/KernelPanic92/speckit-backlog/main/catalog.json",
+  "presets": {
+    "backlog": {
+      "name": "Backlog-Driven SDD",
+      "id": "backlog",
+      "version": "0.1.0",
+      "description": "Specs as a backlog: /specify asks map, epic or story mode and writes PBIs with INVEST stories and Gherkin AC; Papalini-style constitution, product, plan, research and tasks.",
+      "author": "Iacopo Ciao",
+      "repository": "https://github.com/KernelPanic92/speckit-backlog",
+      "download_url": "https://github.com/KernelPanic92/speckit-backlog/archive/refs/tags/v0.1.0.zip",
+      "homepage": "https://github.com/KernelPanic92/speckit-backlog",
+      "documentation": "https://github.com/KernelPanic92/speckit-backlog/blob/v0.1.0/README.md",
+      "license": "MIT",
+      "requires": {
+        "speckit_version": ">=1.2.5"
+      },
+      "provides": {
+        "templates": 14,
+        "commands": 12
+      },
+      "tags": ["backlog", "user-stories", "story-mapping", "bdd", "invest"],
+      "created_at": "2026-11-02T00:00:00Z",
+      "updated_at": "2026-11-02T00:00:00Z"
+    }
+  }
+}

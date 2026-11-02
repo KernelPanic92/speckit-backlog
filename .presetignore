@@ -1,0 +1,11 @@
+# Files that stay in the repository but are not copied into .specify/presets/backlog/
+.git/
+.github/
+tests/
+tools/
+catalog.json
+.gitignore
+*.pyc
+__pycache__/
+.pytest_cache/
+.DS_Store

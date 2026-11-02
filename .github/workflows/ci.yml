@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validator-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Validator unit tests
+        run: uv run --no-project --with pytest --with pyyaml --with jsonschema pytest tests
+
+  preset-install:
+    runs-on: ubuntu-latest
+    env:
+      SPECKIT_VERSION: v1.2.5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Python with PyYAML for spec-kit's template resolver
+        run: |
+          uv venv /tmp/pyenv
+          uv pip install --python /tmp/pyenv/bin/python pyyaml
+          echo "SPECKIT_PYTHON_EXECUTABLE=/tmp/pyenv/bin/python" >> "$GITHUB_ENV"
+      - name: Init a project with the preset
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+          uvx --from "git+https://github.com/github/spec-kit.git@${SPECKIT_VERSION}" specify init /tmp/proj \
+            --integration claude --script sh --non-interactive --ignore-agent-tools \
+            --extension git --preset "$GITHUB_WORKSPACE"
+      - name: Check the installation
+        run: bash tests/check_install.sh /tmp/proj

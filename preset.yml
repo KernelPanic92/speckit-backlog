@@ -1,0 +1,169 @@
+schema_version: "1.0"
+
+preset:
+  id: "backlog"
+  name: "Backlog-Driven SDD"
+  version: "0.1.0"
+  description: "Specs as a backlog: /specify asks map, epic or story mode and writes PBIs with INVEST stories and Gherkin AC; Papalini-style constitution, product, plan, research and tasks."
+  author: "Iacopo Ciao"
+  repository: "https://github.com/KernelPanic92/speckit-backlog"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=1.2.5"
+
+provides:
+  templates:
+    # --- Templates -----------------------------------------------------------
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-template.md"
+      description: "Constitution: principles, stack, MUST/SHOULD/MAY rules, agent boundaries, quality, security, delivery conventions, governance - no document versioning"
+      replaces: "constitution-template"
+
+    - type: "template"
+      name: "product-template"
+      file: "templates/product-template.md"
+      description: "Product context: vision, personas, journeys, constraints and the Ubiquitous Language (written by /constitution)"
+
+    - type: "template"
+      name: "design-template"
+      file: "templates/design-template.md"
+      description: "Design system in the DESIGN.md format (Google Labs, spec alpha): tokens in the front matter, visual rules in the prose (written by /constitution)"
+
+    - type: "template"
+      name: "spec-template"
+      file: "templates/spec-template.md"
+      description: "Spec envelope: the sections that exist only in spec.md, after the root PBI"
+      replaces: "spec-template"
+
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-template.md"
+      description: "Single-file plan merging upstream (technical context, constitution check, structure, complexity) and Papalini (architecture, data model, API, operations)"
+      replaces: "plan-template"
+
+    - type: "template"
+      name: "research-template"
+      file: "templates/research-template.md"
+      description: "Research: Decision / Rationale / Alternatives per question, findings, library versions, validity"
+
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-template.md"
+      description: "Task execution index: phases by spec mode, one checkbox line per TASK PBI, traceability matrix"
+      replaces: "tasks-template"
+
+    - type: "template"
+      name: "sync-clickup-template"
+      file: "templates/sync-clickup-template.md"
+      description: "ClickUp mapping document for /sync (settings + mapping rules, native nesting by default)"
+
+    - type: "template"
+      name: "sync-multica-template"
+      file: "templates/sync-multica-template.md"
+      description: "Multica mapping document for /sync (settings + mapping rules, running Spec Kit inside Multica)"
+
+    - type: "template"
+      name: "pbi-map-template"
+      file: "templates/pbi-map-template.md"
+      description: "User Story Map PBI (root in map mode)"
+
+    - type: "template"
+      name: "pbi-epic-template"
+      file: "templates/pbi-epic-template.md"
+      description: "Epic PBI (root in epic mode, Backbone Macro-Activity in map mode)"
+
+    - type: "template"
+      name: "pbi-story-template"
+      file: "templates/pbi-story-template.md"
+      description: "User Story PBI: Connextra, Gherkin AC with ids, Out of Scope, INVEST check"
+
+    - type: "template"
+      name: "pbi-task-template"
+      file: "templates/pbi-task-template.md"
+      description: "Task PBI: one file per task, listed in tasks.md"
+
+    - type: "template"
+      name: "pbi-spike-template"
+      file: "templates/pbi-spike-template.md"
+      description: "Spike PBI: a timeboxed question answered in research.md"
+
+    # --- Commands that replace core commands ----------------------------------
+    - type: "command"
+      name: "speckit.constitution"
+      file: "commands/speckit.constitution.md"
+      description: "Constitution + product.md (personas, ubiquitous language) + design.md (DESIGN.md format), without document versioning"
+      replaces: "speckit.constitution"
+
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "Asks the working mode (map / epic / story) and writes the backlog with the user-story-writer rules"
+      replaces: "speckit.specify"
+
+    - type: "command"
+      name: "speckit.clarify"
+      file: "commands/speckit.clarify.md"
+      description: "Clarifies open questions and backlog ambiguities, updating PBIs and product.md"
+      replaces: "speckit.clarify"
+
+    - type: "command"
+      name: "speckit.plan"
+      file: "commands/speckit.plan.md"
+      description: "Single plan.md plus research.md that answers unknowns and Spikes"
+      replaces: "speckit.plan"
+
+    - type: "command"
+      name: "speckit.tasks"
+      file: "commands/speckit.tasks.md"
+      description: "TASK PBIs plus the tasks.md execution index, phased by release lane, story or AC"
+      replaces: "speckit.tasks"
+
+    - type: "command"
+      name: "speckit.analyze"
+      file: "commands/speckit.analyze.md"
+      description: "Consistency analysis including the backlog validator and product.md"
+      replaces: "speckit.analyze"
+
+    # --- Commands composed on top of core commands -----------------------------
+    - type: "command"
+      name: "speckit.implement"
+      file: "commands/speckit.implement.md"
+      description: "Appends the backlog rules: TASK files, Gherkin acceptance tests, phase checkpoints"
+      strategy: "append"
+
+    - type: "command"
+      name: "speckit.checklist"
+      file: "commands/speckit.checklist.md"
+      description: "Appends the mapping from FR/user-story references to PBIs and AC ids"
+      strategy: "append"
+
+    - type: "command"
+      name: "speckit.converge"
+      file: "commands/speckit.converge.md"
+      description: "Appends the mapping to AC ids and writes convergence tasks as TASK PBIs"
+      strategy: "append"
+
+    # --- New commands -----------------------------------------------------------
+    - type: "command"
+      name: "speckit.split"
+      file: "commands/speckit.split.md"
+      description: "Carves an epic or a story out of a spec into a new spec where it is the root"
+
+    - type: "command"
+      name: "speckit.sync"
+      file: "commands/speckit.sync.md"
+      description: "Syncs the backlog with ClickUp or Multica following the project's mapping document"
+
+    - type: "command"
+      name: "speckit.merge"
+      file: "commands/speckit.merge.md"
+      description: "Absorbs a spec into another container or groups specs under a new epic or map"
+
+tags:
+  - "backlog"
+  - "user-stories"
+  - "story-mapping"
+  - "bdd"
+  - "invest"
