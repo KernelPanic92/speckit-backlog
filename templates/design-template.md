@@ -130,10 +130,10 @@ components:
 
 ## Sources & Sync
 
-- **Figma**: [FIGMA_FILE_OR_LIBRARY_URL]
+- **Figma**: [FIGMA_FILE_OR_LIBRARY_LINK]
 - **Code tokens**: [CODE_TOKEN_PATHS]
 - **Source of truth when they disagree**: [DESIGN_SOURCE_OF_TRUTH]
-<!-- Where the tokens came from (Figma file/library, CSS variables, Tailwind theme, tokens.json, framework defaults, interview) and which side wins on conflict. No dates: git history records when the file changed. -->
+<!-- Where the tokens came from (Figma file/library, CSS variables, Tailwind theme, tokens.json, framework defaults, interview) and which side wins on conflict. Every source is a link whose text names it (the Figma library by its name, e.g. [Checkout UI kit in Figma](https://…); a code file by what it holds), never a bare URL. No dates: git history records when the file changed. -->
 
 ## Known Gaps
 

@@ -83,6 +83,12 @@ You are updating the project constitution at `.specify/memory/constitution.md`, 
 resolved at command time from `constitution-template`, `product-template` and `design-template` through the
 Spec Kit preset/template resolution stack.
 
+**Readable references.** The three documents are read by the people who steer the product. Every reference in them follows the "Readable references" section of
+`.specify/presets/backlog/knowledge/user-story-writer/rules.md`: a reference between them is a relative Markdown link whose text names
+the section (`[the Personas of the product](product.md#personas)`), principles and rules are named, never numbered, so that plans and
+analyses can cite them by name; sources are links whose text says what they are (`[Checkout UI kit in Figma](https://…)`), never bare
+URLs or paths.
+
 **No document versioning.** No document carries version numbers, ratification/amendment dates,
 "approved by" fields, amendment history or changelog tables, nor a Sync Impact Report comment. Git history is the
 record of changes; the rationale of a change goes in the commit message. If an existing document contains
@@ -165,7 +171,8 @@ Follow this execution flow:
      template slots that the project has chosen not to define yet—explicitly justify any left).
    - Preserve heading hierarchy; comments can be removed once replaced unless they still add clarifying guidance.
    - Remove optional sections and stack groups that do not apply instead of writing "N/A".
-   - Ensure each Principle section: succinct name line, paragraph (or bullet list) capturing non‑negotiable rules,
+   - Ensure each Principle section: succinct name line (other documents cite the principle by this name, never by a number
+     such as "Principle II"), paragraph (or bullet list) capturing non‑negotiable rules,
      explicit rationale if not obvious.
    - Ensure the Governance section lists the amendment procedure and compliance review expectations
      (amendments are reviewed changes to this file; no versioning policy).
@@ -177,6 +184,9 @@ Follow this execution flow:
    - Principles and rules are declarative, testable, and free of vague language ("should" → replace with
      MUST/SHOULD rationale where appropriate).
    - Every persona has who/needs/context; every Ubiquitous Language row has both definitions.
+   - Every reference passes the self-check of the "Readable references" section: links between the documents point to
+     a section heading and name it, sources are links whose text says what they are, no `§` notation, section or
+     principle numbers, bare URLs or bare paths.
    - Constitution and product do not contradict each other (e.g. a compliance regulation required by product.md's
      constraints is reflected in the constitution's Security Posture).
    - design.md agrees with the constitution (accessibility target, UI framework in the Technology Stack) and every
@@ -192,7 +202,8 @@ Follow this execution flow:
      sections, added/changed personas and terms, design tokens added or changed and their source, removed
      versioning fields if any.
    - Dependent artifacts to review: existing specs whose personas or terms no longer match product.md, plans
-     whose Constitution Check may change (list paths; do not edit them).
+     whose Constitution Check may change (each named by its feature and the section affected, with its path;
+     do not edit them).
    - Any TODO placeholders or deferred items requiring manual follow-up.
    - Suggested commit message carrying the rationale (e.g., `docs(constitution): add test-first principle; docs(product): add Back-office Operator persona; docs(design): import tokens from the Figma library`).
    - A `Next Actions` section for any deferred non-governance intents.

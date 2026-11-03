@@ -64,7 +64,8 @@ Relations are set after every item of the run exists, so that both ends have a C
 
 - Written as Markdown (`markdown_description`), from the PBI body: Connextra sentence, Outcome, Acceptance Criteria with their `AC-n` headings and Given/When/Then, Out of Scope, Additional Notes, Assumptions, Risks; for TASK: Outcome, Covers, Files, Actions to complete, Out of Scope, DoD; for SPIKE: question, Timebox, Expected output, Exit Criteria.
 - Leave out the INVEST & DoR check and the frontmatter.
-- End with one line: `Source: {file} ({id})` so a reader can find the PBI in the repository.
+- References inside the description stay readable for a person who has only ClickUp (the "Readable references" rules of the backlog preset): a PBI cited as `type [id] title` keeps its title and, when that PBI has an `external.clickup.url`, its `[id]` becomes a link to that task; a relative link to a file of the repository (`spec.md`, `plan.md`, `research.md`, a PBI file) becomes a link to the same file and heading on the repository's web host when the remote is known (`git remote get-url origin`), otherwise its text stays as plain words without the address.
+- End with one line that tells a reader where the PBI lives in the repository, naming it by id and title: `Source in the repository: [{id} {title}]({file on the repository's web host})`, or `Source in the repository: {id} {title}, file {file}` when the web host is not known.
 - `language: it` → translate the content into Italian when writing it (section headings stay in English); the repository is never translated.
 - Workspaces whose task types apply a description template after creation: create the task without description, read it again until the template has been applied (status no longer the initial one, or custom fields populated, at most ~15 attempts), then write the description.
 

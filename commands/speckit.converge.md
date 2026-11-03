@@ -8,20 +8,22 @@
 
 | Generic key above | Key in this project |
 |-------------------|---------------------|
-| `FR-###` | `US-xxx/AC-n` — a Gherkin scenario of a story |
-| `US1/AC2` | `US-001/AC-2` |
-| `SC-###` | `SC-###` — Success Criteria of the envelope (unchanged); lane Metrics of a MAP count as Success Criteria of that lane |
+| `FR-###` | `US-xxx/AC-n "scenario title"` — a Gherkin scenario of a story, always with its title |
+| `US1/AC2` | `US-001/AC-2 "Card declined"` |
+| `SC-###` | `SC-### "short name"` — Success Criteria of the envelope; lane Metrics of a MAP count as Success Criteria of that lane |
 | "P1 user story" | a story of the first Release Lane (map), the first story in release order (epic), the root US (story) |
-| — | `US-xxx §Out of Scope` — code that builds an Out of Scope item is an `unrequested` finding |
+| — | the Out of Scope of `US-xxx "title"` — code that builds an Out of Scope item is an `unrequested` finding |
+
+Every key in the findings and in the appended tasks follows the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`: the id stays for traceability, the title always comes with it, and the `§` notation is never used.
 
 **Appending tasks** — every appended task is a TASK PBI, so step 7 writes more than tasks.md:
 
 1. Get the first free id with `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py next-id TASK` instead of `T{M+1:03d}`.
-2. For each finding, write a TASK file under `FEATURE_DIR/backlog/tasks/<ID>-<slug>.md` from the `pbi-task-template` template (resolve it with `.specify/scripts/bash/resolve-template.sh pbi-task-template --json`, or the PowerShell equivalent). Set `PARENT` to the story the finding traces to (none for constitution or plan findings), put the `<source-ref>` and `<gap-type>` in the Outcome, and list the Files observed as evidence.
+2. For each finding, write a TASK file under `FEATURE_DIR/backlog/tasks/<ID>-<slug>.md` from the `pbi-task-template` template (resolve it with `.specify/scripts/bash/resolve-template.sh pbi-task-template --json`, or the PowerShell equivalent). Set `PARENT` to the story the finding traces to (none for constitution or plan findings), put the `<source-ref>` (in the readable form above, or a link to the constitution principle or plan section by its name) and `<gap-type>` in the Outcome, and list the Files observed as evidence.
 3. Append the `## Phase N: Convergence` section to tasks.md with lines in the index format:
 
    ```markdown
-   - [ ] TASK-042 [US-003] <imperative title> per US-003/AC-2 (partial) → [backlog/tasks/TASK-042-<slug>.md](backlog/tasks/TASK-042-<slug>.md)
+   - [ ] TASK-042 [US-003] <imperative title> for the "<scenario title>" scenario (partial) → [backlog/tasks/TASK-042-<slug>.md](backlog/tasks/TASK-042-<slug>.md)
    ```
 
 4. Creating these TASK files is the only write allowed besides tasks.md: existing PBIs, spec.md and plan.md stay untouched.

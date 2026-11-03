@@ -1,30 +1,31 @@
 # Research: [FEATURE]
 
-**Plan**: [link to plan.md] | **Spec**: [link to spec.md]
+**Plan**: [[Feature] implementation plan](plan.md) | **Spec**: [[Feature] specification](spec.md)
 
 **Purpose**: [Why this research was needed: the unknowns of the Technical Context and the Spikes of the backlog]
 
-<!-- History of this document is git history: no "last updated", author or changelog fields. -->
+<!-- History of this document is git history: no "last updated", author or changelog fields.
+     References follow the "Readable references" rules of the backlog preset: questions and decisions are named by their topic, never numbered ("R1"), so that the plan, the tasks and the Spikes can link them as [the payment provider decision](research.md#payment-provider). -->
 
 ## Research Questions
 
-<!-- One line per question. Sources: every NEEDS CLARIFICATION in the plan's Technical Context, every SPIKE in backlog/spikes/, every best-practice question for a chosen dependency. -->
+<!-- One line per question. Sources: every NEEDS CLARIFICATION in the plan's Technical Context, every SPIKE in backlog/spikes/, every best-practice question for a chosen dependency. The Decision column links the block below by its heading. -->
 
-| # | Question | Source |
-|---|----------|--------|
-| R1 | [Question] | [NEEDS CLARIFICATION: Technical Context › Storage] |
-| R2 | [Question] | [SPIKE [SPIKE-001] Title] |
+| Question | Source | Decision |
+|----------|--------|----------|
+| [Question?] | [Storage, marked NEEDS CLARIFICATION in the Technical Context of the plan](plan.md#technical-context) | [[Topic]](#topic) |
+| [Question?] | [SPIKE [SPIKE-001] Title](backlog/spikes/SPIKE-001-[slug].md) | [[Topic]](#topic) |
 
 ## Decisions
 
 <!-- The core of this document: one block per question, in the upstream Decision / Rationale / Alternatives format. -->
 
-### R1: [Topic]
+### [Topic]
 
 - **Decision**: [what was chosen]
 - **Rationale**: [why chosen]
 - **Alternatives considered**: [what else was evaluated and why it was rejected]
-- **Spike closed**: [SPIKE [SPIKE-001] Title — Exit Criteria met | n/a]
+- **Spike closed**: [[SPIKE [SPIKE-001] Title](backlog/spikes/SPIKE-001-[slug].md) — Exit Criteria met | n/a]
 
 ## Key Findings
 
@@ -39,7 +40,7 @@
 // Example demonstrating the finding
 ```
 
-**Source:** [URL to documentation/article]
+**Source:** [[What the source is, in words](URL of the page or section)]
 
 **Implications for this feature:**
 - [How this affects the plan]

@@ -29,7 +29,7 @@ media:
 
 ## Expected output
 
-[What the Spike produces: a documented answer, a recommendation, a revised estimate of the PBI it unblocks, a throwaway prototype. It does not produce production code. In spec-kit the answer is recorded in the feature's `research.md` by `/speckit.plan` (Phase 0).]
+[What the Spike produces: a documented answer, a recommendation, a revised estimate of the PBI it unblocks, a throwaway prototype. It does not produce production code. In spec-kit the answer is recorded by `/speckit.plan` (Phase 0) as a decision of the feature's research, which the Exit Criteria link by its topic.]
 
 ## Out of Scope
 
@@ -37,7 +37,8 @@ media:
 - {{what is not included}}: {{where it goes}}
 
 ## Exit Criteria
-- [ ] The question has a documented answer (in `research.md`)
+<!-- When the answer is recorded, /speckit.plan ticks the first item and turns it into a link to the decision, e.g. "The question has a documented answer: [the payment provider decision](../../research.md#payment-provider)" -->
+- [ ] The question has a documented answer in the feature's research
 - [ ] The blocked PBIs can be estimated or revised
 
 <!-- optional section, include it only when filled in -->

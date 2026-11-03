@@ -62,7 +62,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Paths used by this command (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the TASK rules (no Connextra, no INVEST; Outcome, Actions, DoD; relations declared only from the child/blocked side).
+- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the TASK rules (no Connextra, no INVEST; Outcome, Actions, DoD; relations declared only from the child/blocked side). Its "Readable references" section applies to everything this command writes or prints: the TASK files, tasks.md and the report.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` (`next-id <TYPE>`, `check <feature-dir>`). If `uv` is not available, check the frontmatter by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 
 1. **Setup**: Run `{SCRIPT}` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE_CONTENT, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
@@ -73,7 +73,7 @@ Paths used by this command (preset `backlog`):
    - **Optional**: research.md (decisions, Spikes still open)
    - **IF EXISTS**: Load `/memory/constitution.md` for project principles and governance constraints; its Delivery Conventions say whether **acceptance tests from Gherkin** are on (default) or off, and its Quality Standards feed the Task Completion Criteria
    - **IF EXISTS** and the feature has a user interface: Read `.specify/memory/design.md`; UI tasks name, in their Outcome or Actions, the design tokens and components they must use (e.g. `{colors.primary}`, `button-primary`) instead of literal colors, sizes or fonts
-   - Read `RULES` (Task and Spike parts, Frontmatter section)
+   - Read `RULES` (Task and Spike parts, Frontmatter section, "Readable references" section)
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Execute task generation workflow**:
@@ -93,7 +93,8 @@ Paths used by this command (preset `backlog`):
    - **Ids**: local and permanent: get the first free id with `VALIDATOR next-id TASK` and continue the sequence in execution order.
    - **Existing TASK PBIs** (Walking Skeleton items written by `__SPECKIT_COMMAND_SPECIFY__`, or tasks from a previous run) are reused, not duplicated: keep their ids and update them only if the plan changes what they must do. If tasks.md already exists, ask before discarding tasks that are already checked.
    - **Frontmatter**: `PARENT` = the story the task serves (Walking Skeleton items: the Epic of their Macro-Activity; Setup/Foundational/Polish tasks: no PARENT); `BLOCKED_BY` = the tasks that must be completed first. Relations only from this side, in the canonical order of `RULES`.
-   - **Body**: Outcome (specific enough that an LLM can complete the task without additional context), `Covers:` for acceptance-test tasks, Files (exact paths consistent with the plan's Project Structure), Actions to complete, Out of Scope, DoD starting from the Task Completion Criteria of tasks.md.
+   - **Body**: Outcome (specific enough that an LLM can complete the task without additional context), `Covers:` for acceptance-test tasks (each scenario id followed by its title in quotes: `US-007/AC-2 "Card declined"`), Files (exact paths consistent with the plan's Project Structure), Actions to complete, Out of Scope, DoD starting from the Task Completion Criteria of tasks.md. When the Outcome or the Actions rely on a decision of the plan or of the research, cite it as a link whose text names it (`[the card payment contract](../../plan.md#api-design--contracts)`), never as a bare path or a section number.
+   - **Title**: says what the task does in words a person understands; it never names scenarios by bare id ("Acceptance tests for card accepted and card declined", not "Acceptance test for US-007/AC-1 and US-007/AC-2").
    - For each field with constraints in the plan's Data Model (max length, nullable/required, enum values, validation rules), quote the constraint verbatim in the task's Outcome or Actions so it is not left to implementation-time discretion.
 
 5. **Generate tasks.md**: Use TASKS_TEMPLATE_CONTENT (from the JSON output above) as the structure. For compatibility with older setup scripts that omit TASKS_TEMPLATE_CONTENT, read TASKS_TEMPLATE instead. Fill with:
@@ -101,10 +102,11 @@ Paths used by this command (preset `backlog`):
    - Summary (total tasks, parallelizable, phases, suggested MVP) and Task Completion Criteria from the constitution's Quality Standards
    - Phases by mode (see Phase Structure below), each with goal, independent test criteria and checkpoint
    - One strict checkbox line per TASK PBI (see Task Generation Rules below)
-   - Dependency Graph, Phase Dependencies, Parallel Example per story, Implementation Strategy (MVP first, incremental delivery)
-   - Risk Assessment and the Traceability Matrix (every story and every AC → test tasks and implementation tasks)
+   - One block per story inside its phase, headed `### US [US-xxx] Title`: the heading gives the title of the `[US-xxx]` labels of the lines below it
+   - Dependency Graph (every node with its task title), Phase Dependencies, Parallel Example per story, Implementation Strategy (MVP first, incremental delivery)
+   - Risk Assessment (tasks as `TASK [id] title`) and the Traceability Matrix (one row per scenario: the story and the scenario with their titles → test tasks and implementation tasks)
 
-6. **Validate**: run `VALIDATOR check FEATURE_DIR`. It verifies the TASK frontmatter, the relations, and that every checkbox line of tasks.md has a TASK file and vice versa. Fix and re-run until it passes (max 3 iterations; then report the remaining errors).
+6. **Validate**: run `VALIDATOR check FEATURE_DIR`. It verifies the TASK frontmatter, the relations, and that every checkbox line of tasks.md has a TASK file and vice versa. Fix and re-run until it passes (max 3 iterations; then report the remaining errors). Then run the self-check of the "Readable references" section of `RULES` on tasks.md and the TASK files you wrote, and rewrite every reference that fails it.
 
 ## Mandatory Post-Execution Hooks
 
@@ -144,10 +146,10 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 Output path to generated tasks.md and summary:
 - Total task count and TASK PBI files written (new vs reused)
-- Task count per phase and per story
+- Task count per phase and per story (stories as `type [id] title`)
 - Parallel opportunities identified
 - Independent test criteria for each phase
-- Acceptance tests on/off and AC coverage (ACs without a test task, if any)
+- Acceptance tests on/off and AC coverage (ACs without a test task, if any, as `US-xxx/AC-n "title"`)
 - Suggested MVP scope (map: the first Release Lane; epic: the first story; story: the whole story)
 - Format validation: confirm ALL task lines follow the checklist format and the validator passes
 
@@ -159,7 +161,7 @@ The tasks.md index plus the TASK files should be immediately executable - each t
 
 **CRITICAL**: Tasks MUST be organized by delivery slice (Release Lane, story or Acceptance Criterion, depending on the mode) to enable independent implementation and testing.
 
-**Tests follow the constitution**: when acceptance tests from Gherkin are on (the default), every scenario `US-xxx/AC-n` MUST be covered by an acceptance-test task (`Covers:` lists the scenarios) placed before the story's implementation tasks; one task may cover several scenarios of the same story. When off, generate test tasks only if explicitly requested in the spec or by the user.
+**Tests follow the constitution**: when acceptance tests from Gherkin are on (the default), every scenario `US-xxx/AC-n` MUST be covered by an acceptance-test task (`Covers:` lists the scenarios, each id with its title) placed before the story's implementation tasks; one task may cover several scenarios of the same story. When off, generate test tasks only if explicitly requested in the spec or by the user.
 
 ### Checklist Format (REQUIRED)
 
@@ -174,7 +176,7 @@ Every line of tasks.md that represents a task MUST strictly follow this format:
 1. **Checkbox**: ALWAYS start with `- [ ]` (markdown checkbox)
 2. **Task ID**: the TASK PBI id (TASK-014), in execution order
 3. **[P] marker**: Include ONLY if task is parallelizable (different files, no BLOCKED_BY on incomplete tasks)
-4. **[Story] label**: the PARENT story, e.g. [US-007]
+4. **[Story] label**: the PARENT story, e.g. [US-007]; the line sits in the block headed `### US [US-007] Card payment`, which gives the story's title
    - Setup phase: NO story label
    - Walking Skeleton / Foundational phase: NO story label
    - Story and lane phases: MUST have story label
@@ -185,10 +187,11 @@ Every line of tasks.md that represents a task MUST strictly follow this format:
 **Examples**:
 
 - ✅ CORRECT: `- [ ] TASK-001 Create project structure per implementation plan → [backlog/tasks/TASK-001-project-structure.md](backlog/tasks/TASK-001-project-structure.md)`
-- ✅ CORRECT: `- [ ] TASK-012 [P] [US-007] Acceptance test for US-007/AC-1 and US-007/AC-2 → [backlog/tasks/TASK-012-card-payment-acceptance.md](backlog/tasks/TASK-012-card-payment-acceptance.md)`
+- ✅ CORRECT: `- [ ] TASK-012 [P] [US-007] Acceptance tests for card accepted and card declined → [backlog/tasks/TASK-012-card-payment-acceptance.md](backlog/tasks/TASK-012-card-payment-acceptance.md)`
 - ❌ WRONG: `- [ ] Create User model` (missing ID, story label and link)
 - ❌ WRONG: `TASK-001 [US-007] Create model → …` (missing checkbox)
 - ❌ WRONG: `- [ ] TASK-014 [US-007] Create model` (missing link to the TASK file)
+- ❌ WRONG: `- [ ] TASK-012 [P] [US-007] Tests for US-007/AC-1, AC-2 → […](…)` (the title names scenarios by bare id: say what is tested)
 
 ### Task Organization
 

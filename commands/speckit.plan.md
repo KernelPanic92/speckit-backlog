@@ -66,6 +66,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read `.specify/memory/product.md` (Personas, Ubiquitous Language): entity, endpoint and field names in the plan use its terms.
    - **IF EXISTS** and the feature has a user interface: Read `.specify/memory/design.md` (DESIGN.md format: tokens in the front matter, rules in the prose). The plan's Technical Context names it as the design system, the Architecture and Project Structure say where its tokens live in code (CSS variables, Tailwind theme, component library theme), and UI components needed by the stories that design.md does not define are listed in Open Technical Questions.
    - If unchecked items remain in the envelope's Open Questions, warn that downstream rework risk increases and suggest `__SPECKIT_COMMAND_CLARIFY__`; continue only if the user confirms or the questions do not affect the design.
+   - Read the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`: it governs every reference in plan.md, research.md and the Spike files you update. A story is `type [id] title`, a scenario `US-001/AC-1 "title"`, a research decision, a constitution principle or a section of product.md a relative link whose text names it (`[the payment provider decision](research.md#payment-provider)`, `[the "Test-First" principle](../../.specify/memory/constitution.md#test-first)`); never a bare id, a bare path, a section number or a coined label such as "R2".
 
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill the header (spec mode, root PBI, links), Summary and Technical Context (start from the constitution's Technology Stack; mark unknowns as "NEEDS CLARIFICATION")
@@ -73,7 +74,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Evaluate gates (ERROR if violations unjustified; justified violations go to Complexity Tracking following the constitution's Exceptions Process)
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION and answer every Spike)
    - Phase 1: Fill the design sections of plan.md itself (Architecture, Project Structure, Data Model, API Design / Contracts, Integration, Security, Performance, Error Handling, Observability, Testing Strategy, Delivery Slices, Migration, Patterns)
-   - Re-evaluate Constitution Check post-design
+   - Re-evaluate Constitution Check post-design, each gate named after its principle or rule
+   - Run the self-check of the "Readable references" section on plan.md and research.md and rewrite every reference that fails it
 
 ## Mandatory Post-Execution Hooks
 
@@ -111,7 +113,7 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 ## Completion Report
 
-Command ends after Phase 1 design. Report branch, IMPL_PLAN path, research.md path, Spikes answered vs still open, Constitution Check result (and Complexity Tracking entries, if any), and readiness for `__SPECKIT_COMMAND_TASKS__`.
+Command ends after Phase 1 design. Report branch, IMPL_PLAN path, research.md path, Spikes answered vs still open (each as `SPIKE [id] title`), Constitution Check result with the principles and rules named (and Complexity Tracking entries, if any), and readiness for `__SPECKIT_COMMAND_TASKS__`.
 
 ## Phases
 
@@ -136,13 +138,13 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, research.md pa
 
 3. **Consolidate findings** in `research.md`:
    - Resolve the `research-template` by running the template resolver (`.specify/scripts/bash/resolve-template.sh research-template --json`, or `.specify/scripts/powershell/resolve-template.ps1 research-template -Json` on PowerShell) and use its `TEMPLATE_CONTENT` as the structure. If it fails, stop and report the resolution error.
-   - List every question in Research Questions with its source (Technical Context unknown, Spike, dependency, integration).
-   - For each question write a Decisions block using format:
+   - List every question in Research Questions as a full question, without numbering, with its source as a readable reference (the Technical Context unknown as a link to that section of plan.md, the Spike as a link whose text is `SPIKE [id] title`, the dependency or integration by name) and a link to its decision block.
+   - For each question write a Decisions block, headed by its topic in words (the heading other documents link to), using format:
      - Decision: [what was chosen]
      - Rationale: [why chosen]
      - Alternatives considered: [what else evaluated]
    - Add Key Findings with sources, Version Information for the libraries the decisions depend on, and the Validity refresh trigger. Do not add dates, authors or changelogs: git history records them.
-   - For each Spike that the research answers, tick its Exit Criteria in the SPIKE file and reference the Decisions block. A Spike that needs a prototype rather than desk research stays open: say so in research.md, and `__SPECKIT_COMMAND_TASKS__` will schedule it.
+   - For each Spike that the research answers, tick its Exit Criteria in the SPIKE file and turn the answered criterion into a link to the decision, e.g. `The question has a documented answer: [the payment provider decision](../../research.md#payment-provider)`. A Spike that needs a prototype rather than desk research stays open: say so in research.md, and `__SPECKIT_COMMAND_TASKS__` will schedule it.
 
 **Output**: research.md with all NEEDS CLARIFICATION resolved and every Spike answered or explicitly scheduled
 
@@ -161,7 +163,7 @@ Everything in this phase is written **inside plan.md** (single document): do not
    - Identify what interfaces the project exposes to users or other systems
    - Document the contract format appropriate for the project type, with request/response and error examples
    - Examples: public APIs for libraries, command schemas for CLI tools, endpoints for web services, grammars for parsers, UI contracts for applications
-   - Name the stories each contract serves
+   - Name the stories each contract serves as `type [id] title`, linked to their files
    - Skip if project is purely internal (build scripts, one-off tools, etc.)
 
 3. **Validation scenarios** → plan.md › Testing Strategy:
@@ -172,13 +174,13 @@ Everything in this phase is written **inside plan.md** (single document): do not
    - map: the Walking Skeleton first, then one row per Release Lane with its stories in Backbone order.
    - epic: one row per story in BLOCKED_BY / release order.
    - story: one row per Acceptance Criterion (or group).
-   - For each row, the components of the Architecture Overview it touches.
+   - For each row, the PBIs as `type [id] title` (scenarios as `US-001/AC-1 "title"`) and the components of the Architecture Overview it touches.
 
 **Output**: plan.md with all design sections filled
 
 ## Key rules
 
-- Use absolute paths for filesystem operations; use project-relative paths for references in documentation
+- Use absolute paths for filesystem operations; in documentation, a reference to another file is a relative Markdown link whose text names the topic and whose address ends with the heading anchor (the "Readable references" section), never a bare path
 - ERROR on gate failures or unresolved clarifications
 - Name entities, fields and endpoints with the Ubiquitous Language terms of product.md
 - No document versioning: no dates, authors or changelogs in plan.md or research.md

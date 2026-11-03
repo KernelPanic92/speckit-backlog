@@ -5,11 +5,13 @@ description: "Task execution index template (preset backlog)"
 
 # Tasks: [FEATURE NAME]
 
-**Spec**: [link to spec.md] | **Plan**: [link to plan.md] | **Spec mode**: [map | epic | story] | **Root PBI**: [TYPE [ID] Title]
+**Spec**: [[Feature name] specification](spec.md) | **Plan**: [[Feature name] implementation plan](plan.md) | **Spec mode**: [map | epic | story] | **Root PBI**: [TYPE [ID] Title]
 
 **Organization**: Every task is a TASK PBI with its own file under `backlog/tasks/`. This file is the **execution index**: one checkbox line per task, grouped in phases. The checkbox is what `__SPECKIT_COMMAND_IMPLEMENT__` marks; the details (Outcome, Files, Actions, DoD, relations) live in the TASK file.
 
-**Tests**: [Acceptance tests from Gherkin: on | off] — from the constitution's Delivery Conventions. When on, every scenario US-xxx/AC-n has an acceptance-test task, written before the story's implementation.
+<!-- References in this file follow the "Readable references" rules of the backlog preset: a PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a section of another file as a relative link whose text names the topic. A bare id is allowed only as the label of its own line (the task id, the [Story] label under the heading that names that story). -->
+
+**Tests**: [Acceptance tests from Gherkin: on | off] — from [the Delivery Conventions of the constitution](../../.specify/memory/constitution.md#delivery-conventions). When on, every Gherkin scenario has an acceptance-test task, written before the story's implementation.
 
 ## Summary
 
@@ -19,7 +21,7 @@ description: "Task execution index template (preset backlog)"
 
 - **[ID]**: TASK PBI id (e.g. TASK-014), project-wide unique
 - **[P]**: Can run in parallel (different files, no BLOCKED_BY on incomplete tasks)
-- **[Story]**: The user story the task serves (its PARENT), e.g. [US-007]. No label for Setup, Walking Skeleton without a story, Foundational and Polish tasks
+- **[Story]**: The user story the task serves (its PARENT), e.g. [US-007]. The label sits under the story's heading (`### US [US-007] Card payment`), which gives its title. No label for Setup, Walking Skeleton without a story, Foundational and Polish tasks
 - **→ file**: relative link to the TASK PBI
 
 ## Task Completion Criteria
@@ -78,7 +80,7 @@ description: "Task execution index template (preset backlog)"
 
 > **Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] TASK-010 [P] [US-001] Acceptance test for US-001/AC-1 and US-001/AC-2 → [backlog/tasks/TASK-010-….md](backlog/tasks/TASK-010-….md)
+- [ ] TASK-010 [P] [US-001] Acceptance tests for [scenario titles, e.g. "products listed" and "empty catalog"] → [backlog/tasks/TASK-010-….md](backlog/tasks/TASK-010-….md)
 
 #### Implementation
 
@@ -107,9 +109,9 @@ description: "Task execution index template (preset backlog)"
 <!-- From the BLOCKED_BY relations of the TASK files. -->
 
 ```text
-TASK-001 ──┬──▶ TASK-003 ──┬──▶ TASK-011
-           │               │
-TASK-002 ──┘               └──▶ TASK-012
+TASK-001 Project structure ──┬──▶ TASK-003 Static product list ──┬──▶ TASK-011 [Entity] model
+                             │                                   │
+TASK-002 Linting ────────────┘                                   └──▶ TASK-012 [Service]
 ```
 
 ### Phase Dependencies
@@ -125,13 +127,13 @@ TASK-002 ──┘               └──▶ TASK-012
 - Models before services, services before endpoints, core before integration
 - Story complete before moving to the next one
 
-## Parallel Example: US [US-001]
+## Parallel Example: US [US-001] [Story title]
 
 ```bash
-# Launch the acceptance tests of US-001 together (when on):
-Task: "TASK-010 Acceptance test for US-001/AC-1 and US-001/AC-2"
+# Launch the acceptance tests of [story title] together (when on):
+Task: "TASK-010 Acceptance tests for [scenario titles]"
 
-# Launch the models of US-001 together:
+# Launch the models of [story title] together:
 Task: "TASK-011 Create [Entity] model"
 ```
 
@@ -154,15 +156,15 @@ Task: "TASK-011 Create [Entity] model"
 
 | Task | Risk | Mitigation |
 |------|------|------------|
-| [TASK-012] | [Risk description] | [Mitigation strategy] |
+| [TASK [TASK-012] Task title] | [Risk description] | [Mitigation strategy] |
 
 ## Traceability Matrix
 
-<!-- Every story and every Acceptance Criterion must appear here. An AC without a test task (when acceptance tests are on) is a gap. -->
+<!-- Every story and every Acceptance Criterion must appear here, one row per scenario, each id with its title. An AC without a test task (when acceptance tests are on) is a gap. -->
 
-| User Story | Acceptance Criteria | Test tasks | Implementation tasks |
-|------------|---------------------|------------|----------------------|
-| [US-001] | AC-1, AC-2 | TASK-010 | TASK-011, TASK-012 |
+| User Story | Acceptance Criterion | Test tasks | Implementation tasks |
+|------------|----------------------|------------|----------------------|
+| [US [US-001] Story title](backlog/stories/US-001-….md) | [AC-1 "Scenario title"](backlog/stories/US-001-….md#ac-1-scenario-title) | TASK-010 Acceptance tests for … | TASK-011 Create [Entity] model, TASK-012 Implement [Service] |
 
 ## Notes
 

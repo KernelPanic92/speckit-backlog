@@ -8,6 +8,7 @@ It is a preset, not a fork: you keep using the official `specify` CLI and its up
 
 - The backlog rules come from the *user-story-writer* skill (INVEST, vertical splitting, Gherkin, user story mapping after Patton, Rubin, Lawrence, Wake), ported to English.
 - Constitution, plan, research and tasks merge current upstream templates with the ones of *Non-Deterministic Spec-Driven Development* (Enrico Papalini, [popoloni/non-deterministic-sdd](https://github.com/popoloni/non-deterministic-sdd)).
+- Documents are written for the people who steer the work: every reference says what it points to before it is opened and leads to the right spot. A PBI is `US [US-007] Card payment`, a scenario `US-007/AC-2 "Card declined"`, another document a relative link whose text names the section (`[the payment provider decision](research.md#payment-provider)`); no `§` notation, section numbers, coined abbreviations, bare ids or bare paths. The rule is the "Readable references" section of `knowledge/user-story-writer/rules.md`, and every command applies it.
 - No document versioning anywhere: no version numbers, "last amended" dates or changelog tables in constitution, product, design, plan or research. Git is the history.
 - The backlog can be published to **ClickUp** or **Multica** with `/speckit.sync`, and the Spec Kit commands can run inside Multica as skills.
 

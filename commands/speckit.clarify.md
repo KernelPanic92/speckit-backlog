@@ -61,7 +61,7 @@ In this project (preset `backlog`) the specification is: `spec.md` = the root PB
 
 Paths used by this command:
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — every PBI you change must still satisfy these rules (Connextra, INVEST, Gherkin, splitting, relations).
+- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — every PBI you change must still satisfy these rules (Connextra, INVEST, Gherkin, splitting, relations). Its "Readable references" section applies to everything this command writes or prints: PBIs, envelope, Clarifications, questions and the report.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` (`check <feature-dir>`, `next-id <TYPE>`). If `uv` is not available, check the frontmatter by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.
 
@@ -165,7 +165,7 @@ Execution steps:
     - **Question writing quality (applies to every question, MC or short-answer):**
        - Lead with `**Question:**` followed by a full interrogative that ends with `?`. The question text before the `?` must make sense on its own.
        - NEVER use a topic label, section heading, or requirement id as the question itself. For example, `Acceptance device/runtime matrix (US-023/AC-2)` is INVALID — it is a label, not a question.
-       - After the `?`, the only permitted suffix is an optional parenthesized requirement/question id. Exact format: `**Question:** <interrogative>?` or `**Question:** <interrogative>? (US-023/AC-2)`. Never put the id before the `?`, and never use the id (alone or with a topic label) as the whole prompt.
+       - After the `?`, the only permitted suffix is an optional parenthesized reference to the requirement, with its title. Exact format: `**Question:** <interrogative>?` or `**Question:** <interrogative>? (US-023/AC-2 "Card declined")`. Never put the reference before the `?`, never a bare id, and never use the reference (alone or with a topic label) as the whole prompt.
        - When you name a PBI in the question or in "Why it matters", use `type [id] title` (e.g. `US [US-023] Card payment`), never the bare id.
        - Immediately after the question line, add one plain-language "Why it matters" sentence (the stake for acceptance or shipping) before the recommendation/options.
        - Use everyday wording; introduce jargon only if defined in the same sentence. Self-check: a reader who does not know Spec Kit must be able to answer from the Question line alone. Terse is fine; cryptic labels are not.
@@ -209,7 +209,7 @@ Execution steps:
        - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
        - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
     - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
-    - If the answer resolves an item of `## Open Questions`, check it off and append ` → see Clarifications` (or remove it, if the spec's convention is to keep the list short).
+    - If the answer resolves an item of `## Open Questions`, check it off and append ` → answered in [Clarifications, session YYYY-MM-DD](#session-yyyy-mm-dd)` (or remove it, if the spec's convention is to keep the list short).
     - Then immediately apply the clarification to the most appropriate PBI(s) and section(s), following `RULES`:
        - Functional ambiguity → Update or add a Gherkin scenario (`### AC-n`) in the affected story; keep 2-5 scenarios per story — if a story grows beyond 5, re-split it (new US files with ids from `VALIDATOR next-id US`, PARENT and BLOCKED_BY relations, Backlog Index and Release Lanes updated).
        - User interaction / actor distinction → Update the Connextra persona of the affected PBIs; a new persona must be approved by the user and added to `PRODUCT` → Personas.
@@ -232,7 +232,7 @@ Execution steps:
    - Markdown structure valid; only allowed new headings in spec.md: `## Clarifications`, `### Session YYYY-MM-DD`; in PBIs only the headings their templates define (e.g. a new `### AC-n:`).
    - Terminology consistency: same canonical term used across all updated sections and PBIs.
    - Every changed or new PBI still satisfies `RULES` (Connextra, INVEST, Gherkin, Out of Scope).
-   - Every reference in the text you wrote passes the "NO mental mapping" test of `RULES`: another PBI as `type [id] title`, a document as a link whose text names the topic, never a coined abbreviation, a section number without its title, a bare URL or a file the reader cannot open.
+   - Every reference in the text you wrote passes the self-check of the "Readable references" section of `RULES`: another PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a document or a section as a link whose text names the topic, never the `§` notation, a bare id, a coined abbreviation, a section number without its title, a bare URL or path, or a file the reader cannot open.
    - `VALIDATOR check FEATURE_DIR` passes (fix and re-run on errors).
 
 8. Write the updated spec back to `FEATURE_SPEC` (and the touched PBI files and `PRODUCT`). If the Spec Context status was `Draft` and no Open Questions remain, set it to `Clarified`.

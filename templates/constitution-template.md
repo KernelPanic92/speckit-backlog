@@ -9,24 +9,24 @@
 <!-- One-sentence mission statement -->
 
 **Primary Users**: [PRIMARY_USERS]
-<!-- Short reference only: the full Personas live in product.md -->
+<!-- Short reference only: the full Personas live in [the product's Personas](product.md#personas) -->
 
 **Domain**: [BUSINESS_DOMAIN]
 
 ## Core Principles
 
 ### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
+<!-- Example: Library-First. Principles are named, not numbered: plans and analyses cite them by name -->
 [PRINCIPLE_1_DESCRIPTION]
 <!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
 ### [PRINCIPLE_2_NAME]
-<!-- Example: II. Test-First (NON-NEGOTIABLE) -->
+<!-- Example: Test-First (NON-NEGOTIABLE) -->
 [PRINCIPLE_2_DESCRIPTION]
 <!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
 ### [PRINCIPLE_3_NAME]
-<!-- Example: III. Simplicity -->
+<!-- Example: Simplicity -->
 [PRINCIPLE_3_DESCRIPTION]
 <!-- Example: Start simple, YAGNI; every added abstraction must be justified in the plan's Complexity Tracking -->
 
@@ -38,7 +38,7 @@
 - Framework: [FRONTEND_FRAMEWORK]
 - Language: [FRONTEND_LANGUAGE]
 - Styling: [FRONTEND_STYLING]
-- Design system: `.specify/memory/design.md` (DESIGN.md format) — remove this line for products without UI
+- Design system: [the design system](design.md) (DESIGN.md format) — remove this line for products without UI
 - State: [FRONTEND_STATE]
 
 ### Backend
@@ -134,6 +134,7 @@ Style guidelines that can be adapted to the context.
   <!-- "ask" (default) | "map" | "epic" | "story". With "ask", /speckit.specify always asks and recommends a mode. -->
 - **Task manager**: [TASK_MANAGER]
   <!-- "none" (default) | "clickup" | "multica": the tool /speckit.sync publishes the backlog to (its mapping lives in .specify/sync/<tool>.md). PBI ids stay local (US-001…); the tool's ids are stored in each PBI's `external` block. -->
+- **Readable references**: specs and documents are written for the people who steer the work. Every reference a person reads says what it is about before it is opened and leads to the right spot: a PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a section of another document as a relative link whose text names the topic and whose address ends with the heading anchor, a principle or rule of this constitution by its name. Never the `§` notation, section numbers, coined abbreviations, bare ids, bare URLs or bare paths. The commands of the "backlog" preset apply the full rule (its "Readable references" section).
 
 ## Exceptions Process
 

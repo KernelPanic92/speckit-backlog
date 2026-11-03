@@ -32,7 +32,7 @@ Ids are project-wide unique, so files move without renaming and relations keep r
 
 Paths used by this command (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the hierarchy (MAP → EPIC → US → TASK/SPIKE), the map rules (Backbone, Walking Skeleton, Release Lanes, gravity) and how to write a new EPIC or MAP.
+- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the hierarchy (MAP → EPIC → US → TASK/SPIKE), the map rules (Backbone, Walking Skeleton, Release Lanes, gravity) and how to write a new EPIC or MAP. Its "Readable references" section applies to every marker, note and link this command writes, and to the plan and the report it prints.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — `locate <ID> --descendants`, `next-id <TYPE>`, `check <feature-dir>`. If `uv` is not available, find the files with a text search for `id: <ID>` under `specs/` and check them by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 
 ## Allowed combinations
@@ -71,15 +71,15 @@ Paths used by this command (preset `backlog`):
    - Backlog Index: add the moved PBIs in the order the rules require.
    - Success Criteria: append the source criteria, renumbered after the target's last `SC-###`, dropping exact duplicates.
    - Key Entities, Non-Functional Requirements, External Dependencies, Security & Compliance Checklist: merge, keeping one entry per concept (Ubiquitous Language terms).
-   - Open Questions: move them. Clarifications: copy them under `### Carried over from <source dir>`.
+   - Open Questions: move them, fixing their PBI links. Clarifications: copy them under `### Carried over from <source root title>` (the source directory is removed, so name the spec by its root's title, not by its path).
    - Map targets: update the Backbone (new column at the agreed position, referencing the Epic as `EPIC [id] title`), add a Walking Skeleton item for a new Macro-Activity (a TASK or SPIKE with the Epic as PARENT, from `pbi-task-template` / `pbi-spike-template`), place every moved story in its agreed Release Lane respecting BLOCKED_BY, and re-run the map's DoR Check.
-   - Remove any ` → specs/…` extraction markers that pointed to the source spec.
+   - Remove any ` → [moved to …](…)` extraction markers that pointed to the source spec, and fix every relative link that pointed into it.
 
 6. **Retire the source spec directory**: if it contains research.md, copy its Decisions that still apply into the target's research.md (or note in the Completion Report that the target needs `__SPECKIT_COMMAND_PLAN__`). Then remove the source directory (`git rm -r` in a git repository). If `.specify/feature.json` pointed to it, point it to the target.
 
-7. **Stale artifacts**: if the target has plan.md or tasks.md, add a note at the top (`> Merged TYPE [ID] Title from <source dir> by __SPECKIT_COMMAND_MERGE__ — regenerate with __SPECKIT_COMMAND_PLAN__ / __SPECKIT_COMMAND_TASKS__.`). Moved TASK PBIs keep their files; their lines are added to tasks.md only when tasks are regenerated.
+7. **Stale artifacts**: if the target has plan.md or tasks.md, add a note at the top (`> Merged TYPE [ID] Title, formerly a spec of its own, by __SPECKIT_COMMAND_MERGE__ — regenerate with __SPECKIT_COMMAND_PLAN__ / __SPECKIT_COMMAND_TASKS__.`). Moved TASK PBIs keep their files; their lines are added to tasks.md only when tasks are regenerated.
 
-8. **Validate**: run `VALIDATOR check` on the target directory (and on any other spec whose PBIs reference the moved ones). Fix structural errors caused by the move and re-run.
+8. **Validate**: run `VALIDATOR check` on the target directory (and on any other spec whose PBIs reference the moved ones). Fix structural errors caused by the move and re-run. Then run the self-check of the "Readable references" section of `RULES` on what you wrote, including the relative links of the moved files, which may now point to the wrong place.
 
 ## Completion Report
 

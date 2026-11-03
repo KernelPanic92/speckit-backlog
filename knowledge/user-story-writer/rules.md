@@ -1,6 +1,6 @@
 # User Story Writer — Rules
 
-This file is the English port of the user-story-writer skill, adapted for spec-kit. It is read by the speckit.specify, speckit.clarify, speckit.split and speckit.merge commands of the `backlog` preset. The commands own the workflow (mode selection, file paths, validation); this file owns the rules for writing PBIs.
+This file is the English port of the user-story-writer skill, adapted for spec-kit. It is read by the speckit.specify, speckit.clarify, speckit.split and speckit.merge commands of the `backlog` preset. The commands own the workflow (mode selection, file paths, validation); this file owns the rules for writing PBIs. Its "Readable references" section is read by every command of the preset, because it applies to every document the preset produces, not only to PBIs.
 
 ## Role
 
@@ -66,9 +66,9 @@ Use EXACTLY this layout. Do not deviate. There are three phases; the third is ma
 
 WARNING: run the following cyclic block for EVERY User Story. The first time, start from the one(s) entered by the user. NEVER write two User Stories in a row without first printing the "Micro-Scope Reasoning" block in the conversation. If you did Phase 3a, the User Tasks of the Backbone are the candidates to start from, every story has its Epic as `PARENT`, and the order is by lane and then from left to right along the Backbone: never all the stories of one Epic in a row.
 
-**[START USER STORY ITERATION {{Number}}]** *(`{{Number}}` is the iteration count; `{{id}}` below is the story's allocated id, e.g. `US-007`)*
+**[START USER STORY ITERATION {{Number}}]** *(`{{Number}}` is the iteration count; `{{id}}` and `{{title}}` below are the story's allocated id and its title, e.g. `US [US-007] Card payment`)*
 
-#### Micro-Scope Reasoning for {{id}}
+#### Micro-Scope Reasoning for US [{{id}}] {{title}}
 
 - **Value Focus:** [What is the single business outcome of this specific slice?]
 - **Technical Boundaries:** [What is strictly IN scope and what is OUT of scope? E.g.: "UI only, no mutation", "Query only, no complex UI", "The list only: opening the detail is in the detail story"] The OUT items that a reader could reasonably assume are included become the story's `## Out of Scope` section: each one with where it goes (`US [US-004] Title`) or "not planned".
@@ -82,8 +82,8 @@ WARNING: run the following cyclic block for EVERY User Story. The first time, st
 
 After completing all the stories:
 
-- **[FINAL CHECK]** Reread the USs you wrote and check that they are correct. If there are stories that do not meet INVEST or the constraints, repeat the iterative drafting for those stories, splitting them further where necessary. Then reread every reference you wrote (PBI bodies, `reason` of the relations, Micro-Scope blocks, this check and the summary) with the test of "NO mental mapping" in the Anti-patterns: rewrite every coined abbreviation, section number without its title, bare URL or file the reader cannot open before delivering.
-- **[SUMMARY]** Report the final PBIs in release order: by lane and, within the lane, from left to right along the Backbone; without a map, in the order suggested by the `BLOCKED_BY` relations. Never Epic by Epic. If you did not do the map and there are more than 5 stories, propose it in one line.
+- **[FINAL CHECK]** Reread the USs you wrote and check that they are correct. If there are stories that do not meet INVEST or the constraints, repeat the iterative drafting for those stories, splitting them further where necessary. Then reread every reference you wrote (PBI bodies, `reason` of the relations, Micro-Scope blocks, this check and the summary) with the self-check of "Readable references": rewrite every bare id, coined abbreviation, section number without its title, bare URL or file the reader cannot open before delivering. In this check and in the summary, a story is `US [id] title` or, after its first mention, its title or a functional reference, never the bare id.
+- **[SUMMARY]** Report the final PBIs, each as `type [id] title`, in release order: by lane and, within the lane, from left to right along the Backbone; without a map, in the order suggested by the `BLOCKED_BY` relations. Never Epic by Epic. If you did not do the map and there are more than 5 stories, propose it in one line.
 
 ### Phase 3: MAPPING
 
@@ -178,7 +178,7 @@ FIRST look for the user personas, the business context and the domain terms in `
 ### 3. BDD ACCEPTANCE CRITERIA
 
 - **Strict format:** Gherkin syntax — `Given [context], When [action], Then [observable result]`. *Choice of these rules:* we ALWAYS use the Gherkin format for the Acceptance Criteria, even where the literature (e.g. Scrum Alliance) would allow bullet-point checklists for simple and linear requirements.
-- **Stable scenario ids:** in the template's `## Acceptance Criteria` section every scenario has the heading `### AC-1: <title>`, numbered per PBI starting at 1; when tracing, cite a scenario as `US-001/AC-1`.
+- **Stable scenario ids:** in the template's `## Acceptance Criteria` section every scenario has the heading `### AC-1: <title>`, numbered per PBI starting at 1; when tracing, cite a scenario as `US-001/AC-1` followed by its title, `US-001/AC-1 "Card declined"` (see "Readable references").
 - **One behaviour per scenario (a single `When`):** each scenario illustrates a single rule/behaviour, ideally with a single `When` (the action under test). Use `And`/`But` to chain contexts (`Given`) or outcomes (`Then`), NEVER to append a second action. If you end up with two `When`s, you are mixing two behaviours → split them into two distinct scenarios.
 - **Behaviour, not mechanics:** describe the external behaviour based on the user's intent. Do not mix business rules, prescriptive UI details and backend logic (no "When they click the red button, Then it runs `SELECT * FROM users` which returns 401").
 - **Occam's razor:** do not add useless specificity or information. Do not specify the error code, or *which* layer fails, when it adds no information (no "the server returns 404"; yes "the order creation fails").
@@ -215,19 +215,39 @@ FIRST look for the user personas, the business context and the domain terms in `
 - **NO prescriptive UI:** language based on intent ("when the user confirms the submission"), not on the click ("clicks the green button with the paper plane").
 - **NO "Phantom UI" (dead elements):** never introduce UI elements whose logic is postponed to a future story. Today's interface reflects exactly today's functionality and is deployable (a button that shows "Coming soon" is not deployable). A phantom is a **visible command without its logic**: a button, an icon, a menu item, a link that does nothing when clicked or leads to a page that does not exist. An element that is **simply non-interactive is not a phantom**: a list row that does not open yet is a list row, not a dead element, and the list is legitimate and releasable. It becomes a phantom only if it promises an interaction that is not there: a row that on click leads to a non-existent page. The remedy is not to add the opening to the list story, but to leave it to the detail story.
 - **NO references to application layers:** the user story must be understandable by a non-technical person. Refer to the domain in simple terms ("the system processes the order", "the order creation fails"), not to the architecture ("the server processes the order", "it fails because of a network error").
-- **NO mental mapping (Clean Code, Robert C. Martin):** every reference in a text read by a person must be understandable without the context in which it was written: PBI body, Micro-Scope, INVEST check, final check, summary, DoR Check of the map, `reason` of the relations. The PBI is read by someone who never saw the sources, often months later, when the conversation is closed and the files on the generator's machine are gone: making them keep a correspondence table in mind is exactly the mental mapping that Martin forbids for variable names. A reference is one of three things and nothing else:
-  1. **Another PBI:** `type [id] title` at its first occurrence in the block; in the following ones the title is enough, or a functional reference that the reader recognizes from the context: after "US [US-003] Deleting the product from the list", "the product deletion", "the deletion story" or "the deletion" are fine. If the PBI already exists in a task manager, `[id]` is its link. "US-003 and US-004 follow US-001 and US-002" is a mental map. The `id` serves the machine, the title and the functional meaning serve the reader.
-  2. **A document:** a Markdown link whose text is the topic in words a person understands and whose address gets as close as possible to the right spot: the heading anchor of a Markdown file, the specific wiki or document page, the Figma frame, the attachment itself when the user supplied it. `[SCORM export rules for materials](https://…/spec.md#export-scorm)` is right. `see https://…/spec.md#export-scorm` is not: the reader must open the link to learn what it is about, so it is still a mental map. `SPEC §6.6` cannot even be opened. If the address cannot reach the spot, say it in the text of the link: `[spec v2, section 6.6 "SCORM and materials export"](https://…)`.
-  3. **A topic without a link:** plain words, when the source has no address the reader can reach ("as decided in the October 29 meeting", "in the mockup, the export screen").
+- **NO mental mapping (Clean Code, Robert C. Martin):** every reference in a text read by a person (PBI body, Micro-Scope, INVEST check, final check, summary, DoR Check of the map, `reason` of the relations) follows the "Readable references" section below: another PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a document as a link whose text names the topic; never a bare id, a coined abbreviation, a section number without its title, a bare URL or a file the reader cannot open.
 
-  Never write:
-  - abbreviations coined while working (`SPEC`, `INV`, `R14/10`);
-  - a section number without its title (`§6.1`, `sec. 9`);
-  - a bare URL;
-  - a path or a file the reader cannot open: a file on the generator's machine, an inventory or a digest you produced for yourself (cite the original source instead). The feature's `spec.md`, `plan.md` and `research.md` are local working files: a PBI meant for a task manager must not rely on them as its only reference;
-  - an internal identifier without saying what it is (`screen: 'publish'` → "the export screen of the mockup").
+## Readable references
 
-  **Test:** can a reader with only a browser and access to the workspace tell what the reference is about before opening it, and find the intended spot when they open it? If either answer is no, rewrite the reference.
+Specs and documentation exist so that a person can read them and steer the work: they are natural language written for a human reader, not a notation that only their author, or an AI, can decode. This section applies to **every document the `backlog` preset writes and every report its commands print**: the PBIs and `spec.md` with its envelope, `plan.md`, `research.md`, `tasks.md`, the checklists, `.specify/memory/constitution.md`, `product.md` and `design.md`, the mapping documents in `.specify/sync/`, and the blocks printed in the conversation (Micro-Scope, final checks, summaries, analysis and completion reports). Every command of the preset applies it, not only the ones that write PBIs.
+
+The reader is someone who never saw the sources or the conversation, often months later, when the files on the generator's machine are gone. Making them keep a correspondence table in mind is exactly the mental mapping that Clean Code (Robert C. Martin) forbids for variable names. Two questions decide whether a reference is acceptable:
+
+1. Can the reader tell what it is about **before opening it**?
+2. When they open it, do they **land on the right spot**?
+
+### The forms of a reference
+
+A reference is one of these and nothing else:
+
+1. **A PBI:** `type [id] title` at its first occurrence in a block (`US [US-007] Card payment`); in the following ones the title is enough, or a functional reference that the reader recognizes from the context: after "US [US-003] Deleting the product from the list", "the product deletion", "the deletion story" or "the deletion" are fine. In a document of the feature, the `[id]` can be a relative link to the PBI file: `US [US-007](backlog/stories/US-007-card-payment.md) Card payment`. If the PBI already exists in a task manager, a text read in that tool links the `[id]` to its item. "US-003 and US-004 follow US-001 and US-002" is a mental map. The `id` serves the machine, the title and the functional meaning serve the reader.
+2. **A traceability id:** the ids that the validator, the coverage tables and the acceptance tests rely on stay (`US-007/AC-2`, `TASK-014`, `SC-001`), but wherever a person reads them they carry their title: `US-007/AC-2 "Card declined"`, `TASK [TASK-014] Card payment acceptance tests`, `SC-001 "First purchase in under 3 minutes"`; or a Markdown link whose text includes the title: `[US-007/AC-2 "Card declined"](backlog/stories/US-007-card-payment.md#ac-2-card-declined)`. In a table, add a column with the title instead of leaving the ids alone. An id stands alone only where it labels the item it identifies and its title is right next to it: the scenario heading `### AC-2: Card declined`, the task line `- [ ] TASK-014 … Title → link`, a frontmatter key.
+3. **A section of a local document** (`spec.md`, `plan.md`, `research.md`, `tasks.md`, a PBI file, the constitution, `product.md`, `design.md`): a relative Markdown link, computed from the file being written, whose text names the topic and whose address ends with the anchor of the heading: `[the card payment contract](plan.md#api-design--contracts)`, `[the Ubiquitous Language of the product](../../.specify/memory/product.md#ubiquitous-language)`. The constitution and the product are cited by the name of the principle, rule or section, never by its number: `[the "Test-First" principle of the constitution](../../.specify/memory/constitution.md#test-first)`, not "principle II". The anchor is the heading in GitHub style: lowercase, punctuation removed, each space turned into `-` (`### AC-2: Card declined` → `#ac-2-card-declined`, `## API Design / Contracts` → `#api-design--contracts`): check it against the real heading. In a report printed in the conversation, where a link may not open, name the document and the section in words: "the Data Model of plan.md", "the Personas of product.md", "the Out of Scope of US [US-001] Catalog list".
+4. **An external document:** a Markdown link whose text is the topic in words a person understands and whose address gets as close as possible to the right spot: the heading anchor of a Markdown file, the specific wiki or document page, the Figma frame, the attachment itself when the user supplied it. `[SCORM export rules for materials](https://…/spec.md#export-scorm)` is right. `see https://…/spec.md#export-scorm` is not: the reader must open the link to learn what it is about, so it is still a mental map. `SPEC §6.6` cannot even be opened. If the address cannot reach the spot, say it in the text of the link: `[spec v2, section 6.6 "SCORM and materials export"](https://…)`.
+5. **A topic without a link:** plain words, when the source has no address the reader can reach ("as decided in the October 29 meeting", "in the mockup, the export screen").
+
+### Never write
+
+- the `§` notation or a section number without its title (`§6.1`, `sec. 9`, `[Spec §FR-001]`, `US-001 §Out of Scope`): name the section, with a link when it lives in a file (`[the Out of Scope of US-001 "Catalog list"](backlog/stories/US-001-catalog-list.md#out-of-scope)`);
+- an id without its title (`US-007`, `TASK-014`, `AC-2`, `SC-001`), outside the labels listed in form 2;
+- abbreviations or numbering coined while working (`SPEC`, `INV`, `R14/10`, "question Q3", "decision R2"): name the thing;
+- a bare URL or a bare path (`plan.md`, "see research.md"): a link whose text names the topic;
+- a path or a file the reader cannot open: a file on the generator's machine, an inventory or a digest you produced for yourself (cite the original source instead). The feature's `spec.md`, `plan.md` and `research.md` are local working files: a PBI meant for a task manager must not rely on them as its only reference;
+- an internal identifier without saying what it is (`screen: 'publish'` → "the export screen of the mockup").
+
+### Self-check
+
+Before delivering a document or a report, reread every reference you wrote with the two questions above and rewrite every one that fails either of them. Every command of the preset that has a final check or a validation step runs this self-check on what it wrote or printed.
 
 ## Examples and references: when to read what
 

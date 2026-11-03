@@ -60,7 +60,7 @@ Future tracking of user behaviour on courses or lessons must be preserved
 
 **[START USER STORY ITERATION 1]**
 
-#### Micro-Scope Reasoning for US-001
+#### Micro-Scope Reasoning for US [US-001] Course Archiving (Move to Trash)
 
 * **Value Focus:** Allow archiving (soft delete) of `Course`s from the operational flows without immediate data loss.
 * **Technical Boundaries:** Scope limited to the delete action from the existing lists/forms. **OUT:** The Trash page, restore and permanent deletion.
@@ -141,11 +141,11 @@ Implementation of the "Soft Delete" logic on Courses. The action changes the ent
 
 **[START USER STORY ITERATION 2]**
 
-#### Micro-Scope Reasoning for US-002
+#### Micro-Scope Reasoning for US [US-002] Lesson Archiving (Move to Trash)
 
 * **Value Focus:** Allow archiving (soft delete) of `Lesson`s from the operational flows without immediate data loss.
 * **Technical Boundaries:** Scope limited to the delete action from the existing lists/forms. **OUT:** The Trash page, restore and permanent deletion.
-* **Split pattern:** Operations combined with Variations in Data, the same logic as US-001 applied to the Lesson entity, which has a wider set of roles (Editors too).
+* **Split pattern:** Operations combined with Variations in Data, the same logic as the Course archiving applied to the Lesson entity, which has a wider set of roles (Editors too).
 * **INVEST Criteria Check:**
   * **Independent:** Yes, the soft delete is functional even without the trash UI (the data disappears from the main view).
   * **Negotiable:** Yes.
@@ -215,13 +215,13 @@ Implementation of the "Soft Delete" logic on Lessons. The action changes the ent
 
 **[START USER STORY ITERATION 3]**
 
-#### Micro-Scope Reasoning for US-003
+#### Micro-Scope Reasoning for US [US-003] Deletion Confirmation for a Course in Use
 
 * **Value Focus:** Prevents the accidental removal of a Course with active enrollments.
 * **Technical Boundaries:** Scope limited to the delete action from the existing lists/forms. **OUT:** The Trash page, restore and permanent deletion.
-* **Split pattern:** Business Rule Variations. The "active enrollments" rule is a variant of the base archiving flow (US-001): it adds a condition and a warning without changing the operation. Extracted because US-001 remains releasable without it and because the rule has its own test (enrolling a user in a Course).
+* **Split pattern:** Business Rule Variations. The "active enrollments" rule is a variant of the base archiving flow, US [US-001] Course Archiving (Move to Trash): it adds a condition and a warning without changing the operation. Extracted because the Course archiving remains releasable without it and because the rule has its own test (enrolling a user in a Course).
 * **INVEST Criteria Check:**
-  * **Independent:** Yes, once US-001 has been iterated, the check can be implemented without depending on further concepts.
+  * **Independent:** Yes, once the Course archiving has been iterated, the check can be implemented without depending on further concepts.
   * **Valuable:** Immediate (it avoids inadvertently deleting Courses that are bringing value).
   * **Estimable:** Yes.
   * **Small:** Focused on a single action.
@@ -238,7 +238,7 @@ relations:
         title: "Course Archiving (Move to Trash)"
         type: US
         relationType: BLOCKED_BY
-        reason: "the confirmation plugs into the Course deletion flow introduced by US-001"
+        reason: "the confirmation plugs into the Course deletion flow introduced by the Course archiving story"
 ---
 
 As an **advanced content manager (Manager, Admin)**, I want **to receive a confirmation request when I delete a Course with active enrollments**, so that I can remove it with full awareness.
@@ -286,13 +286,13 @@ Implementation of the check logic for Courses currently in use. The action preve
 
 **[START USER STORY ITERATION 4]**
 
-#### Micro-Scope Reasoning for US-004
+#### Micro-Scope Reasoning for US [US-004] Deletion Confirmation for a Lesson in Use
 
 * **Value Focus:** Prevents the accidental removal of a Lesson with active enrollments.
 * **Technical Boundaries:** Scope limited to the delete action from the existing lists/forms. **OUT:** The Trash page, restore and permanent deletion.
-* **Split pattern:** Business Rule Variations, like US-003, applied to the Lesson entity. Here the rule has one extra variant: the Editor can archive (US-002) but cannot proceed if there are active enrollments.
+* **Split pattern:** Business Rule Variations, like US [US-003] Deletion Confirmation for a Course in Use, applied to the Lesson entity. Here the rule has one extra variant: the Editor can archive the Lesson (US [US-002] Lesson Archiving (Move to Trash)) but cannot proceed if there are active enrollments.
 * **INVEST Criteria Check:**
-  * **Independent:** Yes, once US-002 has been iterated, the check can be implemented without depending on further concepts.
+  * **Independent:** Yes, once the Lesson archiving has been iterated, the check can be implemented without depending on further concepts.
   * **Valuable:** Immediate (it avoids inadvertently deleting Lessons that are bringing value).
   * **Estimable:** Yes.
   * **Small:** Focused on a single action.
@@ -309,7 +309,7 @@ relations:
         title: "Lesson Archiving (Move to Trash)"
         type: US
         relationType: BLOCKED_BY
-        reason: "the confirmation plugs into the Lesson deletion flow introduced by US-002"
+        reason: "the confirmation plugs into the Lesson deletion flow introduced by the Lesson archiving story"
 ---
 
 As an **advanced content manager (Manager, Admin)**, I want **to receive a confirmation request when I delete a Lesson with active enrollments**, so that I can remove it with full awareness.
@@ -363,11 +363,11 @@ Implementation of the check logic for Lessons currently in use. The action preve
 
 **[START USER STORY ITERATION 5]**
 
-#### Micro-Scope Reasoning for US-005
+#### Micro-Scope Reasoning for US [US-005] Trash View (Browsing Interface)
 
 * **Value Focus:** Provide visibility on the deleted items for audit or possible recovery.
 * **Technical Boundaries:** **Read** only (Read-Only). Creation of the Trash page and of the list. **OUT:** The restore or hard delete actions.
-* **Split pattern:** Operations (Read). Browsing the Trash is isolated from the restore (US-006) and permanent deletion (US-007) actions, following the Read vs Write rule. It won over a "complete Trash page" split because that would have exceeded 5 scenarios and mixed three operations.
+* **Split pattern:** Operations (Read). Browsing the Trash is isolated from the restore (US [US-006] Entity and Relation Restore (Un-delete)) and permanent deletion (US [US-007] Permanent Deletion (Hard Delete)) actions, following the Read vs Write rule. It won over a "complete Trash page" split because that would have exceeded 5 scenarios and mixed three operations.
 * **INVEST Criteria Check:**
   * **Independent:** Yes.
   * **Valuable:** Visibility and control.
@@ -385,12 +385,12 @@ relations:
         title: "Course Archiving (Move to Trash)"
         type: US
         relationType: BLOCKED_BY
-        reason: "the Trash lists the Courses archived by US-001"
+        reason: "the Trash lists the Courses archived by the Course archiving story"
     "US-002":
         title: "Lesson Archiving (Move to Trash)"
         type: US
         relationType: BLOCKED_BY
-        reason: "the Trash lists the Lessons archived by US-002"
+        reason: "the Trash lists the Lessons archived by the Lesson archiving story"
 ---
 
 As a **content manager (Editor, Manager, Admin)**, I want **to access a "Trash" section**, so that I can view the list of deleted content and check what can be recovered or permanently removed.
@@ -456,13 +456,13 @@ Creation of the "Trash" page, containing a list filtered according to the permis
 
 **[START USER STORY ITERATION 6]**
 
-#### Micro-Scope Reasoning for US-006
+#### Micro-Scope Reasoning for US [US-006] Entity and Relation Restore (Un-delete)
 
 * **Value Focus:** Restore.
 * **Technical Boundaries:** Only the **Restore** action (Un-delete). Includes the complex re-association logic.
-* **Split pattern:** Operations (Restore). A write action separated from the list (US-005) and from permanent deletion (US-007): each one has its own asynchronous states and its own role rules.
+* **Split pattern:** Operations (Restore). A write action separated from the list (US [US-005] Trash View (Browsing Interface)) and from permanent deletion (US [US-007] Permanent Deletion (Hard Delete)): each one has its own asynchronous states and its own role rules.
 * **INVEST Criteria Check:**
-  * **Independent:** Depends on the list (US-005) for the UI interaction.
+  * **Independent:** Depends on the Trash list for the UI interaction.
   * **Valuable:** High (recovery from mistakes).
   * **Small:** Specific restore logic.
   * **Testable:** Yes.
@@ -524,7 +524,7 @@ Implementation of the "Restore" action in the Trash list. Handles the inverse st
 
 **[START USER STORY ITERATION 7]**
 
-#### Micro-Scope Reasoning for US-007
+#### Micro-Scope Reasoning for US [US-007] Permanent Deletion (Hard Delete)
 
 * **Value Focus:** Cleanup and GDPR compliance (Right to be forgotten).
 * **Technical Boundaries:** **Hard Delete**. Destruction of the data.
@@ -599,33 +599,33 @@ Implementation of the final destructive action. The removed data will no longer 
 
 I split the draft into 7 INVEST User Stories.
 
-1. US-001 Course Archiving
-2. US-002 Lesson Archiving
-3. US-003 Deletion Confirmation for a Course in Use
-4. US-004 Deletion Confirmation for a Lesson in Use
-5. US-005 Trash View (Browsing Interface)
-6. US-006 Entity and Relation Restore (Un-delete)
-7. US-007 Permanent Deletion (Hard Delete)
+1. US [US-001] Course Archiving (Move to Trash)
+2. US [US-002] Lesson Archiving (Move to Trash)
+3. US [US-003] Deletion Confirmation for a Course in Use
+4. US [US-004] Deletion Confirmation for a Lesson in Use
+5. US [US-005] Trash View (Browsing Interface)
+6. US [US-006] Entity and Relation Restore (Un-delete)
+7. US [US-007] Permanent Deletion (Hard Delete)
 
 All the requirements of the draft (Buttons, Menu, List fields, Role assumptions, Integrity risks) have been mapped to specific Acceptance Criteria.
 
 **Improvements:**
 
-- US-005, US-006 and US-007 handle Courses and Lessons together because the user asked to manage them under a single "trash" page, but better US (smaller and better detailed) would be obtained by splitting the trash page into multiple tabs per entity or multiple sub-navigations for the entities (Variations in Data pattern, as for US-001/US-002); this way you would get:
+- The Trash view, the restore and the permanent deletion handle Courses and Lessons together because the user asked to manage them under a single "trash" page, but better US (smaller and better detailed) would be obtained by splitting the trash page into multiple tabs per entity or multiple sub-navigations for the entities (Variations in Data pattern, as for the Course and Lesson archiving); this way you would get:
   - course trash view
   - lesson trash view
   - course restore
   - lesson restore
   - course deletion
   - lesson deletion
-- For US-006 the assumption was made that it is possible to trace back to the initial state. If that were not the case, US-006 could be split with these criteria:
+- For the restore the assumption was made that it is possible to trace back to the initial state. If that were not the case, the restore could be split with these criteria:
   - option 1: restore with a choice of state (draft or published)
   - option 2: restore always in draft state
   - option 3: two US for restoring into the specific state
 
 ### [SUMMARY]
 
-The following 7 User Stories are ready for the backlog and can be developed in parallel or sequentially in the same sprint, respecting the declared `BLOCKED_BY` relations. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
+The 7 User Stories listed in the final check, in that order, are ready for the backlog and can be developed in parallel or sequentially in the same sprint, respecting the declared `BLOCKED_BY` relations: first the Course and Lesson archiving, then the two deletion confirmations, then the Trash view, the restore and the permanent deletion. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
 ````
 
 ---
@@ -653,11 +653,11 @@ as an area manager user, I want to be able to change the assignments of the stor
 
 **[START USER STORY ITERATION 1]**
 
-#### Micro-Scope Reasoning for US-001
+#### Micro-Scope Reasoning for US [US-001] Store-Rep Assignments View
 
 * **Value Focus:** Allow the Area Manager to consult the current distribution of Stores across Reps in order to make strategic reassignment decisions.
 * **Technical Boundaries:** Exclusively **Read** (Read-Only). Display of the list of active assignments. **OUT:** Any edit or deletion action.
-* **Split pattern:** Operations (Read), following the Read vs Write rule. Browsing the assignments is isolated from the reassignment action (US-002): it has its own asynchronous states (loading, empty, error) and can be released on its own as a territory analysis tool.
+* **Split pattern:** Operations (Read), following the Read vs Write rule. Browsing the assignments is isolated from the reassignment action (US [US-002] Store Reassignment with Effective Date (Area Manager)): it has its own asynchronous states (loading, empty, error) and can be released on its own as a territory analysis tool.
 * **INVEST Criteria Check:**
   * Is it independent? Yes.
   * Is it negotiable? Yes, it does not prescribe whether it is a table, a tree or a card view.
@@ -724,13 +724,13 @@ Creation of an interface that lists the active relations between the Reps manage
 
 **[START USER STORY ITERATION 2]**
 
-#### Micro-Scope Reasoning for US-002
+#### Micro-Scope Reasoning for US [US-002] Store Reassignment with Effective Date (Area Manager)
 
 * **Value Focus:** Allow the Area Manager to actually change the territories with forward-planning logic (Effective date).
 * **Technical Boundaries:** Only **Write/Action** and input validation. Handling of the asynchronous save state.
-* **Split pattern:** Operations (Update): the reassignment as a transactional action separate from reading (US-001). The effective date was not extracted with Business Rule Variations because it is a single rule, not a variant: without it the action makes no sense, so it lives in the scenarios of this story.
+* **Split pattern:** Operations (Update): the reassignment as a transactional action separate from reading (US [US-001] Store-Rep Assignments View). The effective date was not extracted with Business Rule Variations because it is a single rule, not a variant: without it the action makes no sense, so it lives in the scenarios of this story.
 * **INVEST Criteria Check:**
-  * Is it independent? It depends at UI level on US-001 for the trigger, but the business logic is isolated.
+  * Is it independent? It depends at UI level on the assignments view for the trigger, but the business logic is isolated.
   * Is it valuable? Extremely, it is the core business of the request.
   * Is it testable? Yes, the time limits can be simulated in the tests.
 * **Constraints check:** The BDD criteria explicitly map success, error and loading, as well as the temporal validation.
@@ -803,11 +803,11 @@ Implementation of the transactional logic that historically closes the previous 
 
 **[START USER STORY ITERATION 3]**
 
-#### Micro-Scope Reasoning for US-003
+#### Micro-Scope Reasoning for US [US-003] Visit History for Previously Assigned Stores (Rep)
 
 * **Value Focus:** Guarantee information continuity for the Rep (history).
 * **Technical Boundaries:** Only **Read** for the Rep, and only the history **list**: loading, search and filters. **OUT:** the detail of the single visit and opening it from the list, which are a functional capability of their own (the visit detail already exists and this request does not change it).
-* **Split pattern:** Business Rule Variations on the Rep side, combined with Operations (Read). The request describes two consequences for the Rep: what they can still see (this story) and what they can no longer do (US-004). Separated because they have an identical persona but opposite intent (continuity versus restriction) and independent tests. The scenarios stay on the "list" capability: no scenario about the visit detail.
+* **Split pattern:** Business Rule Variations on the Rep side, combined with Operations (Read). The request describes two consequences for the Rep: what they can still see (this story) and what they can no longer do (US [US-004] Block on New Visits to Reassigned Stores (Rep)). Separated because they have an identical persona but opposite intent (continuity versus restriction) and independent tests. The scenarios stay on the "list" capability: no scenario about the visit detail.
 * **INVEST Criteria Check:**
   * Is it independent? Yes, it evaluates visibility based on the consolidated data.
   * Is it testable? Yes, by logging in with a Rep account.
@@ -855,7 +855,7 @@ Adjustment of the Rep's visit filters and searches, ensuring that the history li
 
 **[START USER STORY ITERATION 4]**
 
-#### Micro-Scope Reasoning for US-004
+#### Micro-Scope Reasoning for US [US-004] Block on New Visits to Reassigned Stores (Rep)
 
 * **Value Focus:** Data integrity (data governance). Prevent unauthorized actions on other people's territories.
 * **Technical Boundaries:** **Action/Validation**. Change of the Store selection behaviour and validation of the visit date.
@@ -875,7 +875,7 @@ relations:
         title: "Store Reassignment with Effective Date (Area Manager)"
         type: US
         relationType: BLOCKED_BY
-        reason: "the block is based on the effective date of the reassignment introduced by US-002"
+        reason: "the block is based on the effective date of the reassignment introduced by the Store reassignment story"
 ---
 
 As a **Rep (Sales Representative)**, I want **to enter new visits only on the Stores currently assigned to me**, so that territorial and data integrity is guaranteed.
@@ -920,21 +920,21 @@ Restriction of the Store selection when creating a new visit based on the effect
 
 I broke down a dense, ambiguous requirement with temporal variables into 4 highly granular User Stories.
 
-* I separated the Area Manager's visual interface (US-001) from the complex reassignment action (US-002).
-* I isolated the Rep's experience, sharply dividing what they can *see* (US-003, browsing the history list) from what they *can no longer do* (US-004, blocking rules). The history story stays on the "list" capability: no scenario opens the visit detail, which is a functional capability of its own.
+* I separated the Area Manager's visual interface (US [US-001] Store-Rep Assignments View) from the complex reassignment action (US [US-002] Store Reassignment with Effective Date (Area Manager)).
+* I isolated the Rep's experience, sharply dividing what they can *see* (US [US-003] Visit History for Previously Assigned Stores (Rep), browsing the history list) from what they *can no longer do* (US [US-004] Block on New Visits to Reassigned Stores (Rep), blocking rules). The history story stays on the "list" capability: no scenario opens the visit detail, which is a functional capability of its own.
 * The use of the effective date ("New visibility start date") has been mapped explicitly in the Acceptance Criteria through Gherkin, handling the cases where the date is past, today or future.
-* There is no "phantom UI": in US-004 the Store simply does not appear among the selectable ones, avoiding fake disabled controls or unclear behaviours.
+* There is no "phantom UI": in the block on new visits the Store simply does not appear among the selectable ones, avoiding fake disabled controls or unclear behaviours.
 
 ### [SUMMARY]
 
 The following 4 User Stories are ready for technical refinement and insertion into the backlog. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
 
-1. **US-001**: Store-Rep Assignments View (Area Manager)
-2. **US-002**: Store Reassignment with Effective Date (Area Manager)
-3. **US-003**: Visit History for Previously Assigned Stores (Rep)
-4. **US-004**: Block on New Visits to Reassigned Stores (Rep)
+1. US [US-001] Store-Rep Assignments View
+2. US [US-002] Store Reassignment with Effective Date (Area Manager)
+3. US [US-003] Visit History for Previously Assigned Stores (Rep)
+4. US [US-004] Block on New Visits to Reassigned Stores (Rep)
 
-Do you agree with the temporal handling (edge case) described in US-004, where the future assignment lets the current Rep keep working until the day of the actual change? Do you need to extract further notification logic (e.g. sending a notification to the Rep when a store is reassigned)?
+Do you agree with the temporal handling (edge case) described in the block on new visits, where the future assignment lets the current Rep keep working until the day of the actual change? Do you need to extract further notification logic (e.g. sending a notification to the Rep when a store is reassigned)?
 ````
 
 ---
@@ -962,11 +962,11 @@ as a salesperson, I must be able to start the synchronization of the application
 
 **[START USER STORY ITERATION 1]**
 
-#### Micro-Scope Reasoning for US-001
+#### Micro-Scope Reasoning for US [US-001] Manual Offline Data Synchronization
 
 * **Value Focus:** Allow the salesperson to actively update their local database in order to work with reliable information.
 * **Technical Boundaries:** Only the manual trigger of the synchronization, the handling of the loading (asynchronous) states and the success/error notification.
-* **Split pattern:** Workflow Steps. The voluntary synchronization action is the core step of the flow and is releasable and useful on its own; the coercive rule on stale data is a subsequent step (US-002) that presupposes it. It won over "a single story" because that would have mixed two opposite intents and exceeded 5 scenarios.
+* **Split pattern:** Workflow Steps. The voluntary synchronization action is the core step of the flow and is releasable and useful on its own; the coercive rule on stale data is a subsequent step (US [US-002] Operations Block for Stale Data (Over 3 Days)) that presupposes it. It won over "a single story" because that would have mixed two opposite intents and exceeded 5 scenarios.
 * **INVEST Criteria Check:** Fully respects the criteria; it is a standalone feature, estimable and objectively verifiable by simulating the connection conditions.
 * **Constraints check:** Compliant. Separates the update action from the blocking rules (which will go in the next US).
 
@@ -1028,7 +1028,7 @@ Implementation of the feature for manually starting the update of the local data
 
 **[START USER STORY ITERATION 2]**
 
-#### Micro-Scope Reasoning for US-002
+#### Micro-Scope Reasoning for US [US-002] Operations Block for Stale Data (Over 3 Days)
 
 * **Value Focus:** Guarantee data governance and prevent commercial errors caused by the use of stale data (e.g. old prices, stock levels that are not real).
 * **Technical Boundaries:** Only the check of the date of the last synchronization and the consequent blocking/unblocking of the operational UI.
@@ -1046,7 +1046,7 @@ relations:
         title: "Manual Offline Data Synchronization"
         type: US
         relationType: BLOCKED_BY
-        reason: "unblocking requires the manual synchronization introduced by US-001"
+        reason: "unblocking requires the manual synchronization introduced by the synchronization story"
 ---
 
 As a **Sales Manager (or Compliance System)**, I want **to prevent the Salesperson from operating in the app if the local data is older than 3 days**, so that no contracts or orders are concluded on the basis of price lists, master data or availability that are no longer valid.
@@ -1093,8 +1093,8 @@ Implementation of a check, when the app is opened or resumed, that verifies the 
 
 I broke down the requirement into 2 distinct User Stories:
 
-1. **US-001**: Focuses on the user's voluntary action of downloading the data, handling the feedback infrastructure (loading, success, error, offline).
-2. **US-002**: Isolates the restrictive business rule. Had we merged everything, the story would have become too big, mixing the salesperson's proactive intent with the system's coercive intent.
+1. US [US-001] Manual Offline Data Synchronization focuses on the user's voluntary action of downloading the data, handling the feedback infrastructure (loading, success, error, offline).
+2. US [US-002] Operations Block for Stale Data (Over 3 Days) isolates the restrictive business rule. Had we merged everything, the story would have become too big, mixing the salesperson's proactive intent with the system's coercive intent.
 
 The stories respect the INVEST and BDD criteria, sharply separating the update action from the interface blocking logic.
 
@@ -1102,8 +1102,8 @@ The stories respect the INVEST and BDD criteria, sharply separating the update a
 
 The following 2 User Stories are structured, deterministic and ready for the sprint backlog. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
 
-1. **US-001**: Manual Offline Data Synchronization
-2. **US-002**: Operations Block for Stale Data (Over 3 Days)
+1. US [US-001] Manual Offline Data Synchronization
+2. US [US-002] Operations Block for Stale Data (Over 3 Days)
 ````
 
 ---
@@ -1156,7 +1156,7 @@ This request is a Horizontal Slicing strongly oriented towards architecture. Ans
 
 **[START USER STORY ITERATION 1]**
 
-#### Micro-Scope Reasoning for US-001
+#### Micro-Scope Reasoning for US [US-001] Newsletter Subscription on the Homepage
 
 * **Value Focus:** Allow anyone browsing the Homepage to express commercial interest by leaving their contact.
 * **Technical Boundaries:** **Vertical Slice UI + Logic.** Includes the visual section in the Homepage, the input validation and the submission to the subscription service.
@@ -1228,7 +1228,7 @@ The configuration (API Key, List ID) of the concrete provider must be retrieved 
 
 I turned the business need (Homepage section) into:
 
-1. **US-001** covers the user experience and the immediate value (registration).
+1. US [US-001] Newsletter Subscription on the Homepage, which covers the user experience and the immediate value (registration).
 
 This split avoids creating a pure "technical User Story" (horizontal slicing) and ensures that the frontend and backend teams have clear acceptance criteria on how the UI must interact with the abstraction service.
 
@@ -1236,7 +1236,7 @@ This split avoids creating a pure "technical User Story" (horizontal slicing) an
 
 The final stories ready for the development cycle are (local id; the task manager's id is linked by `/speckit.sync`):
 
-1. **US-001: Newsletter Subscription on the Homepage** (UX Focus and Business Value)
+1. US [US-001] Newsletter Subscription on the Homepage (UX Focus and Business Value)
 ````
 
 ---
@@ -1294,7 +1294,7 @@ Then the system must register the user's interest in that specific product in th
 
 **[START USER STORY ITERATION 1]**
 
-#### Micro-Scope Reasoning for US-001
+#### Micro-Scope Reasoning for US [US-001] Subscription to "Notify Me" with Marketing Metadata Synchronization
 
 * **Value Focus:** Converting a user interested in an unavailable product into a profiled lead.
 * **Technical Boundaries:** Complete Vertical Slice: from the conditional display in the PDP to the submission of the data to the marketing provider.
@@ -1378,5 +1378,5 @@ The story exceeds the 2-5 scenario rule but is not split: every split tried prod
 
 ### [SUMMARY]
 
-1. **US-001**: Subscription to "Notify Me" with Marketing Metadata Synchronization (local id; the task manager's id is linked by `/speckit.sync`)
+1. US [US-001] Subscription to "Notify Me" with Marketing Metadata Synchronization (local id; the task manager's id is linked by `/speckit.sync`)
 ````
