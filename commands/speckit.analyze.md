@@ -72,7 +72,7 @@ Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_
 - BACKLOG = FEATURE_DIR/backlog/ (epics/, stories/, spikes/, tasks/)
 - RESEARCH = FEATURE_DIR/research.md (if present)
 - PRODUCT = `.specify/memory/product.md` (if present)
-- REFERENCES = the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`: what a readable reference is, for detection pass G and for this report
+- REFERENCES = the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: what a readable reference is, for detection pass G and for this report
 
 Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
 
@@ -190,7 +190,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Child PBIs missing from the Backlog Index, or listed there but missing on disk
 - PBIs without an Out of Scope section (EPIC: Scope Boundaries); Out of Scope items without where they go; scenarios without `AC-n` ids
 - References a reader cannot follow without the generation context, in any artifact (PBIs, spec envelope, plan.md, research.md, tasks.md, TASK files, checklists): a PBI or a scenario cited by its bare id (outside the labels REFERENCES allows), the `§` notation, coined abbreviations or numbering ("R2", "Q3"), section numbers without their title, bare URLs or paths, links whose text does not name the topic, local files as the only source of a PBI, constitution principles cited by number
-- Stories that break the rules of `.specify/presets/backlog/knowledge/user-story-writer/rules.md` in an evident way: conjunctions in the "I want" clause, more than 5 scenarios without justification, Read and Write in the same story, phantom UI
+- Stories that break the rules of `.specify/presets/backlog/knowledge/pbi-writing/rules.md` in an evident way: conjunctions in the "I want" clause, more than 5 scenarios without justification, Read and Write in the same story, phantom UI
 - Spikes neither answered in research.md nor scheduled as tasks
 
 #### H. Product Consistency

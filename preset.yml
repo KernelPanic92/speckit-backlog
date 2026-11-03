@@ -99,7 +99,7 @@ provides:
     - type: "command"
       name: "speckit.specify"
       file: "commands/speckit.specify.md"
-      description: "Asks the working mode (map / epic / story) and writes the backlog with the user-story-writer rules"
+      description: "Asks the working mode (map / epic / story) and writes the backlog with the PBI-writing rules"
       replaces: "speckit.specify"
 
     - type: "command"

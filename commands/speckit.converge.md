@@ -14,7 +14,7 @@
 | "P1 user story" | a story of the first Release Lane (map), the first story in release order (epic), the root US (story) |
 | — | the Out of Scope of `US-xxx "title"` — code that builds an Out of Scope item is an `unrequested` finding |
 
-Every key in the findings and in the appended tasks follows the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`: the id stays for traceability, the title always comes with it, and the `§` notation is never used.
+Every key in the findings and in the appended tasks follows the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: the id stays for traceability, the title always comes with it, and the `§` notation is never used.
 
 **Appending tasks** — every appended task is a TASK PBI, so step 7 writes more than tasks.md:
 

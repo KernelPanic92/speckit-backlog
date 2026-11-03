@@ -62,7 +62,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Paths used by this command (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the TASK rules (no Connextra, no INVEST; Outcome, Actions, DoD; relations declared only from the child/blocked side). Its "Readable references" section applies to everything this command writes or prints: the TASK files, tasks.md and the report.
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — the TASK rules (no Connextra, no INVEST; Outcome, Actions, DoD; relations declared only from the child/blocked side). Its "Readable references" section applies to everything this command writes or prints: the TASK files, tasks.md and the report.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` (`next-id <TYPE>`, `check <feature-dir>`). If `uv` is not available, check the frontmatter by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 
 1. **Setup**: Run `{SCRIPT}` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE_CONTENT, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").

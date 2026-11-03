@@ -84,7 +84,7 @@ resolved at command time from `constitution-template`, `product-template` and `d
 Spec Kit preset/template resolution stack.
 
 **Readable references.** The three documents are read by the people who steer the product. Every reference in them follows the "Readable references" section of
-`.specify/presets/backlog/knowledge/user-story-writer/rules.md`: a reference between them is a relative Markdown link whose text names
+`.specify/presets/backlog/knowledge/pbi-writing/rules.md`: a reference between them is a relative Markdown link whose text names
 the section (`[the Personas of the product](product.md#personas)`), principles and rules are named, never numbered, so that plans and
 analyses can cite them by name; sources are links whose text says what they are (`[Checkout UI kit in Figma](https://…)`), never bare
 URLs or paths.

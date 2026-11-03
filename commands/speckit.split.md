@@ -29,7 +29,7 @@ Ids are project-wide unique, so files move without renaming and every relation (
 
 Paths used by this command (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — its "Readable references" section applies to every marker, note and link this command writes in either spec, and to the report.
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — its "Readable references" section applies to every marker, note and link this command writes in either spec, and to the report.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — `locate <ID> --descendants`, `check <feature-dir>`. If `uv` is not available, find the files with a text search for `id: <ID>` under `specs/` and follow the PARENT relations by hand. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 
 ## Execution Steps

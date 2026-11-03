@@ -4,7 +4,7 @@
 
 **What "the spec" is here** — `spec.md` is the root PBI (MAP, EPIC or US) followed by the spec envelope (Spec Context, Backlog Index, Success Criteria, Key Entities, NFR, External Dependencies, Security & Compliance Checklist, Open Questions, Clarifications); every child PBI lives in its own file under `FEATURE_DIR/backlog/`. Read the root PBI, the envelope and the child PBIs relevant to the checklist's domain.
 
-**Requirement identifiers** — there are no `FR-###` items, and no `§` markers: the checklist is read by a person, so every traceability reference says what it points to and links to the right spot (the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`). Use these references in checklist items instead of the generic ones above; the links are relative to the checklist file in `FEATURE_DIR/checklists/`:
+**Requirement identifiers** — there are no `FR-###` items, and no `§` markers: the checklist is read by a person, so every traceability reference says what it points to and links to the right spot (the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`). Use these references in checklist items instead of the generic ones above; the links are relative to the checklist file in `FEATURE_DIR/checklists/`:
 
 | Generic reference above | Reference in this project |
 |-------------------------|---------------------------|

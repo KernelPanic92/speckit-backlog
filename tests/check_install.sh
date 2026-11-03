@@ -47,7 +47,7 @@ if grep -l "__SPECKIT_COMMAND_\|{SCRIPT}\|@@UPSTREAM" .claude/skills/speckit-*/S
 if grep -h "\.specify/\.specify/\|\.specify/presets/backlog/\.specify" .claude/skills/speckit-*/SKILL.md; then ko "mangled preset paths"; else ok "preset paths intact"; fi
 
 echo "Installed preset files"
-for path in knowledge/user-story-writer/rules.md knowledge/user-story-writer/examples.md schemas/pbi-frontmatter.schema.json scripts/validate_backlog.py NOTICE.md LICENSE; do
+for path in knowledge/pbi-writing/rules.md knowledge/pbi-writing/examples.md schemas/pbi-frontmatter.schema.json scripts/validate_backlog.py NOTICE.md LICENSE; do
   [[ -f ".specify/presets/backlog/$path" ]] && ok "$path" || ko "$path missing"
 done
 for path in tests tools .github catalog.json; do

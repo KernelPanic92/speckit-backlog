@@ -32,7 +32,7 @@ Ids are project-wide unique, so files move without renaming and relations keep r
 
 Paths used by this command (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the hierarchy (MAP → EPIC → US → TASK/SPIKE), the map rules (Backbone, Walking Skeleton, Release Lanes, gravity) and how to write a new EPIC or MAP. Its "Readable references" section applies to every marker, note and link this command writes, and to the plan and the report it prints.
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — the hierarchy (MAP → EPIC → US → TASK/SPIKE), the map rules (Backbone, Walking Skeleton, Release Lanes, gravity) and how to write a new EPIC or MAP. Its "Readable references" section applies to every marker, note and link this command writes, and to the plan and the report it prints.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — `locate <ID> --descendants`, `next-id <TYPE>`, `check <feature-dir>`. If `uv` is not available, find the files with a text search for `id: <ID>` under `specs/` and check them by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 
 ## Allowed combinations

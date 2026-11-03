@@ -61,7 +61,7 @@ In this project (preset `backlog`) the specification is: `spec.md` = the root PB
 
 Paths used by this command:
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — every PBI you change must still satisfy these rules (Connextra, INVEST, Gherkin, splitting, relations). Its "Readable references" section applies to everything this command writes or prints: PBIs, envelope, Clarifications, questions and the report.
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — every PBI you change must still satisfy these rules (Connextra, INVEST, Gherkin, splitting, relations). Its "Readable references" section applies to everything this command writes or prints: PBIs, envelope, Clarifications, questions and the report.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` (`check <feature-dir>`, `next-id <TYPE>`). If `uv` is not available, check the frontmatter by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.
 

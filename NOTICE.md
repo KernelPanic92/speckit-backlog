@@ -1,6 +1,6 @@
 # Notice and provenance
 
-speckit-backlog is MIT-licensed (see `LICENSE`). It contains material derived from two MIT-licensed projects and from the author's own *user-story-writer* skill. This file must travel with every copy of the preset, including the copy installed in `.specify/presets/backlog/`.
+speckit-backlog is MIT-licensed (see `LICENSE`). It contains material derived from two MIT-licensed projects. This file must travel with every copy of the preset, including the copy installed in `.specify/presets/backlog/`.
 
 ## Sources
 
@@ -8,12 +8,11 @@ speckit-backlog is MIT-licensed (see `LICENSE`). It contains material derived fr
 |--------|---------|----------|
 | [github/spec-kit](https://github.com/github/spec-kit) v1.2.5 — Copyright GitHub, Inc. | MIT | Command files (structure, wording, hook sections kept verbatim), plan/tasks/spec/constitution template structure |
 | [popoloni/non-deterministic-sdd](https://github.com/popoloni/non-deterministic-sdd) — Copyright (c) 2026 Enrico Papalini, companion of the book *Non-Deterministic Spec-Driven Development* | MIT | Constitution, plan, research, tasks and spec template sections |
-| *user-story-writer* skill — Iacopo Ciao | MIT (this repository) | `knowledge/user-story-writer/` (rules, references, examples), PBI templates, frontmatter schema |
 | [google-labs-code/design.md](https://github.com/google-labs-code/design.md) — DESIGN.md format, spec version alpha | Apache-2.0 | Structure followed by `design-template.md` (front matter token groups, section names and order). No text of the specification is copied |
 
 ## Provenance per template
 
-Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **S** = user-story-writer skill, **N** = new in this preset.
+Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **N** = new in this preset.
 
 ### constitution-template.md
 | Section | From |
@@ -36,7 +35,7 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **S** = user-story-writer ski
 | Spec Context (Input line), Success Criteria (`SC-###`), Key Entities | U |
 | Non-Functional Requirements, External Dependencies, Security & Compliance Checklist, Open Questions, References | P |
 | Backlog Index, Clarifications log format | N / U (clarify's session log) |
-| Root PBI (MAP / EPIC / US) that precedes the envelope | S |
+| Root PBI (MAP / EPIC / US) that precedes the envelope | N |
 | Removed: Summary / Key decisions, FR-###, Edge Cases (replaced by Gherkin scenarios), Feature ID / Created / Author | — |
 
 ### plan-template.md
@@ -61,7 +60,7 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **S** = user-story-writer ski
 |---------|------|
 | Checkbox line format, phases with Goal / Independent Test / Checkpoint, Phase Dependencies, Parallel Example, Implementation Strategy | U |
 | Summary, Task Completion Criteria, Dependency Graph, Risk Assessment, Traceability Matrix | P |
-| TASK PBI files linked from each line, phases by spec mode (Walking Skeleton, Release Lanes), AC coverage | N / S |
+| TASK PBI files linked from each line, phases by spec mode (Walking Skeleton, Release Lanes), AC coverage | N |
 | Removed: Created, Author | — |
 
 ### design-template.md
@@ -78,7 +77,7 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **S** = user-story-writer ski
 ### pbi-*-template.md
 | Template | From |
 |----------|------|
-| pbi-map, pbi-epic, pbi-story, pbi-task, pbi-spike | S, translated; added Out of Scope everywhere, `AC-n` scenario ids, task Files / Covers (Files from P's tasks template) |
+| pbi-map, pbi-epic, pbi-story, pbi-task, pbi-spike | N; task Files from P's tasks template |
 
 ## Spec Kit license
 

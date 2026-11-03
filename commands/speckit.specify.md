@@ -1,5 +1,5 @@
 ---
-description: Turn a feature description into a backlog-driven specification - asks the working mode (user story map, epic + user stories, single user story) and writes the root PBI plus its children with the user-story-writer rules.
+description: Turn a feature description into a backlog-driven specification - asks the working mode (user story map, epic + user stories, single user story) and writes the root PBI plus its children with the PBI-writing rules.
 handoffs:
   - label: Build Technical Plan
     agent: speckit.plan
@@ -63,7 +63,7 @@ The text the user typed after `__SPECKIT_COMMAND_SPECIFY__` in the triggering me
 
 **Paths used by this command** (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the rules for writing PBIs. Its "Examples and references: when to read what" table tells you when to open `examples.md` and `references/*.md` (same folder). Its "Readable references" section applies to everything this command writes or prints: the PBIs, the spec envelope, the checklist and the conversation blocks.
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — the rules for writing PBIs. Its "Examples and references: when to read what" table tells you when to open `examples.md` and `references/*.md` (same folder). Its "Readable references" section applies to everything this command writes or prints: the PBIs, the spec envelope, the checklist and the conversation blocks.
 - `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` — the binding frontmatter schema.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — subcommands `next-id <TYPE>` and `check <feature-dir>`; JSON output, non-zero exit code on errors. If `uv` is not available, do the same checks by hand against `SCHEMA` and the rules, and say so in the Completion Report. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.

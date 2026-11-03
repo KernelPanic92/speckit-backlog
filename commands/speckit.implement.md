@@ -22,6 +22,6 @@
 
 **Checkpoints** — at the end of each phase verify that every Gherkin scenario of the stories in that phase passes (map: the lane's Metrics can be measured). Report the phase as complete only then; otherwise stop and report which scenarios fail, each as `US-xxx/AC-n "title"` with its story title.
 
-**References** — whatever you write in the TASK files, research.md or tasks.md and whatever you report follows the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`: tasks as `TASK [id] title`, stories as `US [id] title`, scenarios as `US-xxx/AC-n "title"`, other documents as links whose text names the topic; never a bare id, a bare path or a section number.
+**References** — whatever you write in the TASK files, research.md or tasks.md and whatever you report follows the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: tasks as `TASK [id] title`, stories as `US [id] title`, scenarios as `US-xxx/AC-n "title"`, other documents as links whose text names the topic; never a bare id, a bare path or a section number.
 
 **Step 9 (completion validation)** — "matches the original specification" means: every story implemented in this run satisfies all its Acceptance Criteria and none of its Out of Scope items was built.

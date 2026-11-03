@@ -1,6 +1,6 @@
-# User Story Writer — Rules
+# PBI Writing — Rules
 
-This file is the English port of the user-story-writer skill, adapted for spec-kit. It is read by the speckit.specify, speckit.clarify, speckit.split and speckit.merge commands of the `backlog` preset. The commands own the workflow (mode selection, file paths, validation); this file owns the rules for writing PBIs. Its "Readable references" section is read by every command of the preset, because it applies to every document the preset produces, not only to PBIs.
+This file holds the rules for writing Product Backlog Items. It is read by the speckit.specify, speckit.clarify, speckit.split and speckit.merge commands of the `backlog` preset. The commands own the workflow (mode selection, file paths, validation); this file owns the rules for writing PBIs. Its "Readable references" section is read by every command of the preset, because it applies to every document the preset produces, not only to PBIs.
 
 ## Role
 

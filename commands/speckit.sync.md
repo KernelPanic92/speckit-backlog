@@ -35,7 +35,7 @@ Paths used by this command (preset `backlog`):
 - Writing to the tool is an outward-facing action: before the first write of a run, show what will be created and updated and wait for the user's confirmation. Exception: the user already asked for an unattended push in this request (e.g. inside a Multica run whose agent instructions say so).
 - No credentials in the repository: ClickUp is reached through the agent's ClickUp connector (MCP); Multica through its CLI, authenticated by the user or by `MULTICA_TOKEN` inside a Multica run.
 - Content language in the tool follows `language` in `MAPPING`; the repository is never translated.
-- References stay readable in the tool, where the repository's files cannot be opened (the "Readable references" section of `.specify/presets/backlog/knowledge/user-story-writer/rules.md`): a PBI keeps its title and its `[id]` becomes a link to the item when the referenced PBI has a reference in the tool (otherwise it stays `type [id] title`); relative links to repository files become links to the repository's web host, or plain words, as the Description rules of `MAPPING` say.
+- References stay readable in the tool, where the repository's files cannot be opened (the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`): a PBI keeps its title and its `[id]` becomes a link to the item when the referenced PBI has a reference in the tool (otherwise it stays `type [id] title`); relative links to repository files become links to the repository's web host, or plain words, as the Description rules of `MAPPING` say.
 
 ## Execution Steps
 
@@ -68,7 +68,7 @@ Paths used by this command (preset `backlog`):
 
 6. **Pull** (action `pull`): for each PBI in scope that has `external.<tool>`:
    - read the item; report its status, assignee and the number of new comments;
-   - compare its name and description with what a push would write from the PBI; when they differ because someone edited the tool, show the difference and, only if the user confirms, update the PBI file (keep it valid against the rules in `.specify/presets/backlog/knowledge/user-story-writer/rules.md`; links to the tool's items go back to `type [id] title` with the local id, links to the repository's web host go back to relative links), then `VALIDATOR set-external <ID> <tool> --hash-current`;
+   - compare its name and description with what a push would write from the PBI; when they differ because someone edited the tool, show the difference and, only if the user confirms, update the PBI file (keep it valid against the rules in `.specify/presets/backlog/knowledge/pbi-writing/rules.md`; links to the tool's items go back to `type [id] title` with the local id, links to the repository's web host go back to relative links), then `VALIDATOR set-external <ID> <tool> --hash-current`;
    - an item deleted in the tool: ask whether to remove the reference (`set-external <ID> <tool> --remove`).
    Statuses are never written into the PBIs.
 

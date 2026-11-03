@@ -1,4 +1,4 @@
-# Examples — User Story Writer
+# Examples — PBI Writing
 
 Complete, high-fidelity examples adapted from real cases and anonymized: names, vendors and domains have been changed. Each example reports the user's input exactly as it arrived and the full output expected from the skill: macro-analysis, Micro-Scope Reasoning blocks, stories, final check and summary. They are the concrete reference for how to apply the rules in `rules.md`. Wherever the original output violated a rule now in force (multiple actions chained in the `When`, prescriptive UI, a persona outside the Connextra format, references to application layers), it has been corrected, so the examples teach only permitted behaviours.
 
@@ -1110,7 +1110,7 @@ The following 2 User Stories are structured, deterministic and ready for the spr
 
 ## Example 4 — Horizontal slicing → request for clarification (newsletter library)
 
-What it teaches: a purely architectural request is horizontal slicing. The skill stops (constraint 0), asks for the functional value and the persona, and only then produces a vertical slice, preserving the technical constraints in the Additional Notes instead of creating a technical story.
+What it teaches: a purely architectural request is horizontal slicing. The writer stops (constraint 0), asks for the functional value and the persona, and only then produces a vertical slice, preserving the technical constraints in the Additional Notes instead of creating a technical story.
 
 ### User input (turn 1)
 
