@@ -1,17 +1,19 @@
 # Implementation Plan: [FEATURE]
 
-**Spec**: [link to spec.md] | **Spec mode**: [map | epic | story] | **Root PBI**: [TYPE [ID] Title]
+**Spec**: [[Feature] specification](spec.md) | **Spec mode**: [map | epic | story] | **Root PBI**: [TYPE [ID] Title]
 
-**Research**: [link to research.md] | **Product**: `.specify/memory/product.md` | **Status**: [Draft | Review | Approved]
+**Research**: [[Feature] research decisions](research.md) | **Product**: [personas and Ubiquitous Language](../../.specify/memory/product.md) | **Status**: [Draft | Review | Approved]
 
 **Note**: This template is filled in by the `__SPECKIT_COMMAND_PLAN__` command; its definition describes the execution workflow. It is a single document: data model, API contracts and validation scenarios live here (no separate data-model.md, contracts/ or quickstart.md). Research lives in research.md.
+
+<!-- References follow the "Readable references" rules of the backlog preset: a PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a research decision, a constitution rule or a section of product.md as a relative link whose text names it, e.g. [the payment provider decision](research.md#payment-provider), [the "Test-First" principle](../../.specify/memory/constitution.md#test-first). Never a bare id, a bare path or a section number. -->
 
 ## Summary
 
 [2-3 sentences: the primary requirement (from the root PBI's Connextra and Outcome) and the technical approach (from research)]
 
 **Key technical decisions:**
-- [Decision 1]
+- [Decision 1, linked to its research block: [the payment provider decision](research.md#payment-provider)]
 - [Decision 2]
 - [Decision 3]
 
@@ -31,7 +33,7 @@
 
 **Cache / Messaging**: [if applicable, e.g., Redis 7, Kafka or N/A]
 
-**Design System**: [`.specify/memory/design.md` (tokens and components) and where its tokens live in code, or N/A for products without UI]
+**Design System**: [[the design system](../../.specify/memory/design.md) (tokens and components) and where its tokens live in code, or N/A for products without UI]
 
 **Testing**: [e.g., Vitest + Playwright, pytest or NEEDS CLARIFICATION]
 
@@ -55,7 +57,7 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined from the constitution: Core Principles, Three-Tier Rules (MUST items are blocking), Agent Boundaries, Quality Standards, Security Posture, Delivery Conventions. One line per gate: PASS / VIOLATION (→ Complexity Tracking).]
+[Gates determined from the constitution: Core Principles, Three-Tier Rules (MUST items are blocking), Agent Boundaries, Quality Standards, Security Posture, Delivery Conventions. One line per gate, naming the principle or rule (never its number), as a link to its heading in the constitution: PASS / VIOLATION (→ Complexity Tracking).]
 
 ## Architecture Overview
 
@@ -168,8 +170,8 @@ ios/ or android/
 
 | Method | Path | Description | Serves |
 |--------|------|-------------|--------|
-| GET | `/api/v1/[resource]` | List [resources] | [US-001] |
-| POST | `/api/v1/[resource]` | Create [resource] | [US-002] |
+| GET | `/api/v1/[resource]` | List [resources] | [US [US-001] Story title](backlog/stories/US-001-[slug].md) |
+| POST | `/api/v1/[resource]` | Create [resource] | [US [US-002] Story title](backlog/stories/US-002-[slug].md) |
 
 ### Request/Response Examples
 
@@ -280,8 +282,12 @@ Error response (400):
 
 ## Open Technical Questions
 
-- [ ] TQ-1: [Question]
+<!-- Full questions that make sense on their own, each naming what it affects; no numbering such as "TQ-1". -->
+
+- [ ] [Question?] — affects [the component, or TYPE [ID] Title]
 
 ## References
 
-- [Link to architecture diagram, API docs, related research]
+<!-- One bullet per source, as a link whose text says what it is. Never a bare URL or path. -->
+
+- [[What the source is, in words]](address that reaches the spot)

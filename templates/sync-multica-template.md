@@ -48,15 +48,16 @@ Every PBI becomes an issue of the project, including the MAP (Multica nests issu
 | Backlog | Multica |
 |---------|---------|
 | PARENT | parent issue |
-| BLOCKED_BY | metadata `speckit.blocked_by` + a "Blocked by" line in the description linking the blockers' keys |
-| RELATED | metadata `speckit.related` + a "Related" line in the description |
+| BLOCKED_BY | metadata `speckit.blocked_by` + a "Blocked by" line in the description linking each blocker by key and title (`Blocked by: [MUL-12 Card payment](url)`) |
+| RELATED | metadata `speckit.related` + a "Related" line in the description, with the same key and title links |
 
 Multica has no blocking/related relations yet (an `issue_relation` API is proposed upstream). When the workspace exposes `POST /api/issues/{id}/relations`, use `blocks` (from the blocker to this issue) and `related` instead, and remove the description lines.
 
 ## Description
 
 - Markdown from the PBI body: Connextra sentence, Outcome, Acceptance Criteria (`AC-n`, Given/When/Then), Out of Scope, Additional Notes, Assumptions, Risks; TASK and SPIKE sections as in their templates. Leave out the INVEST & DoR check and the frontmatter.
-- Then the "Blocked by" / "Related" lines, and `Source: {file} ({id})`.
+- References inside the description stay readable for a person who has only Multica (the "Readable references" rules of the backlog preset): a PBI cited as `type [id] title` keeps its title and, when that PBI has an `external.multica.url`, its `[id]` becomes a link to that issue; a relative link to a file of the repository (`spec.md`, `plan.md`, `research.md`, a PBI file) becomes a link to the same file and heading on the repository's web host when the remote is known (`git remote get-url origin`), otherwise its text stays as plain words without the address.
+- Then the "Blocked by" / "Related" lines, and one line that tells a reader where the PBI lives in the repository, naming it by id and title: `Source in the repository: [{id} {title}]({file on the repository's web host})`, or `Source in the repository: {id} {title}, file {file}` when the web host is not known.
 - `language: it` → translate the content into Italian when writing it; the repository is never translated.
 
 ## References written back

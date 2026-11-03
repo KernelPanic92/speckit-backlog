@@ -1,5 +1,5 @@
 ---
-description: Turn a feature description into a backlog-driven specification - asks the working mode (user story map, epic + user stories, single user story) and writes the root PBI plus its children with the user-story-writer rules.
+description: Turn a feature description into a backlog-driven specification - asks the working mode (user story map, epic + user stories, single user story) and writes the root PBI plus its children with the PBI-writing rules.
 handoffs:
   - label: Build Technical Plan
     agent: speckit.plan
@@ -63,7 +63,7 @@ The text the user typed after `__SPECKIT_COMMAND_SPECIFY__` in the triggering me
 
 **Paths used by this command** (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md` — the rules for writing PBIs. Its "Examples and references: when to read what" table tells you when to open `examples.md` and `references/*.md` (same folder).
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — the rules for writing PBIs. Its "Examples and references: when to read what" table tells you when to open `examples.md` and `references/*.md` (same folder). Its "Readable references" section applies to everything this command writes or prints: the PBIs, the spec envelope, the checklist and the conversation blocks.
 - `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` — the binding frontmatter schema.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — subcommands `next-id <TYPE>` and `check <feature-dir>`; JSON output, non-zero exit code on errors. If `uv` is not available, do the same checks by hand against `SCHEMA` and the rules, and say so in the Completion Report. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.
@@ -188,10 +188,10 @@ Given that feature description, do this:
    - **`story`**: Phase 2 runs once and its story is the root US (it has no PARENT unless the user names an existing Epic).
    - **Spikes**: when uncertainty prevents estimating a story, write a SPIKE (PARENT: the story it serves) and declare it on the story with `BLOCKED_BY`. `__SPECKIT_COMMAND_PLAN__` answers spikes in research.md.
    - **The iterative discipline of Phase 2 applies**: print the Micro-Scope Reasoning block in the conversation before writing each story file; never write two stories in a row without it.
-   - **Fill the spec envelope**: Spec Context (mode, root PBI, status `Draft`), Backlog Index (every child with a relative link, in the order the rules require), Success Criteria (`SC-###`, measurable and technology-agnostic), Key Entities with Ubiquitous Language terms (if data is involved), and — only when relevant — Non-Functional Requirements, External Dependencies, Security & Compliance Checklist, References. Open Questions lists what is still unknown, each naming the PBIs it affects. Remove the envelope's guidance comment block and every optional section that does not apply.
+   - **Fill the spec envelope**: Spec Context (mode, root PBI, status `Draft`), Backlog Index (every child with a relative link whose text is `type [id] title`, in the order the rules require), Success Criteria (`SC-###` with a short name, measurable and technology-agnostic), Key Entities with Ubiquitous Language terms (if data is involved), and — only when relevant — Non-Functional Requirements, External Dependencies, Security & Compliance Checklist, References (each a link whose text says what the source is). Open Questions lists what is still unknown, each a full question, without numbering, naming the PBIs it affects as `type [id] title`. Remove the envelope's guidance comment block and every optional section that does not apply.
    - Never leave `{{...}}` or `[...]` placeholders, template comments that no longer guide anything, or empty optional keys.
 
-10. **FINAL CHECK and SUMMARY** (end of Phase 2 of `RULES`), printed in the conversation: re-read every story against INVEST and the constraints and re-split where needed; re-read every reference in the PBIs, the relation `reason`s and the conversation blocks with the "NO mental mapping" test of `RULES` and rewrite coined abbreviations, section numbers without their title, bare URLs and files the reader cannot open (the feature's `spec.md` or `plan.md` is not a reference a task-manager reader can open); then list the final PBIs in release order (`type [id] title`) and — in `epic` mode with more than 5 stories — suggest the map in one line.
+10. **FINAL CHECK and SUMMARY** (end of Phase 2 of `RULES`), printed in the conversation: re-read every story against INVEST and the constraints and re-split where needed; re-read every reference in the PBIs, the relation `reason`s, the spec envelope and the conversation blocks with the self-check of the "Readable references" section of `RULES` and rewrite bare ids, coined abbreviations, section numbers without their title, bare URLs or paths and files the reader cannot open (the feature's `spec.md` or `plan.md` is not a reference a task-manager reader can open); then list the final PBIs in release order (`type [id] title`) and — in `epic` mode with more than 5 stories — suggest the map in one line.
 
 11. **Structural validation**: run `VALIDATOR check SPECIFY_FEATURE_DIRECTORY`. Fix every error it reports and run it again until it passes (max 3 iterations; then report the remaining errors).
 
@@ -203,14 +203,14 @@ Given that feature description, do this:
       # Specification Quality Checklist: [FEATURE NAME]
 
       **Purpose**: Validate the backlog before proceeding to planning
-      **Feature**: [Link to spec.md]
+      **Feature**: [[Feature name] specification](../spec.md)
       **Mode**: [map | epic | story]
 
       ## Structure
 
       - [ ] The validator passes (schema, relations, ids, no placeholders)
       - [ ] Every PBI has an Out of Scope section (EPIC: Scope Boundaries) that lists only what a reader could assume is included, each item with where it goes
-      - [ ] Every reference is readable without the generation context: other PBIs as `type [id] title`, documents as links whose text names the topic, no coined abbreviations, untitled section numbers, bare URLs or local files
+      - [ ] Every reference in the PBIs and the envelope is readable without the generation context: other PBIs as `type [id] title`, scenarios as `US-001/AC-1 "title"`, documents and sections as links whose text names the topic, no `§` notation, bare ids, coined abbreviations, untitled section numbers, bare URLs or paths, or local files as the only source
       - [ ] The Backlog Index lists every child PBI in release order
       - [ ] Success Criteria are measurable and technology-agnostic
 
@@ -246,7 +246,7 @@ Given that feature description, do this:
 
       Remove the Map section in `epic` and `story` mode.
 
-   b. **Run Validation Check**: review the backlog against each checklist item; for each failing item document the specific issue (quote the PBI and section).
+   b. **Run Validation Check**: review the backlog against each checklist item; for each failing item document the specific issue, naming the PBI as `type [id] title` and the section by its heading, and quoting the text at fault.
 
    c. **Handle Validation Results**:
 

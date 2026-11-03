@@ -140,6 +140,31 @@ def test_checkbox_lines_that_are_not_tasks(project):
     assert code == 0, result["errors"]
 
 
+def test_readable_references_pass(project):
+    """Ids followed by their titles and links with heading anchors do not disturb the checks."""
+    edit(project, "backlog/tasks/TASK-002-catalog-list-query.md", "## Files",
+         '**Covers:** US-001/AC-1 "List loads", US-001/AC-2 "Empty catalog"\n\n'
+         "Follows [the catalog query contract](../../plan.md#api-design--contracts).\n\n## Files")
+    edit(project, "tasks.md", "- [ ] TASK-002 [US-001] Catalog list query →",
+         "### US [US-001] Catalog list\n\n- [ ] TASK-002 [US-001] Catalog list query →")
+    edit(project, "tasks.md", "## Parallel Example",
+         "## Traceability Matrix\n\n"
+         "| User Story | Acceptance Criterion | Test tasks |\n|---|---|---|\n"
+         "| [US [US-001] Catalog list](backlog/stories/US-001-catalog-list.md) "
+         "| [AC-1 \"List loads\"](backlog/stories/US-001-catalog-list.md#ac-1-list-loads) | TASK-002 Catalog list query |\n\n"
+         "## Parallel Example")
+    edit(project, "spec.md", "  * US [US-002] Card payment",
+         "  * US [US-002] Card payment → [the card payment scenarios](backlog/stories/US-002-card-payment.md#acceptance-criteria)")
+    code, result = run(project, "check", SPEC)
+    assert code == 0, result["errors"]
+    assert result["warnings"] == []
+
+
+def test_task_line_link_with_wrong_path_is_still_caught(project):
+    edit(project, "tasks.md", "(backlog/tasks/TASK-002-catalog-list-query.md)", "(backlog/tasks/TASK-002-missing.md)")
+    assert "broken-link" in codes(run(project, "check", SPEC)[1])
+
+
 def test_duplicate_id_and_file_name(project):
     edit(project, "backlog/tasks/TASK-002-catalog-list-query.md", "id: TASK-002", "id: TASK-001")
     result = run(project, "check", SPEC)[1]

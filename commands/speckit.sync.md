@@ -35,6 +35,7 @@ Paths used by this command (preset `backlog`):
 - Writing to the tool is an outward-facing action: before the first write of a run, show what will be created and updated and wait for the user's confirmation. Exception: the user already asked for an unattended push in this request (e.g. inside a Multica run whose agent instructions say so).
 - No credentials in the repository: ClickUp is reached through the agent's ClickUp connector (MCP); Multica through its CLI, authenticated by the user or by `MULTICA_TOKEN` inside a Multica run.
 - Content language in the tool follows `language` in `MAPPING`; the repository is never translated.
+- References stay readable in the tool, where the repository's files cannot be opened (the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`): a PBI keeps its title and its `[id]` becomes a link to the item when the referenced PBI has a reference in the tool (otherwise it stays `type [id] title`); relative links to repository files become links to the repository's web host, or plain words, as the Description rules of `MAPPING` say.
 
 ## Execution Steps
 
@@ -59,6 +60,7 @@ Paths used by this command (preset `backlog`):
    2. For each item in plan order:
       - `create`: create the item as `MAPPING` says (type, name, parent, description, properties). The parent's tool id comes from `parent_external` (or from the external reference of the ancestor the mapping names, e.g. the nearest Epic in a flat hierarchy). Then run `VALIDATOR set-external <ID> <tool> --id <tool id> --key <display key> --url <url> --hash-current`.
       - `update`: update name and description (and the properties the mapping lists) of the item in `external.<tool>.id`, without changing status or assignee; Multica: with `--no-start`. Then `VALIDATOR set-external <ID> <tool> --hash-current`.
+      - In the same run, after the relations pass, update once more the descriptions written before the PBIs they reference had an item, so that those references become links.
       - `unchanged`: skip.
       - If the tool rejects an item, stop: report the error and what was already written. A new push resumes from there, because every item written so far carries its reference.
    3. **Relations pass**: for each pushed item, apply its BLOCKED_BY and RELATED relations as `MAPPING` says, between items that both have a reference in this tool. Read the item's existing dependencies/links first and add only the missing ones. A relation towards a PBI not yet in the tool is reported, not dropped: it is applied by a later push.
@@ -66,7 +68,7 @@ Paths used by this command (preset `backlog`):
 
 6. **Pull** (action `pull`): for each PBI in scope that has `external.<tool>`:
    - read the item; report its status, assignee and the number of new comments;
-   - compare its name and description with what a push would write from the PBI; when they differ because someone edited the tool, show the difference and, only if the user confirms, update the PBI file (keep it valid against the rules in `.specify/presets/backlog/knowledge/user-story-writer/rules.md`), then `VALIDATOR set-external <ID> <tool> --hash-current`;
+   - compare its name and description with what a push would write from the PBI; when they differ because someone edited the tool, show the difference and, only if the user confirms, update the PBI file (keep it valid against the rules in `.specify/presets/backlog/knowledge/pbi-writing/rules.md`; links to the tool's items go back to `type [id] title` with the local id, links to the repository's web host go back to relative links), then `VALIDATOR set-external <ID> <tool> --hash-current`;
    - an item deleted in the tool: ask whether to remove the reference (`set-external <ID> <tool> --remove`).
    Statuses are never written into the PBIs.
 
@@ -76,7 +78,7 @@ Paths used by this command (preset `backlog`):
 
 - Tool, action, scope, and `MAPPING` path
 - Created / updated / unchanged / failed items, by type, each with its display key (e.g. `US [US-007] Card payment → DE-14620`)
-- Relations added and relations postponed
+- Relations added and relations postponed (each as `type [id] title` on both ends)
 - Pull: statuses read, PBIs updated from the tool, references removed
 - Validator result
 - Next step (e.g. "assign the Release 1 stories in ClickUp", or "run `__SPECKIT_COMMAND_SYNC__ <tool> push` again after `__SPECKIT_COMMAND_TASKS__`")

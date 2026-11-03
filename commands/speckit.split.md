@@ -29,7 +29,7 @@ Ids are project-wide unique, so files move without renaming and every relation (
 
 Paths used by this command (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/user-story-writer/rules.md`
+- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — its "Readable references" section applies to every marker, note and link this command writes in either spec, and to the report.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — `locate <ID> --descendants`, `check <feature-dir>`. If `uv` is not available, find the files with a text search for `id: <ID>` under `specs/` and follow the PARENT relations by hand. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 
 ## Execution Steps
@@ -54,24 +54,24 @@ Paths used by this command (preset `backlog`):
    - `mkdir -p` the new directory and the `backlog/` subfolders needed.
    - Move the PBI file to the new `spec.md` and its descendants to the matching `backlog/` subfolders. In a git repository use `git mv` so history follows the files.
    - Append the envelope after the root PBI's body and fill it from the source envelope, keeping only what concerns the moved PBIs:
-     - Spec Context: the new mode, the root PBI, status `Draft`, and `Input: split from <SOURCE_DIR>`.
+     - Spec Context: the new mode, the root PBI, status `Draft`, and `Input: split from [<source root title>](../<source dir>/spec.md)` (a link whose text names the source spec).
      - Backlog Index: the moved children, in the order the rules require.
      - Success Criteria, Key Entities, Non-Functional Requirements, External Dependencies, Security & Compliance Checklist: copy the items that apply to the moved PBIs (renumber `SC-###` from 001 in the new spec).
-     - Open Questions that affect only moved PBIs: move them; questions that affect both specs: copy them in both.
-     - Clarifications that concern moved PBIs: copy them under `### Carried over from <SOURCE_DIR>`.
+     - Open Questions that affect only moved PBIs: move them; questions that affect both specs: copy them in both, fixing their PBI links.
+     - Clarifications that concern moved PBIs: copy them under `### Carried over from <source root title>`, with a link to the source spec right below the heading.
    - Relations stay as they are: the new root keeps its PARENT (e.g. the MAP it belongs to), and its children keep pointing to it.
 
 5. **Root rules**: the new root must satisfy `RULES` as a root: an EPIC root keeps its Scope Boundaries and Acceptance Criteria; a US root keeps its Out of Scope. Do not rewrite stories beyond what the move requires.
 
 6. **Update the source spec** (`SOURCE_DIR/spec.md`), without deleting the product-level view:
-   - Map Backbone: keep the Epic's column and add ` → [specs/NNN-slug](../NNN-slug/spec.md)` after its title.
-   - Map Release Lanes: keep the moved stories in their lanes, each followed by ` → specs/NNN-slug`, so the release plan stays readable.
+   - Map Backbone: keep the Epic's column and add ` → [moved to its own spec](../NNN-slug/spec.md)` after its title.
+   - Map Release Lanes: keep the moved stories in their lanes, each followed by ` → [moved to the <new root title> spec](../NNN-slug/spec.md)`, so the release plan stays readable.
    - Backlog Index: replace the moved PBIs with one line `- Extracted: [TYPE [ID] Title](../NNN-slug/spec.md)`.
    - Move or copy Open Questions and Clarifications as in step 4.
-   - If `SOURCE_DIR/tasks.md` exists: remove the lines of the moved TASK PBIs and add, at the top of the file, `> Tasks of TYPE [ID] Title moved to specs/NNN-slug by __SPECKIT_COMMAND_SPLIT__ — regenerate with __SPECKIT_COMMAND_TASKS__.` Report which moved tasks were already checked.
+   - If `SOURCE_DIR/tasks.md` exists: remove the lines of the moved TASK PBIs and add, at the top of the file, `> Tasks of TYPE [ID] Title moved to [the <new root title> spec](../NNN-slug/spec.md) by __SPECKIT_COMMAND_SPLIT__ — regenerate with __SPECKIT_COMMAND_TASKS__.` Report which moved tasks were already checked.
    - If `SOURCE_DIR/plan.md` exists: add the same kind of note at the top of the Summary; do not edit the design.
 
-7. **Validate**: run `VALIDATOR check` on the new directory and on `SOURCE_DIR`. Fix structural errors caused by the move (e.g. Backlog Index links) and re-run.
+7. **Validate**: run `VALIDATOR check` on the new directory and on `SOURCE_DIR`. Fix structural errors caused by the move (e.g. Backlog Index links) and re-run. Then run the self-check of the "Readable references" section of `RULES` on what you wrote, including the relative links of the moved files (a PBI moved into `spec.md` or into another directory may now point to the wrong place).
 
 8. **Active feature**: ask whether to make the new spec the active one (`.specify/feature.json` → `feature_directory`). Change it only if the user agrees.
 

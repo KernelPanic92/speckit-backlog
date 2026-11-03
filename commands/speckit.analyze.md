@@ -72,6 +72,7 @@ Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_
 - BACKLOG = FEATURE_DIR/backlog/ (epics/, stories/, spikes/, tasks/)
 - RESEARCH = FEATURE_DIR/research.md (if present)
 - PRODUCT = `.specify/memory/product.md` (if present)
+- REFERENCES = the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: what a readable reference is, for detection pass G and for this report
 
 Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
 
@@ -188,8 +189,8 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Every error reported by the validator (schema, more than one PARENT or a forbidden hierarchy, unknown ids, inverse relations, relation order, duplicate ids, leftover placeholders, a story in a lane earlier than its blocker, tasks.md lines without a TASK file or TASK files missing from tasks.md)
 - Child PBIs missing from the Backlog Index, or listed there but missing on disk
 - PBIs without an Out of Scope section (EPIC: Scope Boundaries); Out of Scope items without where they go; scenarios without `AC-n` ids
-- References a reader cannot follow without the generation context: a PBI cited by its bare id, coined abbreviations, section numbers without their title, bare URLs, local files as the only source
-- Stories that break the rules of `.specify/presets/backlog/knowledge/user-story-writer/rules.md` in an evident way: conjunctions in the "I want" clause, more than 5 scenarios without justification, Read and Write in the same story, phantom UI
+- References a reader cannot follow without the generation context, in any artifact (PBIs, spec envelope, plan.md, research.md, tasks.md, TASK files, checklists): a PBI or a scenario cited by its bare id (outside the labels REFERENCES allows), the `§` notation, coined abbreviations or numbering ("R2", "Q3"), section numbers without their title, bare URLs or paths, links whose text does not name the topic, local files as the only source of a PBI, constitution principles cited by number
+- Stories that break the rules of `.specify/presets/backlog/knowledge/pbi-writing/rules.md` in an evident way: conjunctions in the "I want" clause, more than 5 scenarios without justification, Read and Write in the same story, phantom UI
 - Spikes neither answered in research.md nor scheduled as tasks
 
 #### H. Product Consistency
@@ -216,21 +217,23 @@ Output a Markdown report (no file writes) with the following structure:
 
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
 |----|----------|----------|-------------|---------|----------------|
-| A1 | Duplication | HIGH | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
+| A1 | Duplication | HIGH | Acceptance Criteria of US [US-003] Product page (`backlog/stories/US-003-product-page.md`, lines 40-52) | Two similar requirements ... | Merge phrasing; keep clearer version |
 
-(Add one row per finding; generate stable IDs prefixed by category initial.)
+(Add one row per finding; generate stable IDs prefixed by category initial. Locations name the document, the PBI as `type [id] title` and the section by its heading, with the file and lines in brackets; when a finding is cited again, in Next Actions or in remediation, repeat its summary next to its ID.)
 
 **Coverage Summary Table:**
 
-| Requirement Key | Has Task? | Task IDs | Notes |
-|-----------------|-----------|----------|-------|
-| US-001/AC-1 | Yes | TASK-010, TASK-011 | |
+| Requirement Key | Requirement | Has Task? | Tasks | Notes |
+|-----------------|-------------|-----------|-------|-------|
+| US-001/AC-1 | Catalog list: "Products listed" | Yes | TASK-010 Catalog list acceptance tests, TASK-011 Catalog list query | |
+
+(The Requirement column carries the story title and the scenario title, or the Success Criterion's short name; every task carries its title.)
 
 **Validator Result:** (pass, or the error count by kind)
 
 **Constitution Alignment Issues:** (if any)
 
-**Unmapped Tasks:** (if any)
+**Unmapped Tasks:** (if any, as `TASK [id] title`)
 
 **Metrics:**
 
@@ -248,7 +251,7 @@ At end of report, output a concise Next Actions block:
 
 - If CRITICAL issues exist: Recommend resolving before `__SPECKIT_COMMAND_IMPLEMENT__`
 - If only LOW/MEDIUM: User may proceed, but provide improvement suggestions
-- Provide explicit command suggestions: e.g., "Run __SPECKIT_COMMAND_CLARIFY__ to resolve the open questions", "Run __SPECKIT_COMMAND_PLAN__ to adjust architecture", "Run __SPECKIT_COMMAND_TASKS__ to add coverage for US-004/AC-2", "Run __SPECKIT_COMMAND_SPLIT__ to carve the Checkout epic out of this map"
+- Provide explicit command suggestions: e.g., "Run __SPECKIT_COMMAND_CLARIFY__ to resolve the open questions", "Run __SPECKIT_COMMAND_PLAN__ to adjust architecture", "Run __SPECKIT_COMMAND_TASKS__ to cover the Card declined scenario of the card payment story (US-004/AC-2)", "Run __SPECKIT_COMMAND_SPLIT__ to carve the Checkout epic out of this map"
 
 ### 8. Offer Remediation
 
@@ -302,6 +305,7 @@ After reporting, check if `.specify/extensions.yml` exists in the project root.
 - **Prioritize constitution violations** (these are always CRITICAL)
 - **Use examples over exhaustive rules** (cite specific instances, not generic patterns)
 - **Report zero issues gracefully** (emit success report with coverage statistics)
+- **Readable report**: before printing, run the self-check of REFERENCES on the report itself: every PBI, scenario, task and section it names must be understandable without opening the files
 
 ## Context
 

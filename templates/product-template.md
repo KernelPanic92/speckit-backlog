@@ -1,5 +1,5 @@
 # [PRODUCT_NAME] — Product
-<!-- WHAT we build and for WHOM. HOW we build it lives in .specify/memory/constitution.md. History of changes is git history: no version numbers or change tables in this file. -->
+<!-- WHAT we build and for WHOM. HOW we build it lives in [the constitution](constitution.md). History of changes is git history: no version numbers or change tables in this file. Other documents cite this one by section name, e.g. [the Personas of the product](../../.specify/memory/product.md#personas). -->
 
 ## Vision
 

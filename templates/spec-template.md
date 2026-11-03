@@ -10,6 +10,9 @@
 
   Remove this comment block from the generated spec.md.
   Optional sections: include them only when relevant; remove them entirely instead of writing "N/A".
+  References follow the "Readable references" rules of the backlog preset: a PBI as `type [id] title`,
+  a scenario as `US-001/AC-1 "title"`, another document as a relative link whose text names the topic
+  and whose address ends with the heading anchor; never a bare id, a bare path or a section number.
 -->
 
 ## Spec Context
@@ -18,7 +21,7 @@
 
 **Root PBI**: [TYPE [ID] Title]
 
-**Product context**: `.specify/memory/product.md` (Personas, Ubiquitous Language)
+**Product context**: [Personas](../../.specify/memory/product.md#personas) and [Ubiquitous Language](../../.specify/memory/product.md#ubiquitous-language) of the product
 
 **Status**: [Draft | Clarified | Ready for plan]
 
@@ -46,8 +49,10 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: [Measurable metric, e.g., "Customers complete a first purchase in under 3 minutes"]
-- **SC-002**: [Business metric, e.g., "Searches without results drop below 5%"]
+<!-- Other documents cite a criterion by id and short name, e.g. SC-001 "First purchase in under 3 minutes". -->
+
+- **SC-001 [Short name]**: [Measurable metric, e.g., "Customers complete a first purchase in under 3 minutes"]
+- **SC-002 [Short name]**: [Business metric, e.g., "Searches without results drop below 5%"]
 
 ## Key Entities *(include if the spec involves data)*
 
@@ -60,7 +65,7 @@
 <!--
   Container-level constraints with exact, quantitative values (no "fast", "secure", "user-friendly").
   Following the "core value first, NFR later" splitting rule, the stories that deliver
-  demanding NFRs are sliced separately: reference them here.
+  demanding NFRs are sliced separately: reference them here as `type [id] title`.
 -->
 
 - **Performance**: [e.g., "Search results appear in under 1 second for 95% of queries"]
@@ -88,11 +93,12 @@
 ## Open Questions
 
 <!--
-  Questions that could not be answered while writing the backlog. Each one names the PBIs it affects.
-  /speckit.clarify works through this list; resolved questions move to Clarifications.
+  Questions that could not be answered while writing the backlog. Each one is a full question that
+  makes sense on its own and names the PBIs it affects. No numbering such as "Q1": a question is
+  cited by its topic. /speckit.clarify works through this list; resolved questions move to Clarifications.
 -->
 
-- [ ] Q1: [Question] — affects [TYPE [ID] Title]
+- [ ] [Question?] — affects [TYPE [ID] Title](backlog/[stories|epics|spikes]/[ID]-[slug].md)
 
 ## Clarifications
 
@@ -100,4 +106,6 @@
 
 ## References *(optional)*
 
-- [Link to design mockups, research, related specs]
+<!-- One bullet per source, as a link whose text says what it is: [Checkout mockups in Figma](https://…), [the payment provider decision](research.md#payment-provider). Never a bare URL or path. -->
+
+- [[What the source is, in words]](address that reaches the spot)

@@ -30,8 +30,8 @@ media:
 
 [A clear, concise description of what has to be done technically. E.g.: "Create the login API endpoint" or "Implement the navbar CSS layout"]
 
-<!-- optional, only for test tasks derived from Gherkin scenarios: the scenarios this task turns into automated acceptance tests -->
-**Covers:** {{US-001/AC-1}}, {{US-001/AC-2}}
+<!-- optional, only for test tasks derived from Gherkin scenarios: the scenarios this task turns into automated acceptance tests, each id followed by the scenario title in quotes -->
+**Covers:** {{US-001/AC-1}} "{{scenario title}}", {{US-001/AC-2}} "{{scenario title}}"
 
 ## Files
 
