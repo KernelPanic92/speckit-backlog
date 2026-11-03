@@ -1,7 +1,7 @@
 ---
 name: story-splitting
 description: >-
-  Read when a story is too big and the heuristics in §4 of `../rules.md` are not enough, or when you need to fill in "Split pattern" in the Micro-Scope: Lawrence's 9 patterns with examples, the meta-pattern and the two checks to choose the winning split.
+  Read when a story is too big and the heuristics of the "Scope and splitting" constraints in `../rules.md` are not enough, or when you need to fill in "Split pattern" in the Micro-Scope: Lawrence's 9 patterns with examples, the meta-pattern and the two checks to choose the winning split.
 source: https://www.humanizingwork.com/the-humanizing-work-guide-to-splitting-user-stories/
 ---
 
@@ -85,7 +85,7 @@ Choose the split that produces more small stories of similar size. Four 2-point 
 
 ## The two key checks on every piece
 
-1. **Does every piece bring visible value?** Every story must add an increment of value observable by the user. For Lawrence it does not have to be releasable on its own, but several stories accumulate into a Minimum Marketable Feature (MMF). If a piece does not move the needle for the user, it is not a story. (*Choice of our rules, stricter:* every story must be deployable and usable on its own, see `../rules.md` §2 (I) and §4 "Releasability". The MMF concession does NOT apply: a form without submission or a drag without saving are not stories, even if the MMF would complete them.)
+1. **Does every piece bring visible value?** Every story must add an increment of value observable by the user. For Lawrence it does not have to be releasable on its own, but several stories accumulate into a Minimum Marketable Feature (MMF). If a piece does not move the needle for the user, it is not a story. (*Choice of our rules, stricter:* every story must be deployable and usable on its own, see `../rules.md`, constraint (I) Independent in "I.N.V.E.S.T. constraints" and "Releasability" in "Scope and splitting". The MMF concession does NOT apply: a form without submission or a drag without saving are not stories, even if the MMF would complete them.)
 2. **Are the pieces roughly equal in size and small?** Rule of thumb: when a story reaches the top of the backlog, 6-10 of them should fit in a sprint. Similar sizes reduce estimation variance and increase predictability.
 
 ## Notes on context (Cynefin)

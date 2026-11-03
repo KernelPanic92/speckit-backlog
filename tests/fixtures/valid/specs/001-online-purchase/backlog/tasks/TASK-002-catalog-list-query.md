@@ -28,7 +28,7 @@ Query the products for sale and render them.
 
 ## Out of Scope
 
-- Product detail — not planned
+- Product detail: not planned
 
 ## Definition of Done (DoD)
 - [ ] Unit tests written and passing

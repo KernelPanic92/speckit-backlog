@@ -191,7 +191,7 @@ Given that feature description, do this:
    - **Fill the spec envelope**: Spec Context (mode, root PBI, status `Draft`), Backlog Index (every child with a relative link, in the order the rules require), Success Criteria (`SC-###`, measurable and technology-agnostic), Key Entities with Ubiquitous Language terms (if data is involved), and — only when relevant — Non-Functional Requirements, External Dependencies, Security & Compliance Checklist, References. Open Questions lists what is still unknown, each naming the PBIs it affects. Remove the envelope's guidance comment block and every optional section that does not apply.
    - Never leave `{{...}}` or `[...]` placeholders, template comments that no longer guide anything, or empty optional keys.
 
-10. **FINAL CHECK and SUMMARY** (end of Phase 2 of `RULES`), printed in the conversation: re-read every story against INVEST and the constraints and re-split where needed; then list the final PBIs in release order (`type [id] title`) and — in `epic` mode with more than 5 stories — suggest the map in one line.
+10. **FINAL CHECK and SUMMARY** (end of Phase 2 of `RULES`), printed in the conversation: re-read every story against INVEST and the constraints and re-split where needed; re-read every reference in the PBIs, the relation `reason`s and the conversation blocks with the "NO mental mapping" test of `RULES` and rewrite coined abbreviations, section numbers without their title, bare URLs and files the reader cannot open (the feature's `spec.md` or `plan.md` is not a reference a task-manager reader can open); then list the final PBIs in release order (`type [id] title`) and — in `epic` mode with more than 5 stories — suggest the map in one line.
 
 11. **Structural validation**: run `VALIDATOR check SPECIFY_FEATURE_DIRECTORY`. Fix every error it reports and run it again until it passes (max 3 iterations; then report the remaining errors).
 
@@ -209,7 +209,8 @@ Given that feature description, do this:
       ## Structure
 
       - [ ] The validator passes (schema, relations, ids, no placeholders)
-      - [ ] Every PBI has an Out of Scope section (EPIC: Scope Boundaries)
+      - [ ] Every PBI has an Out of Scope section (EPIC: Scope Boundaries) that lists only what a reader could assume is included, each item with where it goes
+      - [ ] Every reference is readable without the generation context: other PBIs as `type [id] title`, documents as links whose text names the topic, no coined abbreviations, untitled section numbers, bare URLs or local files
       - [ ] The Backlog Index lists every child PBI in release order
       - [ ] Success Criteria are measurable and technology-agnostic
 

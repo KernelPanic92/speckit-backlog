@@ -37,7 +37,7 @@ Returning shoppers pay with their saved card.
 
 ## Out of Scope
 
-- Managing several saved cards — not planned
+- Managing several saved cards: not planned
 
 ## INVEST & DoR (Definition of Ready) Check
 - [x] **I**ndependent - follows card payment, a real dependency

@@ -17,6 +17,11 @@ relations:
         type: US|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
+# optional: architecture documents or the Figma of the whole flow. Only links really supplied by the user
+media:
+    "{{attachment name}}":
+        url: {{attachment}}
+        description: "{{description}}"
 ---
 
 As a {{Persona}}, I want {{Action/Goal}}, so that {{Value}}.
@@ -44,7 +49,7 @@ To avoid *scope creep* (the uncontrolled growth of requirements), we set the bou
 **Then** {{observable or measurable result}}
 
 ## Additional Notes
-[Legal, marketing or cross-team dependencies, links to architecture documents / Figma]
+[Legal, marketing or cross-team dependencies, links to architecture documents / Figma. Write every link as [topic in clear words](address that reaches the spot: section anchor, page, Figma frame), never a bare URL, an abbreviation or a section number without its title]
 
 <!-- optional sections, include them only when filled in -->
 ## Assumptions

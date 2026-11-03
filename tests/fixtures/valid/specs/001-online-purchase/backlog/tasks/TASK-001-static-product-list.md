@@ -24,7 +24,7 @@ Show a static list of 3 products read from the database.
 
 ## Out of Scope
 
-- Pagination — TASK [TASK-002] Catalog list query
+- Pagination: TASK [TASK-002] Catalog list query
 
 ## Definition of Done (DoD)
 - [ ] Unit tests written and passing

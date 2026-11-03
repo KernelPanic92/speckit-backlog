@@ -109,6 +109,30 @@ def test_detects(project, expected, relative, old, new):
     assert expected in codes(result), result["errors"]
 
 
+MEDIA = 'media:\n    "Reference":\n        url: "https://example.com/board"\n        description: "What the attachment shows"\n'
+MEDIA_ON_EVERY_TYPE = [
+    ("MAP", "spec.md"),
+    ("EPIC", "backlog/epics/EPIC-001-discovery.md"),
+    ("US", "backlog/stories/US-001-catalog-list.md"),
+    ("SPIKE", "backlog/spikes/SPIKE-001-payment-provider.md"),
+    ("TASK", "backlog/tasks/TASK-001-static-product-list.md"),
+]
+
+
+@pytest.mark.parametrize("pbi_type, relative", MEDIA_ON_EVERY_TYPE, ids=[m[0] for m in MEDIA_ON_EVERY_TYPE])
+def test_media_on_every_pbi_type(project, pbi_type, relative):
+    edit(project, relative, f"type: {pbi_type}\n", f"type: {pbi_type}\n{MEDIA}")
+    code, result = run(project, "check", SPEC)
+    assert code == 0, result["errors"]
+
+
+@pytest.mark.parametrize("pbi_type, relative", MEDIA_ON_EVERY_TYPE, ids=[m[0] for m in MEDIA_ON_EVERY_TYPE])
+def test_media_items_must_follow_the_schema(project, pbi_type, relative):
+    edit(project, relative, f"type: {pbi_type}\n",
+         f'type: {pbi_type}\nmedia:\n    "Reference":\n        url: "https://example.com/board"\n')
+    assert "schema" in codes(run(project, "check", SPEC)[1])
+
+
 def test_checkbox_lines_that_are_not_tasks(project):
     edit(project, "tasks.md", "## Phase 2: Walking Skeleton",
          "## Task Completion Criteria\n\n- [ ] Unit tests for new code\n- [ ] Feature-flag wrapped when needed\n- [ ] API contract respected\n\n## Phase 2: Walking Skeleton")

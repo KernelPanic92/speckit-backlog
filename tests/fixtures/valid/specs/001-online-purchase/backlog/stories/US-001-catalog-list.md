@@ -33,7 +33,7 @@ The catalog shows every product for sale.
 
 ## Out of Scope
 
-- Opening the product detail — future story
+- Opening the product detail: not planned
 
 ## INVEST & DoR (Definition of Ready) Check
 - [x] **I**ndependent - entry point of the journey

@@ -40,7 +40,7 @@ A shopper finds a product, pays for it by card and gets a confirmation.
 
 ## Out of Scope
 
-- Marketplace sellers — not planned
+- Marketplace sellers: not planned
 
 ## DoR (Definition of Ready) Check
 - [x] Narrative - browse, then pay

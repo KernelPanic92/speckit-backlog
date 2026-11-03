@@ -89,7 +89,7 @@ Execution steps:
    - Binary outcome: every `Then` can be verified as pass/fail; no vague adjectives
    - Asynchronous states: every async operation describes trigger, waiting, outcome, error and retry
    - Phantom UI: no visible command whose logic is deferred to another story
-   - Story boundaries: Read vs Write and List vs Detail are separate stories; Out of Scope sections point to where excluded capabilities live
+   - Story boundaries: Read vs Write and List vs Detail are separate stories; Out of Scope sections point to where excluded capabilities go
    - Dependencies: only real BLOCKED_BY dependencies; Spikes declared where estimation is blocked
    - Map (map mode): lane Outcomes, gravity order, Walking Skeleton vs MVP
 
@@ -213,10 +213,10 @@ Execution steps:
     - Then immediately apply the clarification to the most appropriate PBI(s) and section(s), following `RULES`:
        - Functional ambiguity → Update or add a Gherkin scenario (`### AC-n`) in the affected story; keep 2-5 scenarios per story — if a story grows beyond 5, re-split it (new US files with ids from `VALIDATOR next-id US`, PARENT and BLOCKED_BY relations, Backlog Index and Release Lanes updated).
        - User interaction / actor distinction → Update the Connextra persona of the affected PBIs; a new persona must be approved by the user and added to `PRODUCT` → Personas.
-       - Scope boundary → Update the `## Out of Scope` of the affected PBIs (EPIC: Scope Boundaries), pointing to where the excluded capability lives.
+       - Scope boundary → Update the `## Out of Scope` of the affected PBIs (EPIC: Scope Boundaries): only what a reader could assume is included, each item with where it goes (`type [id] title` or "not planned").
        - Data shape / entities → Update Key Entities in the envelope preserving ordering; note added constraints succinctly.
        - Non-functional constraint → Add/modify measurable criteria in Success Criteria > Measurable Outcomes or Non-Functional Requirements (convert vague adjective to metric or explicit target).
-       - Edge case / negative flow / async state → Add a scenario to the affected story (async: full cycle with loading indicator, error and retry, as `RULES` §3 prescribes).
+       - Edge case / negative flow / async state → Add a scenario to the affected story (async: full cycle with loading indicator, error and retry, as the "BDD Acceptance Criteria" constraints of `RULES` prescribe).
        - Technical uncertainty that blocks estimation → Add a SPIKE (PARENT: the story) and declare it on the story with BLOCKED_BY.
        - Terminology conflict → Normalize the term across spec and PBIs using the canonical term of `PRODUCT`; a new term must be approved by the user and added to `PRODUCT` → Ubiquitous Language (Term, Business definition, Dev definition); retain the original only if necessary by adding `(formerly referred to as "X")` once.
     - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
@@ -232,6 +232,7 @@ Execution steps:
    - Markdown structure valid; only allowed new headings in spec.md: `## Clarifications`, `### Session YYYY-MM-DD`; in PBIs only the headings their templates define (e.g. a new `### AC-n:`).
    - Terminology consistency: same canonical term used across all updated sections and PBIs.
    - Every changed or new PBI still satisfies `RULES` (Connextra, INVEST, Gherkin, Out of Scope).
+   - Every reference in the text you wrote passes the "NO mental mapping" test of `RULES`: another PBI as `type [id] title`, a document as a link whose text names the topic, never a coined abbreviation, a section number without its title, a bare URL or a file the reader cannot open.
    - `VALIDATOR check FEATURE_DIR` passes (fix and re-run on errors).
 
 8. Write the updated spec back to `FEATURE_SPEC` (and the touched PBI files and `PRODUCT`). If the Spec Context status was `Draft` and no Open Questions remain, set it to `Clarified`.

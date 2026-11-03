@@ -17,7 +17,7 @@ relations:
         type: US|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
-# optional: Figma mockups, screenshots or other attachments useful for development
+# optional: Figma mockups, screenshots or other attachments useful for development. Only links really supplied by the user
 media:
     "{{attachment name}}":
         url: {{attachment}}
@@ -43,18 +43,20 @@ As a {{Persona}}, I want {{Action/Goal}}, so that {{Value}}.
 
 ## Out of Scope
 
-<!-- One bullet per capability explicitly excluded by the "I want" clause (the OUT part of the Micro-Scope "Technical Boundaries"), with where it lives -->
-- {{excluded capability}} — {{US [US-004] Title | future story | not planned}}
+<!-- Nearby capabilities, cases or variants that are not part of this story: the scope is fixed by the "I want" clause (the OUT part of the Micro-Scope "Technical Boundaries"). One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->
+- {{what is not included}}: {{where it goes}}
 
-<!-- optional sections, include them only when filled in -->
+<!-- optional section, include it only when filled in -->
 ## Additional Notes
 
-<!-- Bullet list of details that emerged during backlog refinement, links to Figma mockups, technical constraints or business logic -->
+<!-- Bullet list of details that emerged during backlog refinement, links to Figma mockups, technical constraints or business logic. Write every link as [topic in clear words](address that reaches the spot: section anchor, page, Figma frame), never a bare URL, an abbreviation or a section number without its title -->
 
+<!-- optional section, include it only when filled in -->
 ## Assumptions
 
 - {{assumption}}
 
+<!-- optional section, include it only when filled in -->
 ## Risks
 
 - {{risk}}
