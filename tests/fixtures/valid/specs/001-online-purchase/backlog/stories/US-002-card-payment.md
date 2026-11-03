@@ -44,7 +44,7 @@ Shoppers pay by Visa or Mastercard and get a confirmation.
 
 ## Out of Scope
 
-- Saving the card — US [US-003] Saved card
+- Saving the card: US [US-003] Saved card
 
 ## INVEST & DoR (Definition of Ready) Check
 - [x] **I**ndependent - depends only on the catalog list, its entry point

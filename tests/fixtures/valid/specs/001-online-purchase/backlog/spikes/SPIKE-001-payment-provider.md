@@ -24,7 +24,7 @@ A recommendation recorded in research.md.
 
 ## Out of Scope
 
-- Pricing negotiation
+- Pricing negotiation: not planned
 
 ## Exit Criteria
 - [ ] The question has a documented answer (in `research.md`)

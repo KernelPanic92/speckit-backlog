@@ -19,6 +19,11 @@ relations:
         type: US|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
+# optional: diagrams, technical specifications or logs useful for the work. Only links really supplied by the user
+media:
+    "{{attachment name}}":
+        url: {{attachment}}
+        description: "{{description}}"
 ---
 
 ## Outcome
@@ -37,15 +42,16 @@ relations:
 - [ ] Sub-activity 1
 - [ ] Sub-activity 2
 
+<!-- optional section, include it only when filled in -->
 ## Out of Scope
 
-<!-- Work deliberately left to other tasks, with where it lives -->
-- {{excluded work}} — {{TASK [TASK-007] Title | not planned}}
+<!-- Nearby technical work this task does not touch (refactoring, optimizations, adjacent parts). One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->
+- {{what is not included}}: {{where it goes}}
 
 <!-- optional section, include it only when filled in -->
 ## Additional Notes
 
-<!-- Bullet list of details that emerged during refinement, technical constraints or business logic -->
+<!-- Bullet list of details that emerged during refinement, technical constraints or business logic. Write every link as [topic in clear words](address that reaches the spot: section anchor, page, Figma frame), never a bare URL, an abbreviation or a section number without its title -->
 
 ## Definition of Done (DoD)
 <!-- Start from the "Task Completion Criteria" of tasks.md; keep only the items that apply and add task-specific ones -->

@@ -117,7 +117,7 @@
     },
     "userStory": {
       "type": "object",
-      "description": "Frontmatter of the pbi-story-template template.",
+      "description": "Frontmatter of the pbi-story-template template. Media: Figma mockups, screenshots or recordings.",
       "properties": {
         "id": {
           "$ref": "#/$defs/id"
@@ -148,7 +148,7 @@
     },
     "epic": {
       "type": "object",
-      "description": "Frontmatter of the pbi-epic-template template. An Epic is a User Story too big for a sticky note: it is written like a story and then split. When it comes from a Backbone Macro-Activity it declares the Map as PARENT and carries its title; without a map it has no parent. No media field: an Epic carries no attachments of its own, its child stories do.",
+      "description": "Frontmatter of the pbi-epic-template template. An Epic is a User Story too big for a sticky note: it is written like a story and then split. When it comes from a Backbone Macro-Activity it declares the Map as PARENT and carries its title; without a map it has no parent. Media: architecture documents or the Figma of the whole flow.",
       "properties": {
         "id": {
           "$ref": "#/$defs/id"
@@ -162,6 +162,9 @@
         },
         "relations": {
           "$ref": "#/$defs/relationsMap"
+        },
+        "media": {
+          "$ref": "#/$defs/mediaMap"
         },
         "external": {
           "$ref": "#/$defs/externalMap"
@@ -207,7 +210,7 @@
     },
     "task": {
       "type": "object",
-      "description": "Frontmatter of the pbi-task-template template. No media field: a technical Task carries no attachments of its own. Dependencies between tasks are BLOCKED_BY relations.",
+      "description": "Frontmatter of the pbi-task-template template. Media: diagrams, technical specifications or logs. Dependencies between tasks are BLOCKED_BY relations.",
       "properties": {
         "id": {
           "$ref": "#/$defs/id"
@@ -222,6 +225,9 @@
         "relations": {
           "$ref": "#/$defs/relationsMap"
         },
+        "media": {
+          "$ref": "#/$defs/mediaMap"
+        },
         "external": {
           "$ref": "#/$defs/externalMap"
         }
@@ -235,7 +241,7 @@
     },
     "spike": {
       "type": "object",
-      "description": "Frontmatter of the pbi-spike-template template. No media field: a Spike produces knowledge, it consumes no attachments of its own. The PBI the Spike unblocks declares the Spike with relationType BLOCKED_BY.",
+      "description": "Frontmatter of the pbi-spike-template template. Media: provider documentation or existing prototypes. The PBI the Spike unblocks declares the Spike with relationType BLOCKED_BY.",
       "properties": {
         "id": {
           "$ref": "#/$defs/id"
@@ -250,6 +256,9 @@
         "relations": {
           "$ref": "#/$defs/relationsMap"
         },
+        "media": {
+          "$ref": "#/$defs/mediaMap"
+        },
         "external": {
           "$ref": "#/$defs/externalMap"
         }
@@ -263,7 +272,7 @@
     },
     "map": {
       "type": "object",
-      "description": "Frontmatter of the pbi-map-template template. A User Story Map is a PBI of type MAP: the table on which a product, or an Epic that is too big, is broken into pieces. It organizes the other PBIs by listing their ids in the body (Backbone, Walking Skeleton, Release Lanes) and does not reference them in relations: the Backbone Epics declare the Map as PARENT. The Map declares a PARENT only in the 'zoom' case, i.e. the macro-Epic it breaks down. No media field.",
+      "description": "Frontmatter of the pbi-map-template template. A User Story Map is a PBI of type MAP: the table on which a product, or an Epic that is too big, is broken into pieces. It organizes the other PBIs by listing their ids in the body (Backbone, Walking Skeleton, Release Lanes) and does not reference them in relations: the Backbone Epics declare the Map as PARENT. The Map declares a PARENT only in the 'zoom' case, i.e. the macro-Epic it breaks down. Media: a whiteboard photo or the Miro/Figma board.",
       "properties": {
         "id": {
           "$ref": "#/$defs/id"
@@ -277,6 +286,9 @@
         },
         "relations": {
           "$ref": "#/$defs/relationsMap"
+        },
+        "media": {
+          "$ref": "#/$defs/mediaMap"
         },
         "external": {
           "$ref": "#/$defs/externalMap"

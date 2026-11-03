@@ -172,7 +172,7 @@ uv run --no-project --quiet --with pyyaml --with jsonschema \
   python .specify/presets/backlog/scripts/validate_backlog.py check --all
 ```
 
-- `check <feature-dir> | --all` — frontmatter against `schemas/pbi-frontmatter.schema.json`, hierarchy (at most one PARENT, allowed parent types), unknown ids, cycles, canonical relation order, duplicate ids, leftover placeholders, Out of Scope and `AC-n` ids, Backlog Index links, Release Lane order vs `BLOCKED_BY`, `tasks.md` lines vs TASK files.
+- `check <feature-dir> | --all` — frontmatter against `schemas/pbi-frontmatter.schema.json`, hierarchy (at most one PARENT, allowed parent types), unknown ids, cycles, canonical relation order, duplicate ids, leftover placeholders, EPIC Scope Boundaries and `AC-n` ids, Backlog Index links, Release Lane order vs `BLOCKED_BY`, `tasks.md` lines vs TASK files.
 - `next-id <TYPE> [--count N]` — first free project-wide id.
 - `locate <ID> [--descendants]` — file, spec, references and descendants of a PBI.
 

@@ -61,7 +61,7 @@ Paths used by this command (preset `backlog`):
      - Clarifications that concern moved PBIs: copy them under `### Carried over from <SOURCE_DIR>`.
    - Relations stay as they are: the new root keeps its PARENT (e.g. the MAP it belongs to), and its children keep pointing to it.
 
-5. **Root rules**: the new root must satisfy `RULES` as a root: an EPIC root keeps its Scope Boundaries and Acceptance Criteria; a US root keeps its Out of Scope. Do not rewrite stories beyond what the move requires.
+5. **Root rules**: the new root must satisfy `RULES` as a root: an EPIC root keeps its Scope Boundaries and Acceptance Criteria; a US root keeps its Out of Scope, if it has one. Do not rewrite stories beyond what the move requires.
 
 6. **Update the source spec** (`SOURCE_DIR/spec.md`), without deleting the product-level view:
    - Map Backbone: keep the Epic's column and add ` → [specs/NNN-slug](../NNN-slug/spec.md)` after its title.
