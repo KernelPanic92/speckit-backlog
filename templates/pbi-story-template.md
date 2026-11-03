@@ -41,7 +41,6 @@ As a {{Persona}}, I want {{Action/Goal}}, so that {{Value}}.
 **When** {{action performed}}
 **Then** {{observable or measurable result}}
 
-<!-- optional section, include it only when filled in -->
 ## Out of Scope
 
 <!-- Nearby capabilities, cases or variants that are not part of this story: the scope is fixed by the "I want" clause (the OUT part of the Micro-Scope "Technical Boundaries"). One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->

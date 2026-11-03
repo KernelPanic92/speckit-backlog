@@ -42,7 +42,6 @@ media:
 - [ ] Sub-activity 1
 - [ ] Sub-activity 2
 
-<!-- optional section, include it only when filled in -->
 ## Out of Scope
 
 <!-- Nearby technical work this task does not touch (refactoring, optimizations, adjacent parts). One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->

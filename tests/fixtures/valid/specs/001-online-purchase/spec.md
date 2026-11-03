@@ -38,6 +38,10 @@ A shopper finds a product, pays for it by card and gets a confirmation.
 * **2. EPIC [EPIC-002] Checkout**
   * US [US-003] Saved card
 
+## Out of Scope
+
+- Marketplace sellers: not planned
+
 ## DoR (Definition of Ready) Check
 - [x] Narrative - browse, then pay
 - [x] Vertical - every lane crosses the Backbone

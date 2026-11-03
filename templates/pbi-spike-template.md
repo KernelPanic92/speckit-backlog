@@ -31,7 +31,6 @@ media:
 
 [What the Spike produces: a documented answer, a recommendation, a revised estimate of the PBI it unblocks, a throwaway prototype. It does not produce production code. In spec-kit the answer is recorded in the feature's `research.md` by `/speckit.plan` (Phase 0).]
 
-<!-- optional section, include it only when filled in -->
 ## Out of Scope
 
 <!-- Nearby questions this Spike does not answer and alternatives it does not explore. One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->

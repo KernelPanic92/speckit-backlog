@@ -49,8 +49,8 @@ ALLOWED_PARENTS = {
     "SPIKE": ("US", "EPIC"),     # EPIC for Walking Skeleton items
 }
 BACKLOG_DIRS = {"epics": "EPIC", "stories": "US", "spikes": "SPIKE", "tasks": "TASK"}
-# sections a PBI type must have; "## Out of Scope" is optional in US, TASK, SPIKE and MAP
-REQUIRED_HEADING = {"EPIC": "## Scope Boundaries"}
+OUT_OF_SCOPE_HEADING = {"US": "## Out of Scope", "TASK": "## Out of Scope", "SPIKE": "## Out of Scope",
+                        "MAP": "## Out of Scope", "EPIC": "## Scope Boundaries"}
 MOCK_ID = re.compile(r"^(MAP|EPIC|US|SPIKE|BUG|TASK)-(\d+)$")
 # a task line starts with an id (TASK-014, or a task-manager id such as CU-86c1x2); other
 # checkbox lines of tasks.md (e.g. the Task Completion Criteria) are not tasks
@@ -260,7 +260,7 @@ def check_pbi(pbi: Pbi, by_id: dict, validator: Draft202012Validator, report: Re
                      "then type MAP, EPIC, US, SPIKE, BUG, TASK; then ascending id)", pbi.id)
 
     # required sections
-    heading = REQUIRED_HEADING.get(pbi.type)
+    heading = OUT_OF_SCOPE_HEADING.get(pbi.type)
     if heading and heading not in (l.strip() for l in pbi.body.splitlines()):
         report.error(pbi.path, "out-of-scope", f"missing '{heading}' section", pbi.id)
     if pbi.type in ("US", "EPIC"):

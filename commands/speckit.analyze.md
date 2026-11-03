@@ -88,7 +88,7 @@ Load only the minimal necessary context from each artifact:
 
 **From spec.md:**
 
-- Root PBI: type (MAP / EPIC / US), Connextra, Outcome, Out of Scope (if present); for a MAP: Backbone, Walking Skeleton, Release Lanes, DoR Check
+- Root PBI: type (MAP / EPIC / US), Connextra, Outcome, Out of Scope; for a MAP: Backbone, Walking Skeleton, Release Lanes, DoR Check
 - Spec Context (mode, status) and Backlog Index
 - Success Criteria (measurable outcomes — e.g., performance, security, availability, user success, business impact)
 - Key Entities, Non-Functional Requirements, Security & Compliance Checklist (if present)
@@ -97,7 +97,7 @@ Load only the minimal necessary context from each artifact:
 **From the PBIs under backlog/:**
 
 - Frontmatter (id, title, type, relations)
-- Stories: Connextra, Acceptance Criteria (`AC-n` ids, Given/When/Then), Out of Scope (if present), INVEST & DoR Check
+- Stories: Connextra, Acceptance Criteria (`AC-n` ids, Given/When/Then), Out of Scope, INVEST & DoR Check
 - Epics: Scope Boundaries; Spikes: question, Exit Criteria; TASKs: Covers, Files, relations
 
 **From research.md (if present):**
@@ -187,7 +187,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 
 - Every error reported by the validator (schema, more than one PARENT or a forbidden hierarchy, unknown ids, inverse relations, relation order, duplicate ids, leftover placeholders, a story in a lane earlier than its blocker, tasks.md lines without a TASK file or TASK files missing from tasks.md)
 - Child PBIs missing from the Backlog Index, or listed there but missing on disk
-- EPICs without Scope Boundaries; Out of Scope items without where they go; scenarios without `AC-n` ids
+- PBIs without an Out of Scope section (EPIC: Scope Boundaries); Out of Scope items without where they go; scenarios without `AC-n` ids
 - References a reader cannot follow without the generation context: a PBI cited by its bare id, coined abbreviations, section numbers without their title, bare URLs, local files as the only source
 - Stories that break the rules of `.specify/presets/backlog/knowledge/user-story-writer/rules.md` in an evident way: conjunctions in the "I want" clause, more than 5 scenarios without justification, Read and Write in the same story, phantom UI
 - Spikes neither answered in research.md nor scheduled as tasks

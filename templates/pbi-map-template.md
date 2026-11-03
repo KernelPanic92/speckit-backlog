@@ -128,10 +128,9 @@ the next lane).
   * US [US-018] Push notifications on shipment status
 -->
 
-<!-- optional section, include it only when filled in and only when the product is split into several maps: a map that covers the whole product omits it -->
 ## Out of Scope
 
-<!-- Activities, personas or flows this map does not cover, pointing to the other map or PBI that covers them. One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->
+<!-- Activities, personas or flows this map does not cover; when the product is split into several maps, point to the other map or PBI that covers them. One bullet per item, with where it goes: the PBI that covers it (`type [id] title`) or "not planned". List only what a reader could reasonably assume is included, not everything this PBI does not do -->
 - {{what is not included}}: {{where it goes}}
 
 <!-- optional section, include it only when filled in -->

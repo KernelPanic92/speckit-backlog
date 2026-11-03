@@ -183,7 +183,7 @@ Given that feature description, do this:
    - **File layout**:
      - The **root PBI** goes to `SPEC_FILE`: its full template (frontmatter + body), followed by the spec envelope (`TEMPLATE_CONTENT` of `spec-template`). The root is the MAP (`map`), the EPIC (`epic`) or the US (`story`).
      - Every other PBI gets its own file: `backlog/epics/`, `backlog/stories/`, `backlog/spikes/`, `backlog/tasks/`, named `<ID>-<slug>.md` where `<slug>` is the title in lowercase ASCII kebab-case, at most 6 words (e.g. `backlog/stories/US-007-card-payment.md`).
-   - **`map`**: Phase 3a writes the MAP root (Connextra with the global goal, Outcome as elevator pitch, Backbone, Walking Skeleton), one EPIC file per Macro-Activity (PARENT: the MAP) and one TASK/SPIKE file per Walking Skeleton item (PARENT: the Epic of its Macro-Activity). Start the Backbone from the Key User Journeys of `PRODUCT` when one matches. Phase 2 writes the US files (PARENT: their Epic), in lane order and left to right along the Backbone, never all the stories of one Epic in a row. Phase 3b completes the MAP: Release Lanes titled with Outcomes, DoR Check, and Out of Scope only when the product is split across several maps.
+   - **`map`**: Phase 3a writes the MAP root (Connextra with the global goal, Outcome as elevator pitch, Backbone, Walking Skeleton), one EPIC file per Macro-Activity (PARENT: the MAP) and one TASK/SPIKE file per Walking Skeleton item (PARENT: the Epic of its Macro-Activity). Start the Backbone from the Key User Journeys of `PRODUCT` when one matches. Phase 2 writes the US files (PARENT: their Epic), in lane order and left to right along the Backbone, never all the stories of one Epic in a row. Phase 3b completes the MAP: Release Lanes titled with Outcomes, Out of Scope, DoR Check.
    - **`epic`**: the EPIC root, then Phase 2 writes the US files with the EPIC as PARENT, in BLOCKED_BY / release order.
    - **`story`**: Phase 2 runs once and its story is the root US (it has no PARENT unless the user names an existing Epic).
    - **Spikes**: when uncertainty prevents estimating a story, write a SPIKE (PARENT: the story it serves) and declare it on the story with `BLOCKED_BY`. `__SPECKIT_COMMAND_PLAN__` answers spikes in research.md.
@@ -209,7 +209,7 @@ Given that feature description, do this:
       ## Structure
 
       - [ ] The validator passes (schema, relations, ids, no placeholders)
-      - [ ] Every EPIC has Scope Boundaries; every Out of Scope section, when present, lists only what a reader could assume is included, each item with where it goes
+      - [ ] Every PBI has an Out of Scope section (EPIC: Scope Boundaries) that lists only what a reader could assume is included, each item with where it goes
       - [ ] Every reference is readable without the generation context: other PBIs as `type [id] title`, documents as links whose text names the topic, no coined abbreviations, untitled section numbers, bare URLs or local files
       - [ ] The Backlog Index lists every child PBI in release order
       - [ ] Success Criteria are measurable and technology-agnostic

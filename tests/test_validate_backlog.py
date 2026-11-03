@@ -85,7 +85,7 @@ MUTATIONS = [
      '    "MAP-001":\n        title: "Online purchase"\n        type: MAP'),
     ("multiple-parents", "backlog/stories/US-001-catalog-list.md", '        reason: "Parent epic"\n',
      '        reason: "Parent epic"\n    "EPIC-002":\n        title: "Checkout"\n        type: EPIC\n        relationType: PARENT\n        reason: "Second parent"\n'),
-    ("out-of-scope", "backlog/epics/EPIC-002-checkout.md", "## Scope Boundaries", "## Boundaries"),
+    ("out-of-scope", "backlog/stories/US-003-saved-card.md", "## Out of Scope", "## Exclusions"),
     ("ac-id", "backlog/stories/US-001-catalog-list.md", "### AC-2: Empty catalog", "### Empty catalog"),
     ("ac-sequence", "backlog/stories/US-001-catalog-list.md", "### AC-2: Empty catalog", "### AC-3: Empty catalog"),
     ("lane-order", "spec.md", "  * US [US-002] Card payment\n", "  * US [US-003] Saved card\n"),
@@ -107,15 +107,6 @@ def test_detects(project, expected, relative, old, new):
     code, result = run(project, "check", SPEC)
     assert code == 1
     assert expected in codes(result), result["errors"]
-
-
-def test_out_of_scope_is_optional_outside_the_epic(project):
-    # the valid fixture's MAP covers the whole product and has no Out of Scope section
-    edit(project, "backlog/stories/US-001-catalog-list.md", "## Out of Scope\n\n- Opening the product detail: not planned\n\n", "")
-    edit(project, "backlog/tasks/TASK-001-static-product-list.md", "## Out of Scope\n\n- Pagination: TASK [TASK-002] Catalog list query\n\n", "")
-    edit(project, "backlog/spikes/SPIKE-001-payment-provider.md", "## Out of Scope\n\n- Pricing negotiation: not planned\n\n", "")
-    code, result = run(project, "check", SPEC)
-    assert code == 0, result["errors"]
 
 
 MEDIA = 'media:\n    "Reference":\n        url: "https://example.com/board"\n        description: "What the attachment shows"\n'
