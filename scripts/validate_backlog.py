@@ -10,7 +10,7 @@ Commands:
     next-id <TYPE> [--count N]       first free project-wide id(s) for a PBI type
     locate <ID> [--descendants]      where a PBI lives, who references it, its descendants
     sync-plan <tool> <feature-dir> | --all [--only ID]
-                                     what /speckit.sync must create, update or leave alone
+                                     what a tracker extension must create, update or leave alone
                                      in an external tool, parents before children
     set-external <ID> <tool> [--id X] [--key K] [--url U] [--hash-current] [--remove]
                                      write (or remove) the PBI's reference to an external tool

@@ -69,11 +69,6 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **N** = new in this preset.
 | Front matter token groups, the eight canonical sections and their order | DESIGN.md format (Google Labs, alpha) |
 | Extension sections (Responsive Behavior, Motion, Accessibility, Sources & Sync, Known Gaps), guidance | N |
 
-### sync-clickup-template.md, sync-multica-template.md
-| Section | From |
-|---------|------|
-| All (settings, item and hierarchy mapping, relations, description, references, pull) | N |
-
 ### pbi-*-template.md
 | Template | From |
 |----------|------|

@@ -10,7 +10,7 @@ It is a preset, not a fork: you keep using the official `specify` CLI and its up
 - Constitution, plan, research and tasks merge current upstream templates with the ones of *Non-Deterministic Spec-Driven Development* (Enrico Papalini, [popoloni/non-deterministic-sdd](https://github.com/popoloni/non-deterministic-sdd)).
 - Documents are written for the people who steer the work: every reference says what it points to before it is opened and leads to the right spot. A PBI is `US [US-007] Card payment`, a scenario `US-007/AC-2 "Card declined"`, another document a relative link whose text names the section (`[the payment provider decision](research.md#payment-provider)`); no `§` notation, section numbers, coined abbreviations, bare ids or bare paths. The rule is the "Readable references" section of `knowledge/pbi-writing/rules.md`, and every command applies it.
 - No document versioning anywhere: no version numbers, "last amended" dates or changelog tables in constitution, product, design, plan or research. Git is the history.
-- The backlog can be published to **ClickUp** or **Multica** with `/speckit.sync`, and the Spec Kit commands can run inside Multica as skills.
+- Task managers stay out of the preset: separate Spec Kit extensions publish the backlog to a tool through a small contract the preset exposes (see [Tracker extensions](#tracker-extensions)).
 
 ## Workflow
 
@@ -25,7 +25,6 @@ It is a preset, not a fork: you keep using the official `specify` CLI and its up
 | 7 | `/speckit.implement` | executes tasks phase by phase; Gherkin scenarios become acceptance tests |
 | — | `/speckit.split <ID>` | carves an epic or story out of a spec into a new spec where it is the root |
 | — | `/speckit.merge <source> into <target>` | absorbs a spec into another container, or groups specs under a new epic/map |
-| — | `/speckit.sync <clickup\|multica> <setup\|push\|pull\|status>` | publishes the PBIs to a task manager and reads it back, following `.specify/sync/<tool>.md` |
 | — | `/speckit.checklist`, `/speckit.converge` | upstream commands, extended with the backlog's identifiers |
 
 In skills-based agents (Claude Code by default) the commands are invoked as `/speckit-specify`, `/speckit-plan`, …
@@ -65,19 +64,11 @@ For products with a user interface, `/speckit.constitution` also writes `.specif
 - `/speckit.plan`, `/speckit.tasks`, `/speckit.implement` and `/speckit.analyze` use it for UI work: tokens instead of literal values, component rules, the accessibility target.
 - Check it with the format's linter: `npx @google/design.md lint .specify/memory/design.md`.
 
-## Task managers: ClickUp and Multica
+## Tracker extensions
 
-`/speckit.sync <tool> <action>` publishes the PBIs of a spec to a task manager. The repository stays the source of truth for the content; the tool stays the source of truth for the workflow (status, assignees, comments).
+The preset does not talk to task managers. Publishing the backlog to a tool (ClickUp, Jira, Multica…) is the job of a separate Spec Kit **extension**, one per tool, which relies on this contract:
 
-```text
-/speckit.sync clickup setup      # writes .specify/sync/clickup.md: settings + mapping rules
-/speckit.sync clickup status     # what a push would create or update
-/speckit.sync clickup push       # creates/updates items, parents first, then dependencies and links
-/speckit.sync clickup pull       # reads statuses and edits made in the tool back (applied on confirmation)
-```
-
-- **Mapping documents.** `.specify/sync/<tool>.md` has the settings in its front matter and the mapping in prose (types, hierarchy, names, relations, description, language). The default is native nesting (Epic → User Story → Task); edit the prose to change it, e.g. to the one-level Epic → subtask convention described in the document.
-- **Ids.** PBI ids never change. The tool's references are stored in each PBI's frontmatter, written only by the command through the validator:
+- **PBI ids never change.** The tool's references live in each PBI's frontmatter, under `external.<tool>`, and are validated by the schema:
 
   ```yaml
   external:
@@ -88,15 +79,11 @@ For products with a user interface, `/speckit.constitution` also writes `.specif
           hash: "sha256:…"
   ```
 
-  `hash` is the content hash at the last push: `sync-plan` compares it to tell what must be updated.
-- **ClickUp** is reached through the agent's ClickUp connector (MCP): BLOCKED_BY becomes a native dependency, RELATED a task link.
-- **Multica** is reached through its `multica` CLI: every PBI becomes an issue (the MAP too), nested by PARENT; `PBI Type` and `Backlog ID` custom properties make pushes idempotent; BLOCKED_BY/RELATED go in issue metadata and in the description until Multica ships issue relations. Issues are created in `backlog` with no assignee, so a push never starts an agent run.
-- **Start from an item.** `/speckit.specify DE-14620` or `/speckit.specify MUL-42` reads the item as the feature description and links the spec's root PBI to it: the next push nests the backlog under it.
-- **Content language** in the tool is a setting of the mapping document (default English); the repository is never translated.
+  `id` is the tool's durable id, `key` the display key (it may change), `hash` the content hash at the last push.
+- **`validate_backlog.py sync-plan <tool> <feature-dir>|--all [--only ID]`** lists the PBIs parents first, each with its action (`create`, `update`, `unchanged`, from the hash), its parent and ancestors, its non-PARENT relations and the external references already known.
+- **`validate_backlog.py set-external <ID> <tool> [--id] [--key] [--url] [--hash-current] [--remove]`** is the only way to write `external`: an extension never edits that block by hand.
 
-### Running Spec Kit inside Multica
-
-A Multica agent running Claude Code can run `/speckit.specify`, `/speckit.plan` and `/speckit.tasks` on an issue, as skills: give the project the repository as a local-directory resource in worktree mode (so `.specify/` and `.claude/skills/speckit-*` are in the run's working directory), paste the agent instructions from `.specify/sync/multica.md`, and disable the git extension's branch hook for those runs. Multica runs agents without permission prompts: every command of the run executes unattended.
+The repository stays the source of truth for the content; the tool stays the source of truth for the workflow (status, assignees, comments).
 
 ## Installation
 
@@ -146,7 +133,6 @@ In Claude Code you can allow the validator once for the project, so the commands
 |------------|--------|---------|
 | Acceptance tests from Gherkin | `on`: every scenario `US-xxx/AC-n` gets an acceptance-test task written before the story's implementation; `off`: tests only on request | `on` |
 | Default specify mode | `ask`, `map`, `epic`, `story` | `ask` |
-| Task manager | `none`, `clickup` or `multica`: the tool `/speckit.sync` publishes the backlog to. PBI ids stay local (`US-007`); the tool's ids go in each PBI's `external` block | `none` |
 
 Templates can be overridden per project as usual in Spec Kit: put a file with the template's name in `.specify/templates/overrides/` (e.g. `pbi-story-template.md`).
 
@@ -159,7 +145,7 @@ Templates can be overridden per project as usual in Spec Kit: put a file with th
 | `speckit.tasks` | Replaced: TASK PBI files + execution index, phases by spec mode, Gherkin-driven test tasks |
 | `speckit.constitution` | Upstream flow without semver/dates/Sync Impact Report; also writes product.md |
 | `speckit.implement`, `speckit.checklist`, `speckit.converge` | Upstream command + an appended addendum (`strategy: append`) |
-| `speckit.split`, `speckit.merge`, `speckit.sync` | New |
+| `speckit.split`, `speckit.merge` | New |
 | templates | constitution, plan, tasks and spec envelope merged from upstream and Papalini; product, research and the five PBI templates added |
 
 `NOTICE.md` lists, for every template, where each section comes from.

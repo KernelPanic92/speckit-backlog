@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:speckit-backlog:pbi-frontmatter",
   "title": "speckit-backlog — PBI Frontmatter Schema",
-  "description": "Formal, binding schema of the YAML frontmatter used by every PBI template of the preset (pbi-story-template, pbi-epic-template, pbi-task-template, pbi-spike-template, pbi-map-template; BUG is accepted for PBIs created by other tools). Every PBI (Product Backlog Item) must validate against EXACTLY ONE of the schemas in $defs (userStory, epic, bug, task, spike, map): the one selected by its type field. additionalProperties is false everywhere: do not introduce keys not listed here. The optional external key holds references to the PBI in external tools and is written only by /speckit.sync. Unvalued optional keys are omitted entirely, never left empty or null. Constraints that JSON Schema cannot express (checked by scripts/validate_backlog.py): every relation is declared only from the side of the blocked or child PBI, never as an inverse property on the other PBI; a PBI has at most one PARENT relation; relations entries follow a fixed order (first by relationType: PARENT, BLOCKED_BY, RELATED; then by type: MAP, EPIC, US, SPIKE, BUG, TASK; then by ascending id); ids are unique across the whole project.",
+  "description": "Formal, binding schema of the YAML frontmatter used by every PBI template of the preset (pbi-story-template, pbi-epic-template, pbi-task-template, pbi-spike-template, pbi-map-template; BUG is accepted for PBIs created by other tools). Every PBI (Product Backlog Item) must validate against EXACTLY ONE of the schemas in $defs (userStory, epic, bug, task, spike, map): the one selected by its type field. additionalProperties is false everywhere: do not introduce keys not listed here. The optional external key holds references to the PBI in external tools and is written only by tracker extensions, through the validator. Unvalued optional keys are omitted entirely, never left empty or null. Constraints that JSON Schema cannot express (checked by scripts/validate_backlog.py): every relation is declared only from the side of the blocked or child PBI, never as an inverse property on the other PBI; a PBI has at most one PARENT relation; relations entries follow a fixed order (first by relationType: PARENT, BLOCKED_BY, RELATED; then by type: MAP, EPIC, US, SPIKE, BUG, TASK; then by ascending id); ids are unique across the whole project.",
   "oneOf": [
     {
       "$ref": "#/$defs/userStory"
@@ -303,7 +303,7 @@
     },
     "externalRef": {
       "type": "object",
-      "description": "Reference to the PBI in one external tool. Written only by /speckit.sync, never by hand.",
+      "description": "Reference to the PBI in one external tool. Written only by a tracker extension through the validator (set-external), never by hand.",
       "properties": {
         "id": {
           "type": "string",

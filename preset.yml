@@ -55,16 +55,6 @@ provides:
       replaces: "tasks-template"
 
     - type: "template"
-      name: "sync-clickup-template"
-      file: "templates/sync-clickup-template.md"
-      description: "ClickUp mapping document for /sync (settings + mapping rules, native nesting by default)"
-
-    - type: "template"
-      name: "sync-multica-template"
-      file: "templates/sync-multica-template.md"
-      description: "Multica mapping document for /sync (settings + mapping rules, running Spec Kit inside Multica)"
-
-    - type: "template"
       name: "pbi-map-template"
       file: "templates/pbi-map-template.md"
       description: "User Story Map PBI (root in map mode)"
@@ -150,11 +140,6 @@ provides:
       name: "speckit.split"
       file: "commands/speckit.split.md"
       description: "Carves an epic or a story out of a spec into a new spec where it is the root"
-
-    - type: "command"
-      name: "speckit.sync"
-      file: "commands/speckit.sync.md"
-      description: "Syncs the backlog with ClickUp or Multica following the project's mapping document"
 
     - type: "command"
       name: "speckit.merge"

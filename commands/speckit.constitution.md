@@ -164,7 +164,7 @@ Follow this execution flow:
    - **Ubiquitous Language**: one term per concept, no synonyms of the same object; each term gets a business
      definition (the language of marketing and stakeholders) and a dev definition (how it maps to the system).
    - **Delivery Conventions** (constitution): default to acceptance tests from Gherkin `on`, default specify mode
-     `ask`, task manager `none`, unless the user says otherwise.
+     `ask`, unless the user says otherwise.
 
 3. **Draft the updated documents** using the resolved templates as the required structure:
    - Replace every placeholder with concrete text (no bracketed tokens left except intentionally retained

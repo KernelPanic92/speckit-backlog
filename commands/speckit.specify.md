@@ -67,7 +67,7 @@ The text the user typed after `__SPECKIT_COMMAND_SPECIFY__` in the triggering me
 - `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` — the binding frontmatter schema.
 - `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — subcommands `next-id <TYPE>` and `check <feature-dir>`; JSON output, non-zero exit code on errors. If `uv` is not available, do the same checks by hand against `SCHEMA` and the rules, and say so in the Completion Report. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.
-- `CONSTITUTION` = `/memory/constitution.md` — its Delivery Conventions set the default mode and the task manager.
+- `CONSTITUTION` = `/memory/constitution.md` — its Delivery Conventions set the default mode.
 
 Given that feature description, do this:
 
@@ -76,7 +76,6 @@ Given that feature description, do this:
    - **IF EXISTS**: Load `PRODUCT` and `CONSTITUTION`.
    - If `PRODUCT` does not exist, tell the user that personas and domain terms normally come from it and suggest `__SPECKIT_COMMAND_CONSTITUTION__`. You may continue only with personas the user gives you in this conversation; record "product.md missing" in the spec's Open Questions.
    - If the description is empty: ERROR "No feature description provided".
-   - **Starting from a task-manager item**: if the description is only a reference to an item of a tool configured in `.specify/sync/` — a ClickUp task id, custom id or URL (`.specify/sync/clickup.md`), a Multica issue key or URL (`.specify/sync/multica.md`) — read that item (ClickUp connector; `multica issue get <key> --output json`) and use its title, description and comments as the feature description. Remember the item: after writing `SPEC_FILE`, link the root PBI to it with `VALIDATOR set-external <root id> <tool> --id <item id> --key <display key> --url <url>` (no `--hash-current`: the item still holds the original request, so the next `__SPECKIT_COMMAND_SYNC__ <tool> push` updates it and nests the children under it). If no mapping exists for that tool, say so and ask the user to paste the description or to run `__SPECKIT_COMMAND_SYNC__ <tool> setup` first.
 
 2. **MACRO-ANALYSIS** (Phase 1 of `RULES`), printed in the conversation: restate the request briefly, count the distinct user activities it covers (e.g. search, choose, pay) and state the working criteria you have internalized.
 
@@ -177,7 +176,7 @@ Given that feature description, do this:
    - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
    - The spec directory and file are always created by this command, never by the hook
 
-8. **PBI ids**: ids are local, project-wide unique and permanent. Get the first free id of a type with `VALIDATOR next-id <TYPE>` (e.g. `US`), then continue the sequence yourself for the PBIs you create in this run. Ids of a task manager never replace them: `__SPECKIT_COMMAND_SYNC__` stores them in each PBI's `external` block.
+8. **PBI ids**: ids are local, project-wide unique and permanent. Get the first free id of a type with `VALIDATOR next-id <TYPE>` (e.g. `US`), then continue the sequence yourself for the PBIs you create in this run. Ids of a task manager never replace them: a tracker extension stores them in each PBI's `external` block.
 
 9. **Write the backlog** following the phases of `RULES` for the chosen mode. Every PBI is written with its resolved template and validated against `SCHEMA`:
    - **File layout**:
