@@ -18,8 +18,8 @@
         "speckit_version": ">=1.2.5"
       },
       "provides": {
-        "templates": 14,
-        "commands": 12
+        "templates": 12,
+        "commands": 11
       },
       "tags": ["backlog", "user-stories", "story-mapping", "bdd", "invest"],
       "created_at": "2026-11-02T00:00:00Z",

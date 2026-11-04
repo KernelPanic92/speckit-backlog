@@ -1,5 +1,5 @@
 ---
-# id: the next free project-wide id from the validator (e.g. US-001); it never changes. Tool ids are added in `external` by /speckit.sync
+# id: the next free project-wide id from the validator (e.g. US-001); it never changes. Tool ids are added in `external` by a tracker extension
 id: {{id}}
 title: {{title}}
 # PBI type, fixed for this template

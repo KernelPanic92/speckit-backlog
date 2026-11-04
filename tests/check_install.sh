@@ -20,8 +20,6 @@ for pair in \
   "plan-template|## Delivery Slices" \
   "research-template|## Validity" \
   "tasks-template|execution index" \
-  "sync-clickup-template|tool: clickup" \
-  "sync-multica-template|tool: multica" \
   "pbi-map-template|type: MAP" \
   "pbi-epic-template|type: EPIC" \
   "pbi-story-template|### AC-1:" \
@@ -33,7 +31,7 @@ for pair in \
 done
 
 echo "Skills are registered"
-for skill in constitution specify clarify plan tasks analyze implement checklist converge split merge sync; do
+for skill in constitution specify clarify plan tasks analyze implement checklist converge split merge; do
   file=".claude/skills/speckit-$skill/SKILL.md"
   [[ -f "$file" ]] && ok "speckit-$skill" || ko "speckit-$skill missing"
 done
