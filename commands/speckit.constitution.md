@@ -26,7 +26,7 @@ This command's own work is limited to three governance documents:
 - `.specify/memory/product.md` — WHAT we build and for WHOM (vision, problem, personas, goals, scope, journeys, constraints, stakeholders, ubiquitous language).
 - `.specify/memory/design.md` — how the product LOOKS: design tokens and visual rules in the [DESIGN.md format](https://github.com/google-labs-code/design.md) (spec version `alpha`). Only for products with a user interface.
 
-Dependent templates and commands read both documents at runtime and are not modified here.
+Dependent templates and commands read these documents at runtime and are not modified here.
 
 - Classify every part of the user input as constitution content, product content, design content, or a separate,
   non-governance intent. If the input concerns only some of the documents, update only those.
@@ -38,7 +38,7 @@ Dependent templates and commands read both documents at runtime and are not modi
   making changes.
 - After completing the update, include a `Next Actions` section for each deferred
   intent. List the original intent and suggest the appropriate follow-up Spec Kit command, such
-  as `__SPECKIT_COMMAND_SPECIFY__`, without invoking it.
+   as `__SPECKIT_COMMAND_BACKLOG__` for backlog management or `__SPECKIT_COMMAND_SPECIFY__` for a focused specification, without invoking it.
 - If there are no non-governance intents, omit the `Next Actions` section.
 
 ## Pre-Execution Checks
@@ -163,8 +163,19 @@ Follow this execution flow:
      "Database"): they are the only personas the backlog commands accept in the Connextra sentence.
    - **Ubiquitous Language**: one term per concept, no synonyms of the same object; each term gets a business
      definition (the language of marketing and stakeholders) and a dev definition (how it maps to the system).
-   - **Delivery Conventions** (constitution): default to acceptance tests from Gherkin `on`, default specify mode
-     `ask`, task manager `none`, unless the user says otherwise.
+   - **Delivery Conventions** (constitution): ask/confirm **Acceptance tests from Gherkin** (`on` default, `off`
+     only by explicit choice) and **Story isolation** (`worktree` default; alternatives `branch` or `ask`).
+     Explain that every User Story gets **one PR/MR**; stories marked `[P]` in the same computed Story Wave
+     may run in parallel in isolated git worktrees, while a story blocked by another starts only after the
+     blocking PR is merged. `branch` means sequential story branches; `ask` means ask before implementation
+     and recommend `worktree`. Preserve an existing valid explicit choice unless the user changes it.
+     Delivery scheduling is computed by `scripts/backlog.py` from `rank`, `BLOCKED_BY` and exact TASK
+     `## Files`, not a hand-maintained wave list. Task progress lives only in root `backlog/tasks/` Actions/DoD
+     checkboxes; tasks.md is generated. Read `.specify/presets/backlog/knowledge/delivery/rules.md` for these
+     conventions and reflect the confirmed choices in the constitution, without adding unsupported metadata.
+     Functional PBIs live in central root `backlog/` with types `MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`,
+     `TASK`; `__SPECKIT_COMMAND_BACKLOG__` manages them and `__SPECKIT_COMMAND_SPECIFY__` selects functional
+     Scope into a clean 4-block spec. BUG creation is delegated to the bug extension.
 
 3. **Draft the updated documents** using the resolved templates as the required structure:
    - Replace every placeholder with concrete text (no bracketed tokens left except intentionally retained
@@ -184,6 +195,9 @@ Follow this execution flow:
    - Principles and rules are declarative, testable, and free of vague language ("should" → replace with
      MUST/SHOULD rationale where appropriate).
    - Every persona has who/needs/context; every Ubiquitous Language row has both definitions.
+   - Delivery Conventions contain the confirmed Acceptance tests from Gherkin and Story isolation values;
+     recommend `on` / `worktree` for new setups and enforce one PR/MR per US. Remove obsolete delivery
+     selectors that are no longer present in the resolved constitution template rather than carrying them forward.
    - Every reference passes the self-check of the "Readable references" section: links between the documents point to
      a section heading and name it, sources are links whose text says what they are, no `§` notation, section or
      principle numbers, bare URLs or bare paths.
@@ -218,6 +232,8 @@ Formatting & Style Requirements:
 If the user supplies partial updates (e.g., only one principle revision or one new term), still perform validation.
 
 Write only `.specify/memory/constitution.md`, `.specify/memory/product.md` and `.specify/memory/design.md`; do not create or modify template source files.
+
+## Mandatory Post-Execution Hooks
 
 ## Post-Execution Checks
 

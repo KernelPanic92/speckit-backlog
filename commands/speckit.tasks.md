@@ -1,5 +1,5 @@
 ---
-description: Generate the TASK PBIs (one file each under backlog/tasks/) and the dependency-ordered tasks.md execution index, phased by the spec mode (release lanes, stories or acceptance criteria).
+description: Idempotently reconcile cohesive TASK PBIs in root backlog/tasks/ and deterministically render tasks.md with wave-based [P] scheduling and Gherkin AC coverage.
 handoffs:
   - label: Analyze For Consistency
     agent: speckit.analyze
@@ -60,53 +60,51 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-Paths used by this command (preset `backlog`):
+**Paths and tool** (preset `backlog`):
 
-- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — the TASK rules (no Connextra, no INVEST; Outcome, Actions, DoD; relations declared only from the child/blocked side). Its "Readable references" section applies to everything this command writes or prints: the TASK files, tasks.md and the report.
-- `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` (`next-id <TYPE>`, `check <feature-dir>`). If `uv` is not available, check the frontmatter by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
+- `PBI_RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — Task/Spike writing, schema conventions, required sections and Readable References.
+- `DELIVERY_RULES` = `.specify/presets/backlog/knowledge/delivery/rules.md` — root placement, rank/blockers/files as the only scheduling inputs, computed waves/`[P]`, one PR/MR per US with worktree isolation by default.
+- `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` — seven types `MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`, `TASK`; do not create BUGs here.
+- `BACKLOG_TOOL` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/backlog.py`.
 
-1. **Setup**: Run `{SCRIPT}` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE_CONTENT, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
-   - Resolve the TASK PBI template by running the template resolver with the name `pbi-task-template` (`.specify/scripts/bash/resolve-template.sh pbi-task-template --json`, or `.specify/scripts/powershell/resolve-template.ps1 pbi-task-template -Json` on PowerShell) and parse its `TEMPLATE_CONTENT`. If it fails, stop and report the resolution error.
+Expand every `BACKLOG_TOOL` operation below to this full invocation, run from repo root as a **standalone command**, never chained with `;`, `&&`, or `|`, so permissions can allow-list it. Parse JSON and stop/report if tooling is unavailable; do not substitute hand-authored rendered lines.
 
-2. **Load design documents**: Read from FEATURE_DIR:
-   - **Required**: plan.md (tech stack, project structure, data model, contracts, testing strategy, **Delivery Slices**), spec.md (root PBI + envelope: mode, Backlog Index), every PBI under `backlog/` (stories with their Acceptance Criteria `US-xxx/AC-n`, epics, spikes, existing TASK PBIs such as the Walking Skeleton)
-   - **Optional**: research.md (decisions, Spikes still open)
-   - **IF EXISTS**: Load `/memory/constitution.md` for project principles and governance constraints; its Delivery Conventions say whether **acceptance tests from Gherkin** are on (default) or off, and its Quality Standards feed the Task Completion Criteria
-   - **IF EXISTS** and the feature has a user interface: Read `.specify/memory/design.md`; UI tasks name, in their Outcome or Actions, the design tokens and components they must use (e.g. `{colors.primary}`, `button-primary`) instead of literal colors, sizes or fonts
-   - Read `RULES` (Task and Spike parts, Frontmatter section, "Readable references" section)
-   - Note: Not all projects have all documents. Generate tasks based on what's available.
+1. **Setup**: Run `{SCRIPT}` (setup-tasks) from repo root once and parse `FEATURE_DIR`, `TASKS_TEMPLATE_CONTENT`, `TASKS_TEMPLATE`, `AVAILABLE_DOCS`. Paths supplied as absolute must remain absolute for filesystem operations. Read the resolved tasks scaffold for conventions, **not** to hand-write the index.
+   - Resolve `pbi-task-template` with `.specify/scripts/bash/resolve-template.sh pbi-task-template --json`, `.specify/scripts/powershell/resolve-template.ps1 pbi-task-template -Json`, or `python .specify/scripts/python/resolve_template.py pbi-task-template --json`. Use `TEMPLATE_CONTENT` (including composition/overrides); stop on resolution failure.
+   - Treat `$ARGUMENTS` as direct guidance, with **no subcommand ceremony**: honor targeted splitting, merging, regeneration for a named story, or retiring a task, subject to completed-task preservation and deletion confirmation below.
 
-3. **Execute task generation workflow**:
-   - Load plan.md and extract tech stack, libraries, project structure, data model, contracts and Delivery Slices
-   - Load spec.md and determine the mode from the root PBI `type` (MAP → map, EPIC → epic, US → story) and the delivery order:
-     - map: the MAP's Walking Skeleton, then its Release Lanes in order, stories left to right along the Backbone inside each lane
-     - epic: the stories in BLOCKED_BY / release order (Backlog Index)
-     - story: the root US's Acceptance Criteria in order
-   - Map data-model entities and contracts to the stories that need them
-   - If research.md exists: extract decisions for setup tasks; Spikes it could not answer become tasks scheduled before the stories they block
-   - Generate TASK PBIs organized by delivery slice (see Task Generation Rules below)
-   - Generate the dependency graph from the BLOCKED_BY relations
-   - Create parallel execution examples per story
-   - Validate task completeness (each story has all needed tasks and is independently testable; each AC has a test task when acceptance tests are on)
+2. **Load context and inventory**:
+   - Required: `FEATURE_DIR/spec.md` (4 blocks with `**Scope**:` and rendered Backlog) and `plan.md` (Technical Context, Project Structure, Data Model, API Design / Contracts, Testing Strategy, Delivery Slices). Read `research.md` for decisions and open prototype Spikes when present; report its absence, never invent decisions.
+   - Run `BACKLOG_TOOL locate <ID> --descendants` for each scope selector. Read scoped stories and FEATURE/EPIC/MAP ancestors from root `backlog/`, blocking SPIKEs, Walking Skeleton items, and **existing `backlog/tasks/TASK-*.md` belonging to scoped PBIs**. Keep locator `specs` for shared-artifact refreshes. Do not treat `FEATURE_DIR` as the root of backlog paths.
+   - Read `.specify/memory/constitution.md` (`/memory/constitution.md` in the upstream workflow). **Acceptance tests from Gherkin** is `on` by default; Quality Standards supply task DoD. Read `.specify/memory/product.md` for Ubiquitous Language.
+   - For UI work read `.specify/memory/design.md`; task Outcomes/Actions name real design tokens and components instead of inventing literal colors, sizes or fonts.
+   - Read `PBI_RULES`, `DELIVERY_RULES` and `SCHEMA`. Inventory task completion from the TASK files, **never** from cached `tasks.md` checkboxes.
 
-4. **Write the TASK PBIs**: one file per task in `FEATURE_DIR/backlog/tasks/<ID>-<slug>.md` (slug: title in lowercase ASCII kebab-case, at most 6 words), using the resolved `pbi-task-template`:
-   - **Ids**: local and permanent: get the first free id with `VALIDATOR next-id TASK` and continue the sequence in execution order.
-   - **Existing TASK PBIs** (Walking Skeleton items written by `__SPECKIT_COMMAND_SPECIFY__`, or tasks from a previous run) are reused, not duplicated: keep their ids and update them only if the plan changes what they must do. If tasks.md already exists, ask before discarding tasks that are already checked.
-   - **Frontmatter**: `PARENT` = the story the task serves (Walking Skeleton items: the Epic of their Macro-Activity; Setup/Foundational/Polish tasks: no PARENT); `BLOCKED_BY` = the tasks that must be completed first. Relations only from this side, in the canonical order of `RULES`.
-   - **Body**: Outcome (specific enough that an LLM can complete the task without additional context), `Covers:` for acceptance-test tasks (each scenario id followed by its title in quotes: `US-007/AC-2 "Card declined"`), Files (exact paths consistent with the plan's Project Structure), Actions to complete, Out of Scope, DoD starting from the Task Completion Criteria of tasks.md. When the Outcome or the Actions rely on a decision of the plan or of the research, cite it as a link whose text names it (`[the card payment contract](../../plan.md#api-design--contracts)`), never as a bare path or a section number.
-   - **Title**: says what the task does in words a person understands; it never names scenarios by bare id ("Acceptance tests for card accepted and card declined", not "Acceptance test for US-007/AC-1 and US-007/AC-2").
-   - For each field with constraints in the plan's Data Model (max length, nullable/required, enum values, validation rules), quote the constraint verbatim in the task's Outcome or Actions so it is not left to implementation-time discretion.
+3. **Design cohesive task briefs**:
+   - Target **~2–4 cohesive TASKs per US**, not single-boilerplate micro-tasks. When acceptance tests are `on`, plan **one acceptance-test task before 1–3 implementation tasks**. Its `**Covers:** US-xxx/AC-1 "Title", ...` lists every covered scenario with its title. Implementing tasks declare real `BLOCKED_BY` on the tests, so tests are written and fail first. When tests are `off`, create test tasks only when requested; do not demand artificial AC coverage contrary to the constitution.
+   - Map each story's full end-to-end behavior, entities and contracts to its task set. Group useful work a human can track and an autonomous sub-agent can complete, rather than splitting every file or layer into an artificial task.
+   - **Zero orphan tasks**: story tasks set `PARENT` to their US. Cross-story **Setup**, **Foundational** and **Polish** tasks set `PARENT` to the spec's container (`FEATURE` or `EPIC`); for a single-story spec, to that US. Walking Skeleton items keep their valid EPIC/FEATURE parent. For MAP/multi-container scope choose the relevant FEATURE/EPIC for each shared item (split the item if needed); never use MAP or no parent as a shortcut. If ownership cannot be determined, ask before writing.
+   - **Polish** TASKs declare `BLOCKED_BY` on the stories or final story tasks they follow; do not rely on a phase label alone to impose ordering.
+   - Each open **prototype SPIKE** gets a closing TASK (`PARENT`: the blocked US; `RELATED`: the SPIKE, reason "closes the Spike"). Story tasks declare `BLOCKED_BY` that closing TASK. Do not make it `BLOCKED_BY` the Spike it closes; that would deadlock. It documents the research decision and satisfies Spike Exit Criteria before the story's implementation proceeds. For shared Spikes, identify the owning blocked US and make every affected story's work wait for the same closing task; ask if ownership is unclear.
+   - Declare exact touched paths in each TASK's `## Files`, real `BLOCKED_BY`, and sibling `rank` in steps of 10 (`10, 20, 30...`). The scheduler computes Story Waves and Task Waves / `[P]` from these; neither authors nor a hand-edited task index declare parallelism.
 
-5. **Generate tasks.md**: Use TASKS_TEMPLATE_CONTENT (from the JSON output above) as the structure. For compatibility with older setup scripts that omit TASKS_TEMPLATE_CONTENT, read TASKS_TEMPLATE instead. Fill with:
-   - Correct feature name, spec mode, root PBI and links
-   - Summary (total tasks, parallelizable, phases, suggested MVP) and Task Completion Criteria from the constitution's Quality Standards
-   - Phases by mode (see Phase Structure below), each with goal, independent test criteria and checkpoint
-   - One strict checkbox line per TASK PBI (see Task Generation Rules below)
-   - One block per story inside its phase, headed `### US [US-xxx] Title`: the heading gives the title of the `[US-xxx]` labels of the lines below it
-   - Dependency Graph (every node with its task title), Phase Dependencies, Parallel Example per story, Implementation Strategy (MVP first, incremental delivery)
-   - Risk Assessment (tasks as `TASK [id] title`) and the Traceability Matrix (one row per scenario: the story and the scenario with their titles → test tasks and implementation tasks)
+4. **Idempotently reconcile existing central TASKs**, respecting the user guidance:
+   - Match by parent story/container and actual Outcome / covered ACs, not just a similar title or previous line position. Reuse existing Walking Skeleton and prior-run tasks; never duplicate them.
+   - **Completed tasks**: all checkboxes in `## Actions to complete` and `## Definition of Done` (the template's `## Definition of Done (DoD)`) are checked `[x]` / `[X]`. **Preserve these files untouched**, including metadata, paths, IDs and checkboxes. If requirements changed, add a delta TASK instead of reopening, deleting, renumbering or rewriting completed history.
+   - **Open matching tasks**: reuse the permanent `TASK-xxx` ID and path; update Outcome, `Covers:`, `## Files`, Actions, DoD, real `BLOCKED_BY` and `rank` in place as required. Preserve checked sub-actions that remain valid; do not reset progress as a side effect of regeneration.
+   - **New tasks**: allocate with `BACKLOG_TOOL next-id TASK` (or `--count N` and consume each returned ID exactly once), then write `backlog/tasks/<ID>-<slug>.md` using the resolved template. Save allocated files before requesting more IDs. Slug: lowercase ASCII kebab-case, at most 6 words; IDs and existing paths never change on re-parenting.
+   - **Obsolete open tasks**: list them with readable titles and the affected references/descendants from `BACKLOG_TOOL locate <ID> --descendants`. Ask for confirmation and a reference migration before removing via `git rm` (tracked) / `rm` (untracked). Unconfirmed tasks remain, explicitly reported. A user request to regenerate is not blanket authorization to delete.
+   - TASK frontmatter is schema-valid, with at most one PARENT; relations are child/blocked-side only and canonically ordered (`PARENT`, `BLOCKED_BY`, `RELATED`; then `MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`, `TASK`; then ID).
+   - TASK bodies contain a concrete **Outcome**, optional acceptance-test `**Covers:**`, exact **Files**, checkable **Actions to complete**, **Out of Scope** with destinations/not planned, and **Definition of Done** reflecting the constitution. No Connextra/INVEST for technical tasks. Write enough context for a self-contained sub-agent brief; quote Data Model field constraints (length, nullability, enum, validation) **verbatim**, not "as appropriate".
+   - From `backlog/tasks/`, link plan decisions as `[the card payment contract](../../specs/<dir>/plan.md#api-design--contracts)` and research as `[the provider decision](../../specs/<dir>/research.md#provider)`, computing the actual path/anchor. Include necessary technical detail in the TASK itself; spec-local working files must not be its only explanation.
 
-6. **Validate**: run `VALIDATOR check FEATURE_DIR`. It verifies the TASK frontmatter, the relations, and that every checkbox line of tasks.md has a TASK file and vice versa. Fix and re-run until it passes (max 3 iterations; then report the remaining errors). Then run the self-check of the "Readable references" section of `RULES` on tasks.md and the TASK files you wrote, and rewrite every reference that fails it.
+5. **Render deterministically and validate**, each standalone:
+   - Run `BACKLOG_TOOL render-tasks FEATURE_DIR`. **Do NOT hand-write `tasks.md` task lines, phases, completion checkboxes, wave assignments or `[P]` markers.** The tool derives everything from scoped PBIs, TASK files and their completion checkboxes.
+   - Run `BACKLOG_TOOL render-spec FEATURE_DIR` (task file conflicts can change Story Waves in the rendered Backlog), then `BACKLOG_TOOL render-index`.
+   - Run `BACKLOG_TOOL schedule --spec FEATURE_DIR` to inspect `story_waves`, `task_waves`, `critical_path` and computed `parallel` booleans for the report. Honor blockers even if tasks have different files.
+   - Refresh other impacted specs / existing task indices from locator results when shared tasks, scopes or schedules changed.
+   - Run `BACKLOG_TOOL check --spec FEATURE_DIR`. Fix schema, parent, dependency, rank/file, link, stale-render or **`ac-uncovered`** errors, then re-render and re-check (up to 3 iterations; report blockers if still failing). When acceptance tests are on, every scoped Gherkin AC needs a test TASK `Covers:` entry; a test-like title alone is not coverage.
+   - Apply the Readable References self-check to TASKs, indices and report: type/ID/title, `US-xxx/AC-n "title"`, descriptive relative links with correct anchors. Never patch generated text to conceal an error in the source PBIs.
 
 ## Mandatory Post-Execution Hooks
 
@@ -144,89 +142,34 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 ## Completion Report
 
-Output path to generated tasks.md and summary:
-- Total task count and TASK PBI files written (new vs reused)
-- Task count per phase and per story (stories as `type [id] title`)
-- Parallel opportunities identified
-- Independent test criteria for each phase
-- Acceptance tests on/off and AC coverage (ACs without a test task, if any, as `US-xxx/AC-n "title"`)
-- Suggested MVP scope (map: the first Release Lane; epic: the first story; story: the whole story)
-- Format validation: confirm ALL task lines follow the checklist format and the validator passes
+Report the generated tasks.md path and:
+- Total task count and reconciliation counts: created, reused/updated open, completed preserved, delta tasks, obsolete open tasks removed with confirmation or retained pending it
+- Task count per phase/story, approximately 2–4 cohesive items per US; justified exceptions
+- Computed Story Waves, Task Waves, `[P]` opportunities and critical path; one PR/MR per US and constitution-selected isolation
+- Independent acceptance/checkpoint criteria and suggested first delivery wave / first Outcome-titled Release Lane
+- Acceptance tests on/off and AC coverage (gaps as `US-xxx/AC-n "title"`)
+- Validator outcome and refreshed indices; next step `__SPECKIT_COMMAND_ANALYZE__` before `__SPECKIT_COMMAND_IMPLEMENT__`
 
 Context for task generation: {ARGS}
 
 The tasks.md index plus the TASK files should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
 
-## Task Generation Rules
+## Generated Index and Progress Rules
 
-**CRITICAL**: Tasks MUST be organized by delivery slice (Release Lane, story or Acceptance Criterion, depending on the mode) to enable independent implementation and testing.
+The renderer organizes Setup → Walking Skeleton / Foundational → Story Waves (or map Release Lanes) → Polish from actual metadata. Within story waves, TASK waves respect blockers and disjoint `## Files`; `[P]` means two or more eligible items packed in the **same wave**, not "could be parallel someday". Do not add artificial dependencies just to manufacture a preferred list order; rank breaks otherwise eligible ties and must not invert real sibling blockers.
 
-**Tests follow the constitution**: when acceptance tests from Gherkin are on (the default), every scenario `US-xxx/AC-n` MUST be covered by an acceptance-test task (`Covers:` lists the scenarios, each id with its title) placed before the story's implementation tasks; one task may cover several scenarios of the same story. When off, generate test tasks only if explicitly requested in the spec or by the user.
-
-### Checklist Format (REQUIRED)
-
-Every line of tasks.md that represents a task MUST strictly follow this format:
+Generated task lines link from the spec directory to root backlog, for example:
 
 ```text
-- [ ] [TaskID] [P?] [Story?] Title → [backlog/tasks/<ID>-<slug>.md](backlog/tasks/<ID>-<slug>.md)
+- [ ] TASK-012 [P] [US-007] Card payment acceptance tests → [../../backlog/tasks/TASK-012-card-payment-acceptance.md](../../backlog/tasks/TASK-012-card-payment-acceptance.md)
 ```
 
-**Format Components**:
-
-1. **Checkbox**: ALWAYS start with `- [ ]` (markdown checkbox)
-2. **Task ID**: the TASK PBI id (TASK-014), in execution order
-3. **[P] marker**: Include ONLY if task is parallelizable (different files, no BLOCKED_BY on incomplete tasks)
-4. **[Story] label**: the PARENT story, e.g. [US-007]; the line sits in the block headed `### US [US-007] Card payment`, which gives the story's title
-   - Setup phase: NO story label
-   - Walking Skeleton / Foundational phase: NO story label
-   - Story and lane phases: MUST have story label
-   - Polish phase: NO story label
-5. **Title**: the TASK PBI title (the Files and details live in the TASK file)
-6. **Link**: relative link to the TASK file
-
-**Examples**:
-
-- ✅ CORRECT: `- [ ] TASK-001 Create project structure per implementation plan → [backlog/tasks/TASK-001-project-structure.md](backlog/tasks/TASK-001-project-structure.md)`
-- ✅ CORRECT: `- [ ] TASK-012 [P] [US-007] Acceptance tests for card accepted and card declined → [backlog/tasks/TASK-012-card-payment-acceptance.md](backlog/tasks/TASK-012-card-payment-acceptance.md)`
-- ❌ WRONG: `- [ ] Create User model` (missing ID, story label and link)
-- ❌ WRONG: `TASK-001 [US-007] Create model → …` (missing checkbox)
-- ❌ WRONG: `- [ ] TASK-014 [US-007] Create model` (missing link to the TASK file)
-- ❌ WRONG: `- [ ] TASK-012 [P] [US-007] Tests for US-007/AC-1, AC-2 → […](…)` (the title names scenarios by bare id: say what is tested)
-
-### Task Organization
-
-1. **From Stories (backlog/stories/)** - PRIMARY ORGANIZATION:
-   - Each story gets its own block inside its phase, in delivery order
-   - Map all related components to their story: models, services, interfaces/UI needed for that story, and its acceptance tests (when on)
-   - Mark story dependencies with BLOCKED_BY (most stories should be independent; respect the stories' own BLOCKED_BY relations)
-
-2. **From Contracts (plan.md › API Design / Contracts)**:
-   - Map each interface contract → to the story it serves
-   - If tests are on: each interface contract → contract test task [P] before implementation in that story's block
-
-3. **From Data Model (plan.md › Data Model)**:
-   - Map each entity to the story(ies) that need it
-   - If entity serves multiple stories: Put in earliest story or Setup phase
-   - Relationships → service layer tasks in appropriate story block
-
-4. **From Setup/Infrastructure**:
-   - Shared infrastructure → Setup phase (Phase 1)
-   - Walking Skeleton items (map) / blocking prerequisites (epic) → Phase 2
-   - Story-specific setup → within that story's block
-
-5. **From Spikes**: a Spike that research.md could not answer → a TASK (PARENT: the story the Spike serves; RELATED: the SPIKE it closes, with reason "closes the Spike") placed before that story, and the story's tasks are BLOCKED_BY it. When the task is done, `__SPECKIT_COMMAND_IMPLEMENT__` ticks the Spike's Exit Criteria.
-
-### Phase Structure
-
-- **map**: Phase 1 Setup → Phase 2 Walking Skeleton (the MAP's TASK/SPIKE items) → Phase 3+ one phase per Release Lane, titled with the lane's Outcome (the first lane is the 🎯 MVP), stories left to right along the Backbone → Final Phase Polish
-- **epic**: Phase 1 Setup → Phase 2 Foundational (blocking prerequisites) → Phase 3+ one phase per story in BLOCKED_BY / release order (the first story is the 🎯 MVP) → Final Phase Polish
-- **story**: Phase 1 Setup → Phase 2 Spikes (only if some are still open) → Phase 3+ one phase per Acceptance Criterion or coherent group of ACs → Final Phase Polish
-- Within each story: Acceptance tests (when on) → Models → Services → Endpoints → Integration
-- Each phase should be a complete, independently testable increment, closed by a **Checkpoint**: all the Gherkin scenarios of the phase pass (map: the lane's Metrics can be measured)
+This example describes output, not permission to author it. `[P]` is included only when the scheduler computes it. The `[US-007]` label gets its readable title from the story heading. Completion becomes `[X]` **only** when the TASK's Actions and DoD checkboxes are all checked. `__SPECKIT_COMMAND_IMPLEMENT__` edits those central TASK checkboxes and regenerates tasks.md, never a second progress ledger. Each US opens one PR/MR; a story blocked by another starts only after the blocking PR is merged. Parallel stories use isolated worktrees by default, subject to constitution Delivery Conventions.
 
 ## Done When
 
-- [ ] TASK PBI files written (or reused) under backlog/tasks/ and tasks.md generated with all phases, task lines and links
+- [ ] Central TASKs reconciled idempotently; completed files untouched, no orphan tasks, deletions confirmed
+- [ ] tasks.md generated only by render-tasks; spec/index renders reflect computed waves and TASK-owned progress
 - [ ] Validator passing (or remaining errors reported)
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with task count, phase/story breakdown, AC coverage and MVP scope

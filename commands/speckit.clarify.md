@@ -1,5 +1,5 @@
 ---
-description: Identify underspecified areas in the current backlog-driven spec (root PBI, child PBIs, Open Questions) by asking up to 5 highly targeted clarification questions and encoding answers back into the PBIs, the spec and product.md.
+description: Ask up to 5 sequential clarification questions across spec.md, scoped central backlog PBIs and their containers; update PBIs in place and log answers only in spec.md.
 handoffs:
   - label: Build Technical Plan
     agent: speckit.plan
@@ -57,12 +57,14 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Goal: Detect and reduce ambiguity or missing decision points in the active feature specification and record the clarifications directly in the spec files.
 
-In this project (preset `backlog`) the specification is: `spec.md` = the root PBI (MAP, EPIC or US, see its frontmatter `type` and the envelope's "Spec Context") followed by the spec envelope, plus one file per child PBI under `FEATURE_DIR/backlog/` (`epics/`, `stories/`, `spikes/`, `tasks/`). Requirements are the Gherkin Acceptance Criteria of the PBIs (`US-xxx/AC-n`); there are no FR-### items.
+In this project (preset `backlog`), `spec.md` has four blocks: Header with `**Scope**:`, rendered `## Backlog`, optional Key Entities and measurable Success Criteria. Permanent PBIs live in the **repository-root** `backlog/{maps,epics,features,stories,spikes,tasks}/`, not below the spec. Requirements are the stories' Gherkin Acceptance Criteria (`US-xxx/AC-n "title"`), not FR-### items. The seven schema types are `MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`, `TASK`; BUG creation belongs to the bug extension. Clarification logs are the sole additional spec section, never PBI content.
 
 Paths used by this command:
 
-- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — every PBI you change must still satisfy these rules (Connextra, INVEST, Gherkin, splitting, relations). Its "Readable references" section applies to everything this command writes or prints: PBIs, envelope, Clarifications, questions and the report.
-- `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` (`check <feature-dir>`, `next-id <TYPE>`). If `uv` is not available, check the frontmatter by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
+- `PBI_RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — every PBI you change must still satisfy these rules (Connextra, INVEST, Gherkin, splitting, relations). Its "Readable references" section applies to PBIs, spec, Clarifications, questions and report.
+- `DELIVERY_RULES` = `.specify/presets/backlog/knowledge/delivery/rules.md` — central placement, rank, real blockers, computed wave-based `[P]` scheduling, one PR/MR per US and default worktree isolation.
+- `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`.
+- `BACKLOG_TOOL` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/backlog.py`. Every operation below expands to this full invocation, run standalone (never chained with `;`, `&&`, or `|`) so permissions can allow-list it. Parse JSON; stop and report if unavailable instead of bypassing checks or rendering.
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.
 
 Note: This clarification workflow is expected to run (and be completed) BEFORE invoking `__SPECKIT_COMMAND_PLAN__`. If the user explicitly states they are skipping clarification (e.g., exploratory spike), you may proceed, but must warn that downstream rework risk increases.
@@ -76,14 +78,11 @@ Execution steps:
    - If JSON parsing fails, abort and instruct user to re-run `__SPECKIT_COMMAND_SPECIFY__` or verify feature branch environment.
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **IF EXISTS**: Load `/memory/constitution.md` for project principles and governance constraints. Load `PRODUCT` and read `RULES`.
+2. **IF EXISTS**: Load `/memory/constitution.md` (the project's `.specify/memory/constitution.md`) for principles and governance. Load `PRODUCT`, `SCHEMA`, `PBI_RULES` and `DELIVERY_RULES`. If product context is missing, suggest `__SPECKIT_COMMAND_CONSTITUTION__` and use only user-confirmed personas and terms.
 
-3. Load the current spec file and every PBI file under `FEATURE_DIR/backlog/`. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
+3. Load the current spec, read `**Scope**:`, and run `BACKLOG_TOOL locate <ID> --descendants` for each scoped PBI. Read **all scoped PBIs** in root `backlog/` plus their parent `FEATURE` / `EPIC` / `MAP` ancestors (follow `PARENT` recursively). Retain affected `specs` from locator output because shared container clarifications can affect other specs. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark Clear / Partial / Missing internally; do not dump the raw map unless no questions are needed.
 
-   Open Questions (scan these FIRST):
-   - Every unchecked item of the envelope's `## Open Questions` is a candidate question by default
-
-   Backlog Quality (from `RULES`):
+   Backlog Quality (from `PBI_RULES`):
    - Personas: every Connextra persona is defined in `PRODUCT` and is a real human or a distinct system actor
    - Value: every "so that" clause states a real benefit, without repeating the action
    - Binary outcome: every `Then` can be verified as pass/fail; no vague adjectives
@@ -91,7 +90,8 @@ Execution steps:
    - Phantom UI: no visible command whose logic is deferred to another story
    - Story boundaries: Read vs Write and List vs Detail are separate stories; Out of Scope sections point to where excluded capabilities go
    - Dependencies: only real BLOCKED_BY dependencies; Spikes declared where estimation is blocked
-   - Map (map mode): lane Outcomes, gravity order, Walking Skeleton vs MVP
+   - Features: one bounded Outcome, cross-story Constraints, Out of Scope, reviewable size; Map when present: lane Outcomes, populated Epic × lane Features, gravity order, Walking Skeleton vs MVP
+   - Scheduling inputs: `rank` consistent with real `BLOCKED_BY`; no hand-authored waves or `[P]`
 
    Functional Scope & Behavior:
    - Core user goals & success criteria
@@ -158,7 +158,7 @@ Execution steps:
     - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness).
     - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
     - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic.
-    - Open Questions of the envelope come first, unless one of them would not materially change the backlog (then note it as Deferred).
+    - Prioritize high-impact ambiguity in the scoped stories and shared containers; use non-blocking reasonable defaults as explicit PBI Assumptions, never as unanswered-question lists.
 
 5. Sequential questioning loop (interactive):
     - Present EXACTLY ONE question at a time.
@@ -195,7 +195,7 @@ Execution steps:
        - If the user replies with "yes", "recommended", or "suggested", use your previously stated recommendation/suggestion as the answer.
        - Otherwise, validate the answer maps to one option or fits the <=5 word constraint.
        - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
-       - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
+       - Once satisfactory, integrate and save the answer immediately using step 6 **before** moving to the next question.
     - Stop asking further questions when:
        - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
        - User signals completion ("done", "good", "no more"), OR
@@ -206,18 +206,17 @@ Execution steps:
 6. Integration after EACH accepted answer (incremental update approach):
     - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
     - For the first integrated answer in this session:
-       - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
+       - Ensure a `## Clarifications` section exists **only in `spec.md`**, appended after its four base blocks if missing. Never add a Q&A log inside a PBI file.
        - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
-    - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
-    - If the answer resolves an item of `## Open Questions`, check it off and append ` → answered in [Clarifications, session YYYY-MM-DD](#session-yyyy-mm-dd)` (or remove it, if the spec's convention is to keep the list short).
-    - Then immediately apply the clarification to the most appropriate PBI(s) and section(s), following `RULES`:
-       - Functional ambiguity → Update or add a Gherkin scenario (`### AC-n`) in the affected story; keep 2-5 scenarios per story — if a story grows beyond 5, re-split it (new US files with ids from `VALIDATOR next-id US`, PARENT and BLOCKED_BY relations, Backlog Index and Release Lanes updated).
+    - Append exactly one bullet per accepted answer: `- Q: <question> → A: <final answer> (updated [PBI link])`. Replace `[PBI link]` with readable type/ID/title links relative to the spec (e.g., `../../backlog/stories/US-001-card-payment.md`); link every affected PBI when more than one changed.
+    - Immediately apply the answer **in-place** to affected PBI bodies in root `backlog/`. Cross-PBI rules belong on the parent `FEATURE` or `EPIC`, not duplicated across unrelated stories. Follow `PBI_RULES`:
+       - Functional ambiguity → Update/add a Gherkin scenario (`### AC-n`) in the affected story; keep ~2–5 scenarios. If the story exceeds 5, re-split unless value atomicity is justified. Resolve needed `pbi-story-template` / `pbi-feature-template` through `.specify/scripts/bash/resolve-template.sh <template> --json`, `.specify/scripts/powershell/resolve-template.ps1 <template> -Json`, or `python .specify/scripts/python/resolve_template.py <template> --json`; use `TEMPLATE_CONTENT` and stop on failure. Print the Feature Check and concise Micro-Scope summary before each new Feature/US, allocate IDs with `BACKLOG_TOOL next-id <TYPE>`, assign sibling ranks in steps of 10, and update PARENT, real BLOCKED_BY, map lanes and Scope selectors if needed. Never change existing IDs or paths.
        - User interaction / actor distinction → Update the Connextra persona of the affected PBIs; a new persona must be approved by the user and added to `PRODUCT` → Personas.
        - Scope boundary → Update the `## Out of Scope` of the affected PBIs (EPIC: Scope Boundaries): only what a reader could assume is included, each item with where it goes (`type [id] title` or "not planned").
-       - Data shape / entities → Update Key Entities in the envelope preserving ordering; note added constraints succinctly.
-       - Non-functional constraint → Add/modify measurable criteria in Success Criteria > Measurable Outcomes or Non-Functional Requirements (convert vague adjective to metric or explicit target).
-       - Edge case / negative flow / async state → Add a scenario to the affected story (async: full cycle with loading indicator, error and retry, as the "BDD Acceptance Criteria" constraints of `RULES` prescribe).
-       - Technical uncertainty that blocks estimation → Add a SPIKE (PARENT: the story) and declare it on the story with BLOCKED_BY.
+       - Data shape / entities → Apply functional constraints to the affected PBI; update spec Key Entities using approved domain terms, preserving ordering.
+       - Non-functional constraint → Put cross-story Constraints on the FEATURE (or EPIC), or a testable criterion on the relevant story. Reflect measurable business outcomes in Success Criteria > Measurable Outcomes; do not add a parallel spec requirements list.
+       - Edge case / negative flow / async state → Add a scenario to the affected story (async: full cycle with loading indicator, error and retry, as the "BDD Acceptance Criteria" constraints of `PBI_RULES` prescribe).
+       - Technical uncertainty that blocks estimation → Resolve `pbi-spike-template` through the same resolver, allocate with `BACKLOG_TOOL next-id SPIKE`, write `backlog/spikes/<ID>-<slug>.md` with timebox/Exit Criteria (PARENT: the story or cross-story FEATURE/EPIC), and have the blocked PBI declare BLOCKED_BY the SPIKE.
        - Terminology conflict → Normalize the term across spec and PBIs using the canonical term of `PRODUCT`; a new term must be approved by the user and added to `PRODUCT` → Ubiquitous Language (Term, Business definition, Dev definition); retain the original only if necessary by adding `(formerly referred to as "X")` once.
     - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
     - Save every touched file (spec.md, PBI files, product.md) AFTER each integration to minimize risk of context loss (atomic overwrite).
@@ -231,11 +230,11 @@ Execution steps:
    - No contradictory earlier statement remains (scan for now-invalid alternative choices removed).
    - Markdown structure valid; only allowed new headings in spec.md: `## Clarifications`, `### Session YYYY-MM-DD`; in PBIs only the headings their templates define (e.g. a new `### AC-n:`).
    - Terminology consistency: same canonical term used across all updated sections and PBIs.
-   - Every changed or new PBI still satisfies `RULES` (Connextra, INVEST, Gherkin, Out of Scope).
-   - Every reference in the text you wrote passes the self-check of the "Readable references" section of `RULES`: another PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a document or a section as a link whose text names the topic, never the `§` notation, a bare id, a coined abbreviation, a section number without its title, a bare URL or path, or a file the reader cannot open.
-   - `VALIDATOR check FEATURE_DIR` passes (fix and re-run on errors).
+   - Every changed/new PBI satisfies `PBI_RULES` (Connextra, INVEST, Gherkin, Out of Scope) and `SCHEMA`; slug paths are lowercase ASCII kebab-case, max 6 words. Relation order is PARENT, BLOCKED_BY, RELATED, then canonical type and ID.
+   - Every reference passes the Readable References self-check: another PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, and documents as topic links to the real heading; never bare IDs, paths, URLs, coined labels or untitled section numbers.
+   - Run `BACKLOG_TOOL render-spec FEATURE_DIR`, then `BACKLOG_TOOL render-index`, then `BACKLOG_TOOL check --spec FEATURE_DIR`, each standalone; fix and re-run on errors. Refresh other impacted spec blocks from locator results and existing task indices with `render-tasks <spec-dir>` when scope or schedule changed. Do not hand-edit generated content; use `__SPECKIT_COMMAND_TASKS__` if task reconciliation is needed.
 
-8. Write the updated spec back to `FEATURE_SPEC` (and the touched PBI files and `PRODUCT`). If the Spec Context status was `Draft` and no Open Questions remain, set it to `Clarified`.
+8. Save `FEATURE_SPEC`, touched central PBIs and `PRODUCT`. Set header `**Status**:` from `Draft` to `Clarified` when **no high-impact ambiguities remain**. Otherwise retain Draft and report deferred risk without inserting unanswered-question lists or `[NEEDS CLARIFICATION]` markers into PBIs. Q&A stays only under spec.md → Clarifications → Session YYYY-MM-DD.
 
 9. **Re-validate Spec Quality Checklist** (if it exists):
    - Check if `FEATURE_DIR/checklists/requirements.md` exists.

@@ -129,12 +129,10 @@ Style guidelines that can be adapted to the context.
 <!-- Read by the commands of the "backlog" preset. -->
 
 - **Acceptance tests from Gherkin**: [ACCEPTANCE_TESTS]
-  <!-- "on" (default): /speckit.tasks turns every Gherkin scenario (US-xxx/AC-n) into an acceptance-test task written before the story's implementation. "off": tests only when explicitly requested. -->
-- **Default specify mode**: [DEFAULT_SPEC_MODE]
-  <!-- "ask" (default) | "map" | "epic" | "story". With "ask", /speckit.specify always asks and recommends a mode. -->
-- **Task manager**: [TASK_MANAGER]
-  <!-- "none" (default) | "clickup" | "multica": the tool /speckit.sync publishes the backlog to (its mapping lives in .specify/sync/<tool>.md). PBI ids stay local (US-001…); the tool's ids are stored in each PBI's `external` block. -->
-- **Readable references**: specs and documents are written for the people who steer the work. Every reference a person reads says what it is about before it is opened and leads to the right spot: a PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a section of another document as a relative link whose text names the topic and whose address ends with the heading anchor, a principle or rule of this constitution by its name. Never the `§` notation, section numbers, coined abbreviations, bare ids, bare URLs or bare paths. The commands of the "backlog" preset apply the full rule (its "Readable references" section).
+  <!-- "on" (default): every scenario US-xxx/AC-n gets an automated acceptance-test task before implementation. "off": tests only when requested. -->
+- **Story isolation**: [STORY_ISOLATION]
+  <!-- "worktree" (default): each User Story is developed in an isolated git worktree and opens its own PR/MR, allowing stories marked [P] in the same wave to run in parallel. "branch": sequential story branches without worktrees. "ask": ask the user before implementation starts, with "worktree" as the recommended default. -->
+- **Readable references**: specs and documents are written for the people who steer the work. Every reference a person reads says what it is about before it is opened and leads to the right spot: a PBI as `type [id](relative/path.md) title`, a scenario as `US-001/AC-1 "title"`, a section of another document as a relative link whose text names the topic and whose address ends with the heading anchor, a principle or rule of this constitution by its name. Never the `§` notation, section numbers, coined abbreviations, bare ids, bare URLs or bare paths. See [the Readable references rules](../presets/backlog/knowledge/pbi-writing/rules.md) for the complete guidance.
 
 ## Exceptions Process
 

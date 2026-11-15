@@ -1,22 +1,24 @@
 ---
-# id: the next free project-wide id from the validator (e.g. TASK-001); it never changes. Tool ids are added in `external` by /speckit.sync
+# id: the next free project-wide id from scripts/backlog.py next-id TASK (e.g. TASK-001); it never changes
 id: {{id}}
 title: {{title}}
 # PBI type, fixed for this template
 type: TASK
+# optional: priority rank among siblings (10, 20, 30...; lower = higher priority)
+rank: {{rank}}
 # relations with other PBIs, declared only from this side:
-# - PARENT: the user story this task serves (or the Epic of the Macro-Activity, for Walking Skeleton items)
+# - PARENT: the US this task serves, or the FEATURE / EPIC for a cross-story Setup, Foundational or Polish task or a Walking Skeleton item
 # - BLOCKED_BY: the tasks that must be completed first (this replaces a free-text "Dependencies" field)
 # BLOCKED_BY: the referenced PBI blocks this one | PARENT: the referenced PBI is the parent, at most one | RELATED: link without constraints
 relations:
     "{{related id}}":
         title: "{{PBI title}}"
-        type: US|TASK|BUG|EPIC|SPIKE|MAP
+        type: US|FEATURE|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
     "{{related id}}":
         title: "{{PBI title}}"
-        type: US|TASK|BUG|EPIC|SPIKE|MAP
+        type: US|FEATURE|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
 # optional: diagrams, technical specifications or logs useful for the work. Only links really supplied by the user

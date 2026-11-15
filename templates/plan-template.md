@@ -1,16 +1,16 @@
 # Implementation Plan: [FEATURE]
 
-**Spec**: [[Feature] specification](spec.md) | **Spec mode**: [map | epic | story] | **Root PBI**: [TYPE [ID] Title]
+**Spec**: [[Feature name] specification](spec.md) | **Scope**: [scoped PBIs as type [id](../../backlog/...) title]
 
 **Research**: [[Feature] research decisions](research.md) | **Product**: [personas and Ubiquitous Language](../../.specify/memory/product.md) | **Status**: [Draft | Review | Approved]
 
 **Note**: This template is filled in by the `__SPECKIT_COMMAND_PLAN__` command; its definition describes the execution workflow. It is a single document: data model, API contracts and validation scenarios live here (no separate data-model.md, contracts/ or quickstart.md). Research lives in research.md.
 
-<!-- References follow the "Readable references" rules of the backlog preset: a PBI as `type [id] title`, a scenario as `US-001/AC-1 "title"`, a research decision, a constitution rule or a section of product.md as a relative link whose text names it, e.g. [the payment provider decision](research.md#payment-provider), [the "Test-First" principle](../../.specify/memory/constitution.md#test-first). Never a bare id, a bare path or a section number. -->
+<!-- References follow the "Readable references" rules of the backlog preset: a PBI as `type [id](relative/path.md) title`, a scenario as `US-001/AC-1 "title"`, a research decision, a constitution rule or a section of product.md as a relative link whose text names it, e.g. [the payment provider decision](research.md#payment-provider), [the "Test-First" principle](../../.specify/memory/constitution.md#test-first). Never a bare id, a bare path or a section number. -->
 
 ## Summary
 
-[2-3 sentences: the primary requirement (from the root PBI's Connextra and Outcome) and the technical approach (from research)]
+[2-3 sentences: the primary requirements from the scoped PBIs and the technical approach from research]
 
 **Key technical decisions:**
 - [Decision 1, linked to its research block: [the payment provider decision](research.md#payment-provider)]
@@ -21,8 +21,8 @@
 
 <!--
   ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. Start from the constitution's Technology Stack; mark every unknown
-  as NEEDS CLARIFICATION — Phase 0 turns each one into a research question.
+  for the project. Start from the constitution's Technology Stack and resolve unknowns
+  in Phase 0 research.
 -->
 
 **Language/Version**: [e.g., TypeScript 5.x, Python 3.12 or NEEDS CLARIFICATION]
@@ -83,12 +83,25 @@
 
 ```text
 specs/[###-feature]/
-├── spec.md              # Root PBI + spec envelope (__SPECKIT_COMMAND_SPECIFY__)
-├── backlog/             # Child PBIs: epics/, stories/, spikes/, tasks/
-├── checklists/          # requirements.md (__SPECKIT_COMMAND_SPECIFY__) and others
-├── research.md          # Phase 0 output (__SPECKIT_COMMAND_PLAN__)
-├── plan.md              # This file (__SPECKIT_COMMAND_PLAN__)
-└── tasks.md             # Execution index (__SPECKIT_COMMAND_TASKS__ - NOT created by __SPECKIT_COMMAND_PLAN__)
+├── spec.md              # Feature specification and rendered backlog index
+├── research.md          # Phase 0 research decisions
+├── plan.md              # This implementation plan
+├── tasks.md             # Generated execution index
+└── checklists/
+    └── [requirements and other checklists]
+```
+
+Repository-root backlog:
+
+```text
+backlog/
+├── index.md
+├── maps/
+├── epics/
+├── features/
+├── stories/
+├── spikes/
+└── tasks/
 ```
 
 ### Source Code (repository root)
@@ -108,7 +121,7 @@ src/
 └── lib/
 
 tests/
-├── acceptance/      # Gherkin scenarios (US-xxx/AC-n), when acceptance tests are on
+├── acceptance/      # Gherkin scenarios (US-001/AC-1 "title"), when acceptance tests are on
 ├── contract/
 ├── integration/
 └── unit/
@@ -170,8 +183,8 @@ ios/ or android/
 
 | Method | Path | Description | Serves |
 |--------|------|-------------|--------|
-| GET | `/api/v1/[resource]` | List [resources] | [US [US-001] Story title](backlog/stories/US-001-[slug].md) |
-| POST | `/api/v1/[resource]` | Create [resource] | [US [US-002] Story title](backlog/stories/US-002-[slug].md) |
+| GET | `/api/v1/[resource]` | List [resources] | US [US-001](../../backlog/stories/US-001-[slug].md) Story title |
+| POST | `/api/v1/[resource]` | Create [resource] | US [US-002](../../backlog/stories/US-002-[slug].md) Story title |
 
 ### Request/Response Examples
 
@@ -235,7 +248,7 @@ Error response (400):
 
 ## Testing Strategy
 
-- **Acceptance tests**: [on | off, from the constitution's Delivery Conventions]. When on, every Gherkin scenario (US-xxx/AC-n) becomes an automated acceptance test, written before the story's implementation. The Gherkin scenarios are the feature's validation scenarios (they replace upstream's quickstart.md).
+- **Acceptance tests**: [on | off, from the constitution's Delivery Conventions]. When on, every Gherkin scenario cited as US-001/AC-1 "title" becomes an automated acceptance test, written before the story's implementation. The Gherkin scenarios are the feature's validation scenarios (they replace upstream's quickstart.md).
 - **Unit tests**: [coverage target, framework, mocking approach]
 - **Integration / contract tests**: [scope, tools]
 - **E2E tests**: [framework, critical paths]
@@ -243,16 +256,16 @@ Error response (400):
 ## Delivery Slices
 
 <!--
-  How the backlog maps onto the architecture, in delivery order. /speckit.tasks uses this table to build its phases.
-  map mode: Walking Skeleton first, then one block per Release Lane (stories in Backbone order).
-  epic mode: one row per story in BLOCKED_BY / release order.
-  story mode: one row per Acceptance Criterion.
+  Describe the wave-based schedule produced by `scripts/backlog.py schedule --spec <spec-dir>`.
+  Schedule the Walking Skeleton first, then delivery waves and, for map specs, Release Lanes.
+  Stories marked [P] in the same wave can run in parallel when their dependencies and files allow it.
 -->
 
-| Slice | PBIs | Components touched | Notes |
-|-------|------|--------------------|-------|
-| Walking Skeleton | [TASK [TASK-001] …, SPIKE [SPIKE-001] …] | [components] | [end-to-end path] |
-| [Release 1: Outcome title] | [US [US-001] …, US [US-002] …] | [components] | [MVP] |
+| Wave / Slice | PBIs | Components touched | Parallelism & Notes |
+|--------------|------|--------------------|---------------------|
+| Walking Skeleton | TASK [TASK-001](../../backlog/tasks/TASK-001-slug.md) Title; SPIKE [SPIKE-001](../../backlog/spikes/SPIKE-001-slug.md) Title | [components] | [End-to-end path; prerequisites before story waves] |
+| Wave 1 — Release Lane 1 MVP | US [US-001](../../backlog/stories/US-001-slug.md) Title; US [US-002](../../backlog/stories/US-002-slug.md) Title | [components] | [P] stories with no dependency or file conflicts |
+| Wave 2 | US [US-003](../../backlog/stories/US-003-slug.md) Title | [components] | [Blocked by Wave 1; release outcome] |
 
 ## Migration Plan *(if applicable)*
 
@@ -279,12 +292,6 @@ Error response (400):
 | Violation | Why Needed | Simpler Alternative Rejected Because | Mitigation | Approved by |
 |-----------|------------|--------------------------------------|------------|-------------|
 | [e.g., 4th project] | [current need] | [why 3 projects insufficient] | [mitigation] | [role] |
-
-## Open Technical Questions
-
-<!-- Full questions that make sense on their own, each naming what it affects; no numbering such as "TQ-1". -->
-
-- [ ] [Question?] — affects [the component, or TYPE [ID] Title]
 
 ## References
 

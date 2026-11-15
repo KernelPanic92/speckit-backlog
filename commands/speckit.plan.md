@@ -1,5 +1,5 @@
 ---
-description: Execute the implementation planning workflow - a single plan.md (design, data model, contracts, delivery slices) plus research.md that answers the unknowns and the backlog Spikes.
+description: Plan scoped central backlog PBIs with a single wave-aligned plan.md and research.md resolving technical unknowns and desk-research Spikes.
 handoffs:
   - label: Create Tasks
     agent: speckit.tasks
@@ -59,23 +59,32 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
+**Rules and tool**:
+
+- `PBI_RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` (including Readable References).
+- `DELIVERY_RULES` = `.specify/presets/backlog/knowledge/delivery/rules.md` (rank, blockers, computed Story/Task Waves and `[P]`, one PR/MR per US and default worktree isolation).
+- `BACKLOG_TOOL` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/backlog.py`.
+
+Every `BACKLOG_TOOL` operation below expands to that full invocation from the repository root as a **standalone command**, never chained with `;`, `&&`, or `|`, so permissions can allow-list it. Parse JSON output; stop and report unavailable tooling rather than hand-authoring a substitute schedule.
+
 1. **Setup**: Run `{SCRIPT}` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, FEATURE_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **Load context**: Read FEATURE_SPEC and `/memory/constitution.md`. Load IMPL_PLAN template (already copied).
-   - FEATURE_SPEC is the root PBI (MAP, EPIC or US: see its frontmatter `type` and the envelope's Spec Context) followed by the spec envelope (Backlog Index, Success Criteria, Key Entities, NFR, dependencies, compliance, Open Questions). Also read every child PBI under `FEATURE_DIR/backlog/`: the stories' Gherkin Acceptance Criteria (`US-xxx/AC-n`) are the requirements, the Spikes are open research questions, the map's Release Lanes and Walking Skeleton are the delivery order.
+   - FEATURE_SPEC is the **4-block spec**: Header with `**Scope**:`, rendered Backlog, optional Key Entities, Success Criteria. Run `BACKLOG_TOOL locate <ID> --descendants` for each scope ID; read scoped PBIs, FEATURE/EPIC/MAP ancestors and blocking SPIKEs from **root** `backlog/{maps,epics,features,stories,spikes,tasks}/`. Follow dependencies outside the immediate descendants where needed. The seven-type model also accepts BUG references (creation belongs to the bug extension). Gherkin `US-xxx/AC-n "title"` scenarios are requirements; Feature Constraints / Epic Scope Boundaries and map lanes contextualize them.
    - **IF EXISTS**: Read `.specify/memory/product.md` (Personas, Ubiquitous Language): entity, endpoint and field names in the plan use its terms.
-   - **IF EXISTS** and the feature has a user interface: Read `.specify/memory/design.md` (DESIGN.md format: tokens in the front matter, rules in the prose). The plan's Technical Context names it as the design system, the Architecture and Project Structure say where its tokens live in code (CSS variables, Tailwind theme, component library theme), and UI components needed by the stories that design.md does not define are listed in Open Technical Questions.
-   - If unchecked items remain in the envelope's Open Questions, warn that downstream rework risk increases and suggest `__SPECKIT_COMMAND_CLARIFY__`; continue only if the user confirms or the questions do not affect the design.
-   - Read the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: it governs every reference in plan.md, research.md and the Spike files you update. A story is `type [id] title`, a scenario `US-001/AC-1 "title"`, a research decision, a constitution principle or a section of product.md a relative link whose text names it (`[the payment provider decision](research.md#payment-provider)`, `[the "Test-First" principle](../../.specify/memory/constitution.md#test-first)`); never a bare id, a bare path, a section number or a coined label such as "R2".
+   - **IF EXISTS** and the feature has a user interface: Read `.specify/memory/design.md` (DESIGN.md format). Name it in Technical Context, identify code locations for tokens/components in Architecture and Project Structure, and resolve missing UI component decisions during research rather than inventing tokens.
+   - Load the project's `.specify/memory/constitution.md` for principles, stack, Quality Standards and Delivery Conventions. If a high-impact functional ambiguity prevents design, suggest `__SPECKIT_COMMAND_CLARIFY__` and stop for the decision; do not create an unanswered-question section in the spec.
+   - Read `PBI_RULES` and `DELIVERY_RULES`. Every reference in plan/research/Spike edits must be readable: titled PBIs/scenarios, topic links with correct anchors, named constitution principles (never numbers or coined labels).
+   - Run `BACKLOG_TOOL schedule --spec FEATURE_DIR`. Keep JSON `story_waves`, `task_waves`, `critical_path` and computed `parallel` booleans; use these Story Waves in Delivery Slices, never invent `[P]`. Where TASK file declarations do not exist yet, describe that the task command will refine file-conflict scheduling.
 
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
-   - Fill the header (spec mode, root PBI, links), Summary and Technical Context (start from the constitution's Technology Stack; mark unknowns as "NEEDS CLARIFICATION")
+   - Fill the header (selected Scope PBIs and links), Summary and Technical Context (start from the constitution's Technology Stack; mark technical unknowns as "NEEDS CLARIFICATION" until Phase 0 resolves them)
    - Fill Constitution Check section from constitution
    - Evaluate gates (ERROR if violations unjustified; justified violations go to Complexity Tracking following the constitution's Exceptions Process)
-   - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION and answer every Spike)
+   - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION and desk-research SPIKEs; identify prototype SPIKEs that remain open for task scheduling)
    - Phase 1: Fill the design sections of plan.md itself (Architecture, Project Structure, Data Model, API Design / Contracts, Integration, Security, Performance, Error Handling, Observability, Testing Strategy, Delivery Slices, Migration, Patterns)
    - Re-evaluate Constitution Check post-design, each gate named after its principle or rule
-   - Run the self-check of the "Readable references" section on plan.md and research.md and rewrite every reference that fails it
+   - Run the Readable References self-check on plan.md, research.md and edited Spike Exit Criteria; fix references. After Spike updates run `BACKLOG_TOOL render-spec FEATURE_DIR`, `BACKLOG_TOOL render-index`, and `BACKLOG_TOOL check --spec FEATURE_DIR` as separate standalone commands; refresh other impacted specs / existing task indices when necessary. Do not report ready with unresolved structural errors.
 
 ## Mandatory Post-Execution Hooks
 
@@ -113,7 +122,7 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 ## Completion Report
 
-Command ends after Phase 1 design. Report branch, IMPL_PLAN path, research.md path, Spikes answered vs still open (each as `SPIKE [id] title`), Constitution Check result with the principles and rules named (and Complexity Tracking entries, if any), and readiness for `__SPECKIT_COMMAND_TASKS__`.
+Command ends after Phase 1 design. Report branch, selected Scope, IMPL_PLAN/research paths, Story Waves and critical path, Spikes answered vs prototype work still open (each as `SPIKE [id] title`), validator and Constitution Check results with named rules (plus Complexity Tracking entries), and readiness for `__SPECKIT_COMMAND_TASKS__`.
 
 ## Phases
 
@@ -133,18 +142,18 @@ Command ends after Phase 1 design. Report branch, IMPL_PLAN path, research.md pa
      Task: "Find best practices for {tech} in {domain}"
    ```
 
-   For each SPIKE under `FEATURE_DIR/backlog/spikes/`:
-     Task: "Answer {spike Outcome question} within {spike Timebox}"
+   For each scoped or blocking SPIKE in root `backlog/spikes/`:
+     Task: "Answer {spike Outcome question} within {spike Timebox}, if desk research suffices; otherwise identify required prototype work"
 
 3. **Consolidate findings** in `research.md`:
-   - Resolve the `research-template` by running the template resolver (`.specify/scripts/bash/resolve-template.sh research-template --json`, or `.specify/scripts/powershell/resolve-template.ps1 research-template -Json` on PowerShell) and use its `TEMPLATE_CONTENT` as the structure. If it fails, stop and report the resolution error.
+   - Resolve `research-template` via `.specify/scripts/bash/resolve-template.sh research-template --json`, `.specify/scripts/powershell/resolve-template.ps1 research-template -Json`, or `python .specify/scripts/python/resolve_template.py research-template --json`. Use resolved `TEMPLATE_CONTENT`; stop on failure.
    - List every question in Research Questions as a full question, without numbering, with its source as a readable reference (the Technical Context unknown as a link to that section of plan.md, the Spike as a link whose text is `SPIKE [id] title`, the dependency or integration by name) and a link to its decision block.
    - For each question write a Decisions block, headed by its topic in words (the heading other documents link to), using format:
      - Decision: [what was chosen]
      - Rationale: [why chosen]
      - Alternatives considered: [what else evaluated]
    - Add Key Findings with sources, Version Information for the libraries the decisions depend on, and the Validity refresh trigger. Do not add dates, authors or changelogs: git history records them.
-   - For each Spike that the research answers, tick its Exit Criteria in the SPIKE file and turn the answered criterion into a link to the decision, e.g. `The question has a documented answer: [the payment provider decision](../../research.md#payment-provider)`. A Spike that needs a prototype rather than desk research stays open: say so in research.md, and `__SPECKIT_COMMAND_TASKS__` will schedule it.
+   - For each desk-research Spike answered with evidence, tick **only satisfied** Exit Criteria in `backlog/spikes/SPIKE-xxx-<slug>.md` and link to the decision from that root-backlog file, e.g. `[the payment provider decision](../../specs/<dir>/research.md#payment-provider)`. Compute the real relative path and anchor. Do not tick work that was not done. A Spike needing a prototype stays open; document that boundary in research.md so `__SPECKIT_COMMAND_TASKS__` creates its closing TASK before the story work it blocks.
 
 **Output**: research.md with all NEEDS CLARIFICATION resolved and every Spike answered or explicitly scheduled
 
@@ -171,10 +180,8 @@ Everything in this phase is written **inside plan.md** (single document): do not
    - Add unit, integration/contract and E2E strategy per the constitution's Quality Standards.
 
 4. **Delivery Slices** → plan.md › Delivery Slices:
-   - map: the Walking Skeleton first, then one row per Release Lane with its stories in Backbone order.
-   - epic: one row per story in BLOCKED_BY / release order.
-   - story: one row per Acceptance Criterion (or group).
-   - For each row, the PBIs as `type [id] title` (scenarios as `US-001/AC-1 "title"`) and the components of the Architecture Overview it touches.
+   - Walking Skeleton / foundational prerequisites first, then rows aligned with the **Story Waves** returned by `BACKLOG_TOOL schedule --spec FEATURE_DIR`; retain Outcome-titled Release Lanes and Backbone order when a map is scoped. A single-story spec still uses its computed wave, not a separate AC scheduling model.
+   - For every row, link PBIs as `type [id](../../backlog/<type-dir>/<ID>-<slug>.md) title`, identify touched components, blockers, critical-path implications and only scheduler-computed `[P]` opportunities. Explain that dependent stories wait for their blockers' PRs to merge and each US gets its own PR/MR (worktree by default, per constitution).
 
 **Output**: plan.md with all design sections filled
 
@@ -187,6 +194,8 @@ Everything in this phase is written **inside plan.md** (single document): do not
 
 ## Done When
 
-- [ ] Plan workflow executed: plan.md with all design sections, research.md with all unknowns resolved and Spikes answered or scheduled
+- [ ] Single-file plan.md includes Data Model, API Design / Contracts, Testing Strategy and computed wave-aligned Delivery Slices
+- [ ] research.md resolves technical unknowns and desk-research Spikes; prototype Spikes remain explicitly open for tasks; Spike decision links use correct root-relative traversal
+- [ ] Rendered indices refreshed when affected; backlog check and Constitution Check pass; Readable References checked
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
 - [ ] Completion reported to user with branch, plan path, and generated artifacts

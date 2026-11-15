@@ -1,15 +1,17 @@
 ---
-# id: the next free project-wide id from the validator (e.g. MAP-001); it never changes. Tool ids are added in `external` by /speckit.sync
+# id: the next free project-wide id from scripts/backlog.py next-id MAP (e.g. MAP-001); it never changes
 id: {{id}}
 title: {{title}}
 # PBI type, fixed for this template
 type: MAP
+# optional: priority rank among siblings (10, 20, 30...; lower = higher priority)
+rank: {{rank}}
 # optional. The Backbone Epics declare THIS map as their PARENT, not the other way round. The map has a PARENT only in the "zoom" case: the macro-Epic this map breaks down
 # BLOCKED_BY: the referenced PBI blocks this one | PARENT: the referenced PBI is the parent, at most one | RELATED: link without constraints
 relations:
     "{{related id}}":
         title: "{{PBI title}}"
-        type: US|TASK|BUG|EPIC|SPIKE|MAP
+        type: US|FEATURE|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
 # optional: a photo of the whiteboard, the Miro or Figma board of the map. Only links really supplied by the user
@@ -26,7 +28,7 @@ As a {{Persona}}, I want {{Global Goal}}, so that {{Value}}.
 {{Elevator Pitch description}}
 
 ## Backbone
-*The user's narrative flow from left to right, in time order. It is made of Macro-Activities (phases) and User Tasks (the specific steps). Every Macro-Activity is an Epic, written with the `pbi-epic-template` template and with this map as PARENT: reference it as `EPIC [id] title`. The User Tasks are the sticky notes that are candidates to become User Stories, children of that Epic.*
+*The user's narrative flow from left to right, in time order. It is made of Macro-Activities (phases) and User Tasks (the specific steps). Every Macro-Activity is an Epic, written with the `pbi-epic-template` template and with this map as PARENT: reference it as `EPIC [id] title`. The User Tasks are candidates to become User Stories, children of the Feature for that Epic × Release Lane intersection.*
 
 | Macro-Activities (Epics) | 1. EPIC [{{related id}}] {{title}} | 2. EPIC [{{related id}}] {{title}} | 3. EPIC [{{related id}}] {{title}} |
 |:---|:---|:---|:---|
@@ -56,20 +58,20 @@ Example
 -->
 
 ## Release Lanes
-*The horizontal "slices" that cut the tasks vertically. Each lane is a working increment of value and is titled with the Outcome it unlocks (the business goal or user behaviour), never with a sterile label such as "Release 1", "MVP" or "v1.0": the title is the filter that decides what enters the lane. The description line says in one sentence what the user gets and which slicing pattern drew the line. Each item references a PBI in the format `{{type}} [{{related id}}] {{title}}`. Each lane takes stories from every Epic of the Backbone, in Backbone order: lanes slice the Epics, an Epic is never completed before starting the next one. Within each Epic the items are in priority order: the first is the most necessary, the last is the first to cut. Never two items with the same priority (gravity rule). In spec-kit each lane becomes one phase of tasks.md, the first lane being the MVP.*
+*The horizontal "slices" that cut the tasks vertically. Each lane is a working increment of value and is titled with the Outcome it unlocks (the business goal or user behaviour), never with a sterile label such as "Release 1", "MVP" or "v1.0": the title is the filter that decides what enters the lane. The description line says in one sentence what the user gets and which slicing pattern drew the line. Each Epic × Release Lane intersection with work is a Feature with the Epic as PARENT; list its stories underneath it. Each lane takes stories from every Epic of the Backbone, in Backbone order: lanes slice the Epics, an Epic is never completed before starting the next one. Within each Feature the stories are in priority order: the first is the most necessary, the last is the first to cut. Never two stories with the same priority (gravity rule). In spec-kit each lane becomes one phase of tasks.md, the first lane being the MVP.*
 
 ### Release n: {{title}}
 [description]
 * **Goal:** [E.g. Enable the first purchase by credit card]
 * **Metrics:** [E.g. 10 transactions completed without errors]
-* **1. EPIC [{{related id}}] {{title}}**
-  * {{type}} [{{related id}}] {{title}}
-  * {{type}} [{{related id}}] {{title}}
-* **2. EPIC [{{related id}}] {{title}}**
-  * {{type}} [{{related id}}] {{title}}
-  * {{type}} [{{related id}}] {{title}}
-* **3. EPIC [{{related id}}] {{title}}**
-  * {{type}} [{{related id}}] {{title}}
+* **1. EPIC [{{related id}}] {{title}}** → **FEATURE [{{related id}}] {{title}}**
+  * US [{{related id}}] {{title}}
+  * US [{{related id}}] {{title}}
+* **2. EPIC [{{related id}}] {{title}}** → **FEATURE [{{related id}}] {{title}}**
+  * US [{{related id}}] {{title}}
+  * US [{{related id}}] {{title}}
+* **3. EPIC [{{related id}}] {{title}}** → **FEATURE [{{related id}}] {{title}}**
+  * US [{{related id}}] {{title}}
 
 <!--
 Example
@@ -86,31 +88,31 @@ the next lane).
 *A visitor finds a product, puts it in the cart and pays by card, receiving the confirmation. Slicing by Outcome: only what is needed to complete the journey once.*
 * **Goal:** Enable the first complete purchase by a real customer and validate the idea
 * **Metrics:** 10 transactions completed without errors in the first week
-* **1. EPIC [EPIC-001] Discovery**
+* **1. EPIC [EPIC-001] Discovery** → **FEATURE [FEATURE-001] Product found in the catalog**
   * US [US-001] Exact text search
   * US [US-002] Basic catalog
-* **2. EPIC [EPIC-002] Selection**
+* **2. EPIC [EPIC-002] Selection** → **FEATURE [FEATURE-002] First cart**
   * US [US-003] Product page with price and photo
   * US [US-004] Basic cart
-* **3. EPIC [EPIC-003] Checkout**
+* **3. EPIC [EPIC-003] Checkout** → **FEATURE [FEATURE-003] Card payment**
   * US [US-005] Credit card payment
-* **4. EPIC [EPIC-004] After-Sales**
+* **4. EPIC [EPIC-004] After-Sales** → **FEATURE [FEATURE-004] Order confirmation**
   * US [US-006] Confirmation email with summary
 
 ### Release 2: Higher average order value and product found at the first attempt
 *Buyers find what they look for sooner and add more items to the same order. Slicing Necessity vs Richness: no new flow, the flows of the first lane get thicker.*
 * **Goal:** Increase the average order value and reduce searches without results
 * **Metrics:** Average order value +15%, searches without results below 5%
-* **1. EPIC [EPIC-001] Discovery**
+* **1. EPIC [EPIC-001] Discovery** → **FEATURE [FEATURE-005] Guided search**
   * US [US-007] Price and colour filters
   * US [US-008] Search autocomplete
-* **2. EPIC [EPIC-002] Selection**
+* **2. EPIC [EPIC-002] Selection** → **FEATURE [FEATURE-006] Richer cart**
   * US [US-009] Related products
   * US [US-010] Quantity management in the cart
-* **3. EPIC [EPIC-003] Checkout**
+* **3. EPIC [EPIC-003] Checkout** → **FEATURE [FEATURE-007] More payment methods**
   * US [US-011] Saving the card for later purchases
   * US [US-012] PayPal payment
-* **4. EPIC [EPIC-004] After-Sales**
+* **4. EPIC [EPIC-004] After-Sales** → **FEATURE [FEATURE-008] Post-purchase tracking**
   * US [US-013] Shipment tracking
   * US [US-014] PDF invoice
 
@@ -118,13 +120,13 @@ the next lane).
 *Those who have already bought find the shop again on their own and close the second order in a few seconds. Slicing by Learning: tests the riskiest hypothesis, that loyalty comes from fast repurchase.*
 * **Goal:** Loyalty and spontaneous repurchase
 * **Metrics:** 20% of customers with a second order within 30 days
-* **1. EPIC [EPIC-001] Discovery**
+* **1. EPIC [EPIC-001] Discovery** → **FEATURE [FEATURE-009] Personal suggestions**
   * US [US-015] Suggestions based on previous purchases
-* **2. EPIC [EPIC-002] Selection**
+* **2. EPIC [EPIC-002] Selection** → **FEATURE [FEATURE-010] Video reviews**
   * US [US-016] Video reviews
-* **3. EPIC [EPIC-003] Checkout**
+* **3. EPIC [EPIC-003] Checkout** → **FEATURE [FEATURE-011] One-click payment**
   * US [US-017] One-click payment with Apple Pay or Google Pay
-* **4. EPIC [EPIC-004] After-Sales**
+* **4. EPIC [EPIC-004] After-Sales** → **FEATURE [FEATURE-012] Shipment updates**
   * US [US-018] Push notifications on shipment status
 -->
 
@@ -144,5 +146,6 @@ the next lane).
 - [ ] Gravity - [1 line only: stories are correctly ordered from the most to the least important, top to bottom]
 - [ ] Functional - [1 line only: the map describes the experience, not the system]
 - [ ] Walking Skeleton vs MVP - [1 line only: the Walking Skeleton is different from the MVP]
+- [ ] Features - [1 line only: every Epic × Release Lane intersection with work has exactly one Feature, whose Out of Scope points to the next Feature in that Epic when applicable]
 - [ ] Lane Outcomes - [1 line only: every lane is titled with the Outcome it unlocks, not a label ("Release 1", "MVP", "Delight"), and every story in the lane is strictly necessary to that Outcome]
 - [ ] Elevator Pitch - [1 line only: the whole BASE product can be explained in under 60 seconds, otherwise the narrative constraint is broken]
