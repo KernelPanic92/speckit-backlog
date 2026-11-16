@@ -1,5 +1,5 @@
 ---
-description: Perform read-only cross-artifact analysis of a 4-block spec, central backlog PBIs, computed Story/Task Waves, AC coverage, governance, plan, research and generated tasks.
+description: Perform read-only cross-artifact analysis of modular spec artifacts, backlog PBIs, ADRs, schedules, and task coverage.
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-spec --require-tasks --include-tasks
   ps: scripts/powershell/check-prerequisites.ps1 -Json -RequireSpec -RequireTasks -IncludeTasks
@@ -51,7 +51,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Goal
 
-Identify inconsistencies, duplication, ambiguity and underspecification across the 4-block `spec.md` (`**Scope**:` + rendered `## Backlog`, optional Key Entities, Success Criteria), the permanent PBIs in repository-root `backlog/`, `plan.md`, `research.md`, generated `tasks.md` and product/governance context before implementation. This command MUST run only after `__SPECKIT_COMMAND_TASKS__` has produced `tasks.md`; validation may still expose defects. Never treat spec.md as a PBI file.
+Identify inconsistencies, duplication, ambiguity and underspecification across the 4-block `spec.md` (`**Scope**:` + rendered `## Backlog`, optional Key Entities, Success Criteria), permanent PBIs in repository-root `backlog/`, `plan.md`, optional `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, generated `tasks.md`, Accepted ADRs in `docs/adr/`, and product/governance context before implementation. This command MUST run only after `__SPECKIT_COMMAND_TASKS__` has produced `tasks.md`; validation may still expose defects. Never treat spec.md as a PBI file.
 
 ## Operating Constraints
 
@@ -71,6 +71,10 @@ Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_
 
 - BACKLOG = repository-root `backlog/` (`maps/`, `epics/`, `features/`, `stories/`, `spikes/`, `tasks/`, `bugs/`), never FEATURE_DIR/backlog/
 - RESEARCH = FEATURE_DIR/research.md (if present)
+- DATA_MODEL = FEATURE_DIR/data-model.md (if present)
+- CONTRACTS = FEATURE_DIR/contracts/ (if present; inspect per boundary/story file)
+- QUICKSTART = FEATURE_DIR/quickstart.md (if present)
+- ADRs = Accepted decisions under `docs/adr/` (plus recognized legacy archives)
 - PRODUCT = `.specify/memory/product.md` (if present)
 - REFERENCES = the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: what a readable reference is, for detection pass G and for this report
 - DELIVERY_RULES = `.specify/presets/backlog/knowledge/delivery/rules.md`: rank/blockers/files, computed wave scheduling, one PR/MR per US and default worktree isolation
@@ -103,7 +107,7 @@ Load only the minimal necessary context from each artifact:
 
 **From research.md (if present):**
 
-- Research Questions and Decisions; Spikes answered or still open
+- Research Questions, Fact-finding/Technical Findings, Architectural Trade-offs and Verdicts; Spikes answered or still open. Flag durable cross-feature decisions buried here without an ADR.
 
 **From product.md (if present):**
 
@@ -113,12 +117,13 @@ Load only the minimal necessary context from each artifact:
 
 - Token groups and component names (front matter), Do's and Don'ts, accessibility target
 
-**From plan.md:**
+**From plan.md and modular design artifacts:**
 
-- Architecture/stack choices
-- Data Model references
-- Phases
-- Technical constraints
+- `plan.md`: feature-specific architecture/stack deltas, Constitution Check, Project Structure, delivery slices, and technical constraints; flag copied constitution boilerplate/filler.
+- `data-model.md`: entities, fields, validation constraints, relations, state transitions and migration details when present.
+- `contracts/`: boundary contracts per story slice when present.
+- `quickstart.md`: runnable acceptance-suite and smoke verification commands when present.
+- Accepted ADRs in `docs/adr/`: governing cross-feature decisions and supersession status; flag contradictions with artifacts or constitution.
 
 **From tasks.md:**
 
@@ -167,7 +172,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 
 #### D. Constitution Alignment
 
-- Any requirement or plan element conflicting with a MUST principle
+- Any requirement or plan element conflicting with a MUST principle or Accepted ADR
 - Missing mandated sections or quality gates from constitution
 
 #### E. Coverage Gaps
@@ -181,7 +186,9 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 #### F. Inconsistency
 
 - Terminology drift (same concept named differently across files)
-- Data entities referenced in plan but absent in spec (or vice versa)
+- Data entities referenced in plan/data-model but absent in spec (or vice versa)
+- Contract, story, data-model and `quickstart.md` verification inconsistencies
+- Contradictions with Accepted ADRs, unrecorded cross-feature decisions hidden in `research.md`, or constitution boilerplate filler in `plan.md`
 - Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note; a task listed before a task it is BLOCKED_BY)
 - Phase order contradicting computed Story/Task Waves, `rank` / `BLOCKED_BY`, or map Release Lane / Backbone order
 - Conflicting requirements (e.g., one requires Next.js while other specifies Vue)

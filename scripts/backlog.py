@@ -599,11 +599,95 @@ def reachable(graph, source, target):
 def validate_links(project, path, text):
     for target in re.findall(r"\[[^\]\n]*\]\(\s*<?([^\s)>]+)>?(?:\s+[^)]*)?\)", clean_markdown(text)):
         parsed = urlsplit(target)
-        if parsed.scheme or parsed.netloc or not parsed.path or parsed.path.startswith("/"):
+        if (parsed.scheme or parsed.netloc or not parsed.path or parsed.path.startswith("/")
+                or "{{" in target or "}}" in target):
             continue
         local = unquote(parsed.path)
-        if local.endswith(".md") and not (path.parent / local).is_file():
-            project.report.add("broken-link", project.rel(path), f"Missing local Markdown target: {target}")
+        target_path = (path.parent / local).resolve()
+        try:
+            target_path.relative_to(project.root)
+        except ValueError:
+            continue
+        if not target_path.exists():
+            project.report.add("broken-link", project.rel(path), f"Missing local target: {target}")
+
+
+ADR_DIRS = ("docs/adr", "docs/decisions", "doc/adr", "adr")
+ADR_FILENAME_RE = re.compile(r"^\d{4}-[a-z0-9-]+\.md$")
+ADR_STATUS_RE = re.compile(r"^\|\s*\*\*Status\*\*\s*\|\s*(.*?)\s*\|\s*$", re.M)
+ADR_SUPERSEDES_RE = re.compile(r"^Superseded by \[ADR-(\d{4}):[^\]]+\]\(([^)]+)\)$")
+
+
+def validate_adrs(project):
+    """Validate names, unique IDs, statuses and explicit negative consequences."""
+    entries = []
+    for relative_dir in ADR_DIRS:
+        directory = project.root / relative_dir
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.glob("*.md")):
+            if path.name.lower() in {"readme.md", "index.md"}:
+                continue
+            if not ADR_FILENAME_RE.fullmatch(path.name):
+                project.report.add("adr-file-name", project.rel(path),
+                                   "Expected NNNN-kebab-slug.md")
+                continue
+            entries.append(path)
+
+    by_id = {}
+    for path in entries:
+        identifier = path.name[:4]
+        by_id.setdefault(identifier, []).append(path)
+    for identifier, paths in sorted(by_id.items()):
+        if len(paths) > 1:
+            for path in paths:
+                project.report.add("adr-duplicate-id", project.rel(path),
+                                   f"Duplicate ADR ID {identifier}")
+
+    valid_statuses = {"Proposed", "Accepted", "Rejected", "Deprecated"}
+    for path in entries:
+        name = project.rel(path)
+        text = clean_markdown(path.read_text(encoding="utf-8"))
+        status_match = ADR_STATUS_RE.search(text)
+        status = status_match[1].strip() if status_match else ""
+        if status not in valid_statuses:
+            supersedes = ADR_SUPERSEDES_RE.fullmatch(status)
+            if not supersedes:
+                project.report.add("adr-status", name,
+                                   "Status must be Proposed, Accepted, Rejected, Deprecated, or a valid Superseded by ADR link")
+            else:
+                target_id, target = supersedes.groups()
+                target_path = (path.parent / unquote(target)).resolve()
+                same_id = target_path.name.startswith(target_id + "-")
+                if not same_id or not target_path.is_file():
+                    project.report.add("adr-status", name,
+                                       f"Superseding ADR target does not exist: {target}")
+
+        negative = re.search(r"^###\s+Negative\s*$([\s\S]*?)(?=^#{1,3}\s|\Z)", text, re.M)
+        bullets = re.findall(r"^\s*-\s+\S", negative[1], re.M) if negative else []
+        if len(bullets) < 2:
+            project.report.add("adr-consequences", name,
+                               "### Negative must contain at least two concrete bullet items")
+
+
+def validate_spec_documents(project, directory):
+    """Check links in modular companion artifacts and contract Markdown files."""
+    names = ("plan.md", "research.md", "data-model.md", "quickstart.md")
+    paths = [directory / name for name in names]
+    contracts = directory / "contracts"
+    if contracts.is_dir():
+        paths.extend(contracts.rglob("*.md"))
+    for path in paths:
+        if path.is_file():
+            validate_links(project, path, path.read_text(encoding="utf-8"))
+
+
+def validate_adr_links(project):
+    for relative_dir in ADR_DIRS:
+        directory = project.root / relative_dir
+        if directory.is_dir():
+            for path in sorted(directory.glob("*.md")):
+                validate_links(project, path, path.read_text(encoding="utf-8"))
 
 
 def validate_pbis(project):
@@ -706,6 +790,8 @@ def validate_pbis(project):
 def check_project(project, spec=None):
     validate_pbis(project)
     report = project.report
+    validate_adrs(project)
+    validate_adr_links(project)
     if spec is not None:
         directories = [project.spec_path(spec)]
     else:
@@ -720,6 +806,7 @@ def check_project(project, spec=None):
             continue
         _, text, scope, _ = project.read_spec(directory)
         validate_links(project, path, text)
+        validate_spec_documents(project, directory)
         if "{{" in text:
             report.add("placeholder", name, "Unresolved template placeholder")
         if not scope:

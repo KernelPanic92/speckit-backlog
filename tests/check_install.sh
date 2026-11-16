@@ -25,7 +25,8 @@ for pair in \
   "pbi-feature-template|type: FEATURE" \
   "pbi-story-template|### AC-1:" \
   "pbi-task-template|type: TASK" \
-  "pbi-spike-template|type: SPIKE"; do
+  "pbi-spike-template|type: SPIKE" \
+  "adr-template|## Decision Drivers"; do
   name="${pair%%|*}" marker="${pair#*|}"
   content="$(bash .specify/scripts/bash/resolve-template.sh "$name" --json | python3 -c 'import json,sys; print(json.load(sys.stdin)["TEMPLATE_CONTENT"])' 2>/dev/null || true)"
   if [[ "$content" == *"$marker"* ]]; then ok "$name"; else ko "$name (marker '$marker' not found)"; fi
@@ -51,7 +52,7 @@ if grep -l "__SPECKIT_COMMAND_\|{SCRIPT}\|@@UPSTREAM" .claude/skills/speckit-*/S
 if grep -h "\.specify/\.specify/\|\.specify/presets/backlog/\.specify" .claude/skills/speckit-*/SKILL.md; then ko "mangled preset paths"; else ok "preset paths intact"; fi
 
 echo "Installed preset files"
-for path in knowledge/pbi-writing/rules.md knowledge/pbi-writing/examples.md knowledge/delivery/rules.md schemas/pbi-frontmatter.schema.json scripts/backlog.py NOTICE.md LICENSE; do
+for path in knowledge/pbi-writing/rules.md knowledge/pbi-writing/examples.md knowledge/delivery/rules.md knowledge/architecture/rules.md schemas/pbi-frontmatter.schema.json scripts/backlog.py NOTICE.md LICENSE; do
   [[ -f ".specify/presets/backlog/$path" ]] && ok "$path" || ko "$path missing"
 done
 for path in tests tools .github catalog.json; do

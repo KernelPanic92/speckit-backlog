@@ -1,87 +1,59 @@
 # Research: [FEATURE]
 
-**Plan**: [[Feature] implementation plan](plan.md) | **Spec**: [[Feature] specification](spec.md)
+**Spec**: [[Feature name] specification](spec.md) | **Plan**: [[Feature name] implementation plan](plan.md) | **ADRs**: [crystallized decisions as [ADR-NNNN: title](../../docs/adr/...) or none]
 
-**Purpose**: [Why this research was needed: the unknowns of the Technical Context and the Spikes of the backlog]
+<!-- Git owns history; do not add dates, authors, versions, or changelogs for this document. Follow the [Readable references rules](../../knowledge/pbi-writing/rules.md#readable-references). -->
 
-<!-- History of this document is git history: no version, date, author or changelog fields.
-     References follow the "Readable references" rules of the backlog preset: questions and decisions are named by their topic, never numbered, so the plan, tasks and Spike PBIs can link them as [the payment provider decision](research.md#payment-provider). -->
+## Questions & Scope
 
-## Research Questions
+| Question | Mode | Source | Outcome |
+|----------|------|--------|---------|
+| [Question] | Fact-finding / Trade-off | [Technical Context](plan.md#technical-context) or SPIKE [id](../../backlog/spikes/...) title | [Finding](research.md#topic) and [ADR-NNNN: title](../../docs/adr/NNNN-slug.md), if applicable |
 
-<!-- One line per question. Sources: unresolved items from the plan's Technical Context, every SPIKE PBI in the root backlog, and best-practice questions for a chosen dependency. The Decision column links the block below by its heading. -->
+## Technical Findings
 
-| Question | Source | Decision |
-|----------|--------|----------|
-| [Question?] | [Storage, marked NEEDS CLARIFICATION in the Technical Context of the plan](plan.md#technical-context) | [Topic](research.md#topic) |
-| [Question?] | SPIKE [SPIKE-001](../../backlog/spikes/SPIKE-001-[slug].md) Title | [Topic](research.md#topic) |
-
-## Decisions
-
-<!-- The core of this document: one block per question, in the upstream Decision / Rationale / Alternatives format. -->
+<!-- Fact-finding questions and desk-research Spikes: concise empirical facts, constraints, versions, and evidence. No prose padding. -->
 
 ### [Topic]
 
-- **Decision**: [what was chosen]
-- **Rationale**: [why chosen]
-- **Alternatives considered**: [what else was evaluated and why it was rejected]
-- **Spike**: SPIKE [SPIKE-001](../../backlog/spikes/SPIKE-001-[slug].md) Title — [Exit Criteria met | prototype Spike remains scheduled by `/speckit.tasks` before the stories it blocks | n/a]
+- **Finding**: [verified fact or result]
+- **Constraint / version**: [bound, compatibility, or version]
+- **Evidence**: [named source and link]
+- **Implication**: [effect on this feature]
 
-## Key Findings
+## Architectural Trade-offs *(include only for genuine Trade-off forks; omit when existing stack and ADRs settle the design)*
 
-### Finding 1: [Title]
+### [Topic]
 
-**Summary:** [One sentence]
+#### Assumptions & Latent Gaps
 
-**Details:** [Explanation with context]
+| Assumption / Constraint | Type | What changes if false |
+|-------------------------|------|-----------------------|
+| [scale, latency/SLO, team/stack, compliance, or other input] | [known / assumption / open] | [verdict or option change] |
 
-**Code Example:**
-```text
-// Example demonstrating the finding
-```
+#### Decision Matrix
 
-**Source:** [What the source is, in words](URL of the page or section)
+| Driver | [Option 1: status quo, if meaningful] | [Option 2] | [Option 3] |
+|--------|--------------------------------------|------------|------------|
+| Latency / 10x scale | [evidence and bottleneck] | [comparison] | [comparison] |
+| Failure mode / blast radius | [comparison] | [comparison] | [comparison] |
+| Operability / developer velocity (6/18m) | [comparison] | [comparison] | [comparison] |
+| Security / lock-in | [comparison] | [comparison] | [comparison] |
+| **Effort** | [Xh @ Y% risk] | [Xh @ Y% risk] | [Xh @ Y% risk] |
+| **Poison pill** | [structural flaw accepted] | [structural flaw accepted] | [structural flaw accepted] |
 
-**Implications for this feature:**
-- [How this affects the plan]
+#### Options, Stress Test & Poison Pills
 
-## Version Information
+- **[Option 1]** — 10x bottleneck: [limit]; failure mode: [impact]; velocity: [6/18-month effect]. **Poison pill**: [structural flaw accepted].
+- **[Option 2]** — 10x bottleneck: [limit]; failure mode: [impact]; velocity: [6/18-month effect]. **Poison pill**: [structural flaw accepted].
+- **[Option 3]** — 10x bottleneck: [limit]; failure mode: [impact]; velocity: [6/18-month effect]. **Poison pill**: [structural flaw accepted].
 
-<!-- Versions of the libraries and services this research is based on (not versions of this document). -->
+#### Verdict
 
-| Component | Version | Release Date | EOL Date |
-|-----------|---------|--------------|----------|
-| [Library/Framework] | [X.Y.Z] | [Date] | [Date or N/A] |
+**Choose [one option].** [Explain why it beats the runner-up and name the assumption that would flip the verdict and the expected alternative.] For a durable project-wide choice, record [ADR-NNNN: title](../../docs/adr/NNNN-slug.md).
 
-**Compatibility notes:**
-- [Framework X]: compatible with versions [range]
-- [Known conflicts]: [list]
+## Validity & Refresh Triggers
 
-## Migration Notes *(if applicable)*
-
-| Change | Old Approach | New Approach |
-|--------|--------------|--------------|
-| [Change 1] | [Old pattern] | [New pattern] |
-
-## Performance Considerations *(if applicable)*
-
-| Scenario | Benchmark | Notes |
-|----------|-----------|-------|
-| [Scenario] | [X ms/ops] | [Context] |
-
-## Security Considerations *(if applicable)*
-
-- [ ] [Security concern]: [Mitigation]
-
-## Validity
-
-<!-- When this research must be re-checked. Tie it to library versions and events, not to dates: the date of the research is in git history. -->
-
-This research is valid for the versions listed in Version Information.
-
-**Refresh trigger**: [e.g., "next major version of [library]", "before choosing a new payment provider"]
-
-Before relying on it:
-- [ ] Check whether the library versions have changed significantly
-- [ ] Review the changelogs for breaking changes since those versions
-- [ ] Verify the code examples still work
+| Dependency / Assumption | Current Version / Bound | Refresh Trigger |
+|-------------------------|-------------------------|-----------------|
+| [dependency, API, or assumption] | [verified version, limit, or bound] | [specific change or threshold] |

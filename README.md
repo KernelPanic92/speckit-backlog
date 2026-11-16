@@ -14,7 +14,7 @@ The backlog follows INVEST, vertical slicing, Gherkin acceptance criteria, and U
 | `/speckit.backlog` | Create, map, refine, reorder, and retire PBIs in the central `backlog/`. |
 | `/speckit.specify` | Turn free text or a functional PBI into a scoped, four-block `spec.md`. |
 | `/speckit.clarify` | Resolve scope questions with the user and record accepted clarifications in the specification. |
-| `/speckit.plan` | Produce `research.md` and a single `plan.md` with architecture and delivery slices. |
+| `/speckit.plan` | Produce feature research and a modular `plan.md` with conditional `data-model.md`, `contracts/`, `quickstart.md`, and delivery slices; durable decisions go in `docs/adr/`. |
 | `/speckit.tasks` | Reconcile central TASK PBIs idempotently and render the task execution index. |
 | `/speckit.analyze` | Check consistency across product context, PBIs, acceptance criteria, and computed schedule. |
 | `/speckit.implement` | Execute scheduled work, with one PR/worktree per User Story and TASK-owned progress. |
@@ -42,12 +42,22 @@ specs/003-online-purchase/
 ├── spec.md               # Header, Backlog, Key Entities, Success Criteria
 ├── research.md
 ├── plan.md
+├── data-model.md         # when entities or state change
+├── contracts/            # when external interfaces change
+├── quickstart.md         # runnable verification runbook
 ├── tasks.md              # rendered schedule and TASK links
 └── checklists/
     └── requirements.md
+
+docs/adr/                  # durable, atomic project-wide architecture decisions
+└── 0001-example-decision.md
 ```
 
 The `spec.md` **Scope** selects functional PBIs; its `## Backlog` block is rendered from the central `backlog/`. PBI files stay in the repository-wide backlog and can be referenced by multiple specifications.
+
+## Modular Plan, Research & ADRs
+
+`research.md` holds feature-scoped facts and, only for genuine architectural forks, a trade-off matrix with 10x stress tests and poison-pill analysis. `docs/adr/` holds durable, atomic project-wide decisions and their supersession history. The modular `plan.md`, conditional `data-model.md` and `contracts/`, and runnable `quickstart.md` keep feature execution zero-fluff, human-reviewable, and progressively loadable by parallel sub-agents.
 
 ## Ordering, Waves & Parallel Execution
 
@@ -120,7 +130,7 @@ Templates can be overridden in `.specify/templates/overrides/` using their templ
 | `speckit.clarify`, `speckit.plan`, `speckit.analyze` | Adapts the upstream commands to central PBIs, research, and computed scheduling. |
 | `speckit.tasks` | Reconciles TASK PBIs and renders an idempotent, wave-based execution index. |
 | `speckit.implement`, `speckit.checklist`, `speckit.converge` | Adds PBI traceability and delivery guidance to the upstream commands. |
-| Templates | Supplies 13 templates for project context, specifications, plans, research, tasks, and the six PBI types. |
+| Templates | Supplies 14 templates for project context, specifications, modular plans, research, ADRs, tasks, and the six PBI types. |
 
 `NOTICE.md` documents template provenance and third-party licenses.
 

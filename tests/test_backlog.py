@@ -108,6 +108,52 @@ def test_valid_fixture_checks_without_errors_or_warnings(project, cli):
     assert result["pbis"] == {"MAP": 1, "EPIC": 2, "FEATURE": 3, "US": 3, "SPIKE": 1, "BUG": 1, "TASK": 10}
 
 
+@pytest.mark.parametrize("document", ["plan.md", "data-model.md", "research.md", "quickstart.md"])
+def test_modular_spec_companion_broken_links_are_checked(project, cli, document):
+    path = project / SPEC / document
+    path.write_text(path.read_text() + "\n[missing artifact](missing-artifact.md)\n")
+    result = check_code(cli, project, "broken-link")
+    assert any(entry["file"] == f"{SPEC}/{document}" for entry in result["errors"])
+
+
+def test_contract_links_in_modular_spec_are_checked(project, cli):
+    path = project / SPEC / "plan.md"
+    path.write_text(path.read_text().replace("contracts/catalog-api.yaml", "contracts/missing-api.yaml"))
+    result = check_code(cli, project, "broken-link")
+    assert any(entry["file"] == f"{SPEC}/plan.md" and "missing-api.yaml" in entry["message"]
+               for entry in result["errors"])
+
+
+def test_adr_file_name_validation(project, cli):
+    (project / "docs/adr/not-an-adr.md").write_text("# Not an ADR\n")
+    check_code(cli, project, "adr-file-name")
+
+
+def test_adr_duplicate_id_validation(project, cli):
+    source = project / "docs/adr/0001-use-stripe-payment-intents.md"
+    (source.parent / "0001-another-choice.md").write_text(source.read_text())
+    check_code(cli, project, "adr-duplicate-id")
+
+
+@pytest.mark.parametrize("status", [
+    "Approved",
+    "Superseded by [ADR-0002: Replace provider](0002-replace-provider.md)",
+])
+def test_adr_status_validation(project, cli, status):
+    path = project / "docs/adr/0001-use-stripe-payment-intents.md"
+    path.write_text(re.sub(r"(?m)^\| \*\*Status\*\* \|.*$", f"| **Status** | {status} |", path.read_text()))
+    result = check_code(cli, project, "adr-status")
+    assert any(entry["file"] == "docs/adr/0001-use-stripe-payment-intents.md"
+               for entry in result["errors"])
+
+
+def test_adr_requires_two_negative_consequences(project, cli):
+    path = project / "docs/adr/0001-use-stripe-payment-intents.md"
+    path.write_text(path.read_text().replace(
+        "- Payment behavior depends on Stripe's API and account availability.\n", ""))
+    check_code(cli, project, "adr-consequences")
+
+
 def test_valid_fixture_scoped_check(project, cli):
     result = cli(project, "check", "--spec", SPEC)
     assert result["errors"] == result["warnings"] == []

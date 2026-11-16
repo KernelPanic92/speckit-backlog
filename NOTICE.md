@@ -40,19 +40,23 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **N** = new in this preset.
 | Section | From |
 |---------|------|
 | Technical Context (`NEEDS CLARIFICATION`), Constitution Check gate, Project Structure + Structure Decision, Complexity Tracking | U |
-| Summary + Key technical decisions, New Dependencies, Architecture Overview, Data Model, API Design, Integration Points, Security, Performance, Error Handling, Observability, Testing Strategy, Migration Plan + Feature Flags, Patterns Established, References | P |
-| Delivery Slices, Gherkin scenarios as validation scenarios (instead of quickstart.md), links to PBIs | N |
-| Removed: Open Technical Questions; delivery order is computed by the deterministic `render-tasks` wave schedule | N |
+| Summary, modular architecture & project structure, feature-specific resilience/migration/rollout deltas | N |
+| Delivery Slices aligned to the deterministic `render-tasks` wave schedule; conditional `data-model.md`, `contracts/`, and `quickstart.md`; links to PBIs and ADRs | N |
+| Removed: the 18-section single-file monolith, including embedded data model/contracts/operations boilerplate; modular upstream-compatible artifacts support progressive disclosure | N |
 | Removed: Created, Author | — |
 
 ### research-template.md
 | Section | From |
 |---------|------|
-| Decisions in the Decision / Rationale / Alternatives considered format | U (plan command, Phase 0) |
-| Research Questions, Key Findings, Version Information, Migration Notes, Performance / Security Considerations | P |
-| Validity (refresh trigger tied to library versions) | P "Staleness Warning", without dates |
-| Spike closure, question sources | N |
-| Removed: Open Questions, Last Updated, Author, Next Review, Changelog | — |
+| Feature-scoped empirical findings, questions, validity/refresh triggers, and conditional TDD trade-off matrix with stress tests and poison pills | N |
+| Separation of empirical research and architectural evaluation from durable atomic ADRs in `docs/adr/` | N |
+| Removed: decisions-as-ADR substitutes, routine-feature alternative theater, dates, authors, and changelogs | N |
+
+### adr-template.md
+| Section | From |
+|---------|------|
+| Context, decision drivers, considered options, decision, consequences, validation | N (MADR/Nygard-style atomic project-wide decision record) |
+| Status, supersession, mandatory concrete negative trade-offs, no dates/authors | N |
 
 ### tasks-template.md
 | Section | From |
