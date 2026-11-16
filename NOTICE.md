@@ -21,46 +21,49 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **N** = new in this preset.
 | Project Identity, Technology Stack, Three-Tier Rules (MUST/SHOULD/MAY), Quality Standards, Security Posture + Compliance, Exceptions Process, Review Schedule | P (constitution-template.md) |
 | Agent Boundaries (Always / Ask First / Never), Performance Baselines | P (memory/constitution.md) |
 | Governance | U, without versioning policy |
-| Delivery Conventions | N |
+| Delivery Conventions (Acceptance tests from Gherkin, Story isolation, Readable references) | N |
 | Removed: Version, Ratified / Effective Date, Last Amended, Approved By, Amendment History / Changelog | — |
 
 ### product-template.md
 | Section | From |
 |---------|------|
-| All (Vision, Problem, Personas, Goals, Scope, Key User Journeys, Constraints, Stakeholders, Ubiquitous Language, Open Questions) | N (Ubiquitous Language table: Term / Business definition / Dev definition) |
+| All (Vision, Problem, Personas, Goals, Scope, Key User Journeys, Constraints, Stakeholders, Ubiquitous Language) | N (Ubiquitous Language table: Term / Business definition / Dev definition) |
 
-### spec-template.md (spec envelope)
+### spec-template.md (four-block specification)
 | Section | From |
 |---------|------|
-| Spec Context (Input line), Success Criteria (`SC-###`), Key Entities | U |
-| Non-Functional Requirements, External Dependencies, Security & Compliance Checklist, Open Questions, References | P |
-| Backlog Index, Clarifications log format | N / U (clarify's session log) |
-| Root PBI (MAP / EPIC / US) that precedes the envelope | N |
-| Removed: Summary / Key decisions, FR-###, Edge Cases (replaced by Gherkin scenarios), Feature ID / Created / Author | — |
+| Header (Feature Specification, Feature Branch, Status, Input), Key Entities, Success Criteria (`SC-###`) | U (derived from Spec Kit's specification structure) |
+| Scope selector and `## Backlog` block rendered from the central `backlog/` | N |
+| Removed: FR-###, Edge Cases (represented in PBIs), Open Questions, Feature ID / Created / Author | — |
 
 ### plan-template.md
 | Section | From |
 |---------|------|
 | Technical Context (`NEEDS CLARIFICATION`), Constitution Check gate, Project Structure + Structure Decision, Complexity Tracking | U |
-| Summary + Key technical decisions, New Dependencies, Architecture Overview, Data Model, API Design, Integration Points, Security, Performance, Error Handling, Observability, Testing Strategy, Migration Plan + Feature Flags, Patterns Established, Open Technical Questions, References | P |
-| Delivery Slices, Gherkin scenarios as validation scenarios (instead of quickstart.md), links to PBIs | N |
+| Summary, modular architecture & project structure, feature-specific resilience/migration/rollout deltas | N |
+| Delivery Slices aligned to the deterministic `render-tasks` wave schedule; conditional `data-model.md`, `contracts/`, and `quickstart.md`; links to PBIs and ADRs | N |
+| Removed: the 18-section single-file monolith, including embedded data model/contracts/operations boilerplate; modular upstream-compatible artifacts support progressive disclosure | N |
 | Removed: Created, Author | — |
 
 ### research-template.md
 | Section | From |
 |---------|------|
-| Decisions in the Decision / Rationale / Alternatives considered format | U (plan command, Phase 0) |
-| Research Questions, Key Findings, Version Information, Migration Notes, Performance / Security Considerations, Open Questions | P |
-| Validity (refresh trigger tied to library versions) | P "Staleness Warning", without dates |
-| Spike closure, question sources | N |
-| Removed: Last Updated, Author, Next Review, Changelog | — |
+| Feature-scoped empirical findings, questions, validity/refresh triggers, and conditional TDD trade-off matrix with stress tests and poison pills | N |
+| Separation of empirical research and architectural evaluation from durable atomic ADRs in `docs/adr/` | N |
+| Removed: decisions-as-ADR substitutes, routine-feature alternative theater, dates, authors, and changelogs | N |
+
+### adr-template.md
+| Section | From |
+|---------|------|
+| Context, decision drivers, considered options, decision, consequences, validation | N (MADR/Nygard-style atomic project-wide decision record) |
+| Status, supersession, mandatory concrete negative trade-offs, no dates/authors | N |
 
 ### tasks-template.md
 | Section | From |
 |---------|------|
 | Checkbox line format, phases with Goal / Independent Test / Checkpoint, Phase Dependencies, Parallel Example, Implementation Strategy | U |
 | Summary, Task Completion Criteria, Dependency Graph, Risk Assessment, Traceability Matrix | P |
-| TASK PBI files linked from each line, phases by spec mode (Walking Skeleton, Release Lanes), AC coverage | N |
+| TASK PBI files linked from each line, phases by spec scope (Walking Skeleton, Release Lanes), AC coverage, deterministic `render-tasks` wave schedule and computed `[P]` markers | N |
 | Removed: Created, Author | — |
 
 ### design-template.md
@@ -69,15 +72,15 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **N** = new in this preset.
 | Front matter token groups, the eight canonical sections and their order | DESIGN.md format (Google Labs, alpha) |
 | Extension sections (Responsive Behavior, Motion, Accessibility, Sources & Sync, Known Gaps), guidance | N |
 
-### sync-clickup-template.md, sync-multica-template.md
-| Section | From |
-|---------|------|
-| All (settings, item and hierarchy mapping, relations, description, references, pull) | N |
-
-### pbi-*-template.md
+### PBI templates
 | Template | From |
 |----------|------|
-| pbi-map, pbi-epic, pbi-story, pbi-task, pbi-spike | N; task Files from P's tasks template |
+| `pbi-map-template.md` | N |
+| `pbi-epic-template.md` | N |
+| `pbi-feature-template.md` | N |
+| `pbi-story-template.md` | N |
+| `pbi-task-template.md` | N; task Files from P's tasks template |
+| `pbi-spike-template.md` | N |
 
 ## Spec Kit license
 

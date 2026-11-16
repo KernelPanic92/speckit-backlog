@@ -2,345 +2,168 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:speckit-backlog:pbi-frontmatter",
   "title": "speckit-backlog — PBI Frontmatter Schema",
-  "description": "Formal, binding schema of the YAML frontmatter used by every PBI template of the preset (pbi-story-template, pbi-epic-template, pbi-task-template, pbi-spike-template, pbi-map-template; BUG is accepted for PBIs created by other tools). Every PBI (Product Backlog Item) must validate against EXACTLY ONE of the schemas in $defs (userStory, epic, bug, task, spike, map): the one selected by its type field. additionalProperties is false everywhere: do not introduce keys not listed here. The optional external key holds references to the PBI in external tools and is written only by /speckit.sync. Unvalued optional keys are omitted entirely, never left empty or null. Constraints that JSON Schema cannot express (checked by scripts/validate_backlog.py): every relation is declared only from the side of the blocked or child PBI, never as an inverse property on the other PBI; a PBI has at most one PARENT relation; relations entries follow a fixed order (first by relationType: PARENT, BLOCKED_BY, RELATED; then by type: MAP, EPIC, US, SPIKE, BUG, TASK; then by ascending id); ids are unique across the whole project.",
+  "description": "Formal, binding schema for the YAML frontmatter used by every PBI template in this preset. Every Product Backlog Item must validate against exactly one definition selected by its type. The seven PBI types are MAP, EPIC, FEATURE, US, SPIKE, BUG, and TASK. Additional properties are forbidden. Optional keys without values are omitted, never left empty or null. Constraints JSON Schema cannot express are checked by scripts/backlog.py: relations are declared only from the blocked or child PBI, each PBI has at most one PARENT, relation entries follow the canonical order (first by relationType: PARENT, BLOCKED_BY, RELATED; then by type: MAP, EPIC, FEATURE, US, SPIKE, BUG, TASK; then by ascending id), and ids are unique project-wide.",
   "oneOf": [
-    {
-      "$ref": "#/$defs/userStory"
-    },
-    {
-      "$ref": "#/$defs/epic"
-    },
-    {
-      "$ref": "#/$defs/bug"
-    },
-    {
-      "$ref": "#/$defs/task"
-    },
-    {
-      "$ref": "#/$defs/spike"
-    },
-    {
-      "$ref": "#/$defs/map"
-    }
+    { "$ref": "#/$defs/map" },
+    { "$ref": "#/$defs/epic" },
+    { "$ref": "#/$defs/feature" },
+    { "$ref": "#/$defs/userStory" },
+    { "$ref": "#/$defs/spike" },
+    { "$ref": "#/$defs/bug" },
+    { "$ref": "#/$defs/task" }
   ],
   "$defs": {
     "id": {
       "type": "string",
       "minLength": 1,
-      "description": "Local PBI identifier, allocated with the validator (next-id): 3-digit, unique across the project and consistent with the type (e.g. US-001, EPIC-001, BUG-001, TASK-001, SPIKE-001, MAP-001). It never changes; ids of external tools go in external."
+      "pattern": "^(MAP|EPIC|FEATURE|US|SPIKE|BUG|TASK)-[0-9]{3,}$",
+      "description": "Project-wide PBI identifier allocated with scripts/backlog.py next-id <TYPE>. It has at least three digits, is unique across the project, matches one of the seven canonical types (MAP, EPIC, FEATURE, US, SPIKE, BUG, TASK), and never changes."
+    },
+    "rank": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional priority rank among sibling PBIs sharing the same PARENT (convention: 10, 20, 30...; lower number = higher priority / earlier delivery). Checked against BLOCKED_BY by scripts/backlog.py."
     },
     "pbiType": {
       "type": "string",
-      "enum": [
-        "US",
-        "TASK",
-        "BUG",
-        "EPIC",
-        "SPIKE",
-        "MAP"
-      ],
-      "description": "Type of a PBI. In a PBI's type field it is its own type, fixed by the template used. Inside a relation it is the type of the referenced PBI, not of the current one."
+      "enum": ["MAP", "EPIC", "FEATURE", "US", "SPIKE", "BUG", "TASK"],
+      "description": "Type of a PBI. In a PBI's type field it is its own type, fixed by the template used. Inside a relation it is the type of the referenced PBI. Canonical order: MAP, EPIC, FEATURE, US, SPIKE, BUG, TASK."
     },
     "relationType": {
       "type": "string",
-      "enum": [
-        "BLOCKED_BY",
-        "PARENT",
-        "RELATED"
-      ],
-      "description": "Nature of the relation between the current PBI and the referenced one. BLOCKED_BY: the referenced PBI blocks the current one. PARENT: the referenced PBI is the parent of the current one in the hierarchy, at most one: the Map for an Epic born from a Backbone Macro-Activity; the Epic for a US or a Bug; the User Story for a Task or a Spike; the Epic of the Macro-Activity for Walking Skeleton items; the macro-Epic for a 'zoom' Map. RELATED: a link with neither blocking constraint nor hierarchy. The inverse values BLOCKING and CHILD do not exist."
+      "enum": ["BLOCKED_BY", "PARENT", "RELATED"],
+      "description": "Nature of the relation. BLOCKED_BY means the referenced PBI blocks the current one. PARENT means the referenced PBI is the current PBI's parent in the hierarchy, at most one. RELATED links PBIs without blocking or hierarchy. Inverse values BLOCKING and CHILD do not exist."
     },
     "relation": {
       "type": "object",
-      "description": "A single relation towards another PBI.",
+      "description": "A single relation to another PBI.",
       "properties": {
-        "title": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Title of the referenced PBI, for readability without resolving the id."
-        },
-        "type": {
-          "$ref": "#/$defs/pbiType"
-        },
-        "relationType": {
-          "$ref": "#/$defs/relationType"
-        },
-        "reason": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Why the relation exists. For BLOCKED_BY: why the current PBI cannot start or close before the referenced one. For PARENT and RELATED: the nature of the link (e.g. 'parent epic', 'related story')."
-        }
+        "title": { "type": "string", "minLength": 1, "description": "Title of the referenced PBI, for readability without resolving its id." },
+        "type": { "$ref": "#/$defs/pbiType" },
+        "relationType": { "$ref": "#/$defs/relationType" },
+        "reason": { "type": "string", "minLength": 1, "description": "Why the relation exists. For BLOCKED_BY, why the current PBI cannot start or close before the referenced one. For PARENT and RELATED, the nature of the link." }
       },
-      "required": [
-        "title",
-        "type",
-        "relationType",
-        "reason"
-      ],
+      "required": ["title", "type", "relationType", "reason"],
       "additionalProperties": false
     },
     "relationsMap": {
       "type": "object",
-      "description": "Map id -> relation. Keys are the ids (strings, quoted in YAML) of the referenced PBIs. A referenced PBI appears only once. Entry order: first by relationType (PARENT, BLOCKED_BY, RELATED), then by type (MAP, EPIC, US, SPIKE, BUG, TASK), then by ascending id. A writing convention that JSON Schema and YAML cannot enforce (the validator checks it).",
+      "description": "Map from referenced PBI id to relation. A referenced PBI appears only once. Canonical order: first by relationType (PARENT, BLOCKED_BY, RELATED), then by type (MAP, EPIC, FEATURE, US, SPIKE, BUG, TASK), then by ascending id. scripts/backlog.py checks this writing convention.",
       "minProperties": 1,
-      "additionalProperties": {
-        "$ref": "#/$defs/relation"
-      }
+      "additionalProperties": { "$ref": "#/$defs/relation" }
     },
     "mediaItem": {
       "type": "object",
       "properties": {
-        "url": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Link to the attachment (Figma mockup, screenshot, screen recording, log, document). Only URLs actually provided by the user: never invent links."
-        },
-        "description": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Short description of what the attachment shows or contains."
-        }
+        "url": { "type": "string", "minLength": 1, "description": "Link to a user-provided attachment such as a mockup, screenshot, recording, log, document, or map photo. Never invent links." },
+        "description": { "type": "string", "minLength": 1, "description": "Short description of what the attachment shows or contains." }
       },
-      "required": [
-        "url",
-        "description"
-      ],
+      "required": ["url", "description"],
       "additionalProperties": false
     },
     "mediaMap": {
       "type": "object",
-      "description": "Map attachment name -> mediaItem.",
+      "description": "Map from attachment name to media item.",
       "minProperties": 1,
-      "additionalProperties": {
-        "$ref": "#/$defs/mediaItem"
-      }
+      "additionalProperties": { "$ref": "#/$defs/mediaItem" }
     },
     "userStory": {
       "type": "object",
-      "description": "Frontmatter of the pbi-story-template template. Media: Figma mockups, screenshots or recordings.",
+      "description": "Frontmatter for pbi-story-template. A User Story is a vertical, independently usable behavior slice.",
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "const": "US"
-        },
-        "relations": {
-          "$ref": "#/$defs/relationsMap"
-        },
-        "media": {
-          "$ref": "#/$defs/mediaMap"
-        },
-        "external": {
-          "$ref": "#/$defs/externalMap"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "US" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
       },
-      "required": [
-        "id",
-        "title",
-        "type"
-      ],
+      "required": ["id", "title", "type"],
       "additionalProperties": false
     },
     "epic": {
       "type": "object",
-      "description": "Frontmatter of the pbi-epic-template template. An Epic is a User Story too big for a sticky note: it is written like a story and then split. When it comes from a Backbone Macro-Activity it declares the Map as PARENT and carries its title; without a map it has no parent. Media: architecture documents or the Figma of the whole flow.",
+      "description": "Frontmatter for pbi-epic-template. An Epic frames an open-ended or macro-level goal. It declares a Map as PARENT when it is a Backbone activity; an Epic without a Map has no parent. A Feature under an Epic declares that Epic as its parent.",
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "const": "EPIC"
-        },
-        "relations": {
-          "$ref": "#/$defs/relationsMap"
-        },
-        "media": {
-          "$ref": "#/$defs/mediaMap"
-        },
-        "external": {
-          "$ref": "#/$defs/externalMap"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "EPIC" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
       },
-      "required": [
-        "id",
-        "title",
-        "type"
-      ],
+      "required": ["id", "title", "type"],
+      "additionalProperties": false
+    },
+    "feature": {
+      "type": "object",
+      "description": "Frontmatter for pbi-feature-template. A Feature is a bounded capability with one Outcome, either a segment of an Epic in a Release Lane or a standalone bounded capability. It declares its Epic as PARENT when it belongs to an Epic.",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "FEATURE" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
+      },
+      "required": ["id", "title", "type"],
       "additionalProperties": false
     },
     "bug": {
       "type": "object",
-      "description": "Frontmatter of a Bug PBI. Not created by this preset's commands (use spec-kit's bug extension); accepted so that relations to bugs validate.",
+      "description": "Frontmatter for a Bug PBI. Bugs are not created by this preset's commands; use the spec-kit's bug extension. This schema accepts them for relations and hierarchy.",
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "const": "BUG"
-        },
-        "relations": {
-          "$ref": "#/$defs/relationsMap"
-        },
-        "media": {
-          "$ref": "#/$defs/mediaMap"
-        },
-        "external": {
-          "$ref": "#/$defs/externalMap"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "BUG" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
       },
-      "required": [
-        "id",
-        "title",
-        "type"
-      ],
+      "required": ["id", "title", "type"],
       "additionalProperties": false
     },
     "task": {
       "type": "object",
-      "description": "Frontmatter of the pbi-task-template template. Media: diagrams, technical specifications or logs. Dependencies between tasks are BLOCKED_BY relations.",
+      "description": "Frontmatter for pbi-task-template. Tasks describe technical work for a User Story, a Feature or an Epic, including Walking Skeleton items.",
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "const": "TASK"
-        },
-        "relations": {
-          "$ref": "#/$defs/relationsMap"
-        },
-        "media": {
-          "$ref": "#/$defs/mediaMap"
-        },
-        "external": {
-          "$ref": "#/$defs/externalMap"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "TASK" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
       },
-      "required": [
-        "id",
-        "title",
-        "type"
-      ],
+      "required": ["id", "title", "type"],
       "additionalProperties": false
     },
     "spike": {
       "type": "object",
-      "description": "Frontmatter of the pbi-spike-template template. Media: provider documentation or existing prototypes. The PBI the Spike unblocks declares the Spike with relationType BLOCKED_BY.",
+      "description": "Frontmatter for pbi-spike-template. A Spike is timeboxed research that produces knowledge, not production code. The PBI it unblocks declares the Spike with BLOCKED_BY.",
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "const": "SPIKE"
-        },
-        "relations": {
-          "$ref": "#/$defs/relationsMap"
-        },
-        "media": {
-          "$ref": "#/$defs/mediaMap"
-        },
-        "external": {
-          "$ref": "#/$defs/externalMap"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "SPIKE" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
       },
-      "required": [
-        "id",
-        "title",
-        "type"
-      ],
+      "required": ["id", "title", "type"],
       "additionalProperties": false
     },
     "map": {
       "type": "object",
-      "description": "Frontmatter of the pbi-map-template template. A User Story Map is a PBI of type MAP: the table on which a product, or an Epic that is too big, is broken into pieces. It organizes the other PBIs by listing their ids in the body (Backbone, Walking Skeleton, Release Lanes) and does not reference them in relations: the Backbone Epics declare the Map as PARENT. The Map declares a PARENT only in the 'zoom' case, i.e. the macro-Epic it breaks down. Media: a whiteboard photo or the Miro/Figma board.",
+      "description": "Frontmatter for pbi-map-template. A Map organizes PBIs in its body through the Backbone, Walking Skeleton, and Release Lanes; Backbone Epics declare the Map as PARENT. A Map has a PARENT only in the zoom case, when it breaks down a macro-Epic.",
       "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "const": "MAP"
-        },
-        "relations": {
-          "$ref": "#/$defs/relationsMap"
-        },
-        "media": {
-          "$ref": "#/$defs/mediaMap"
-        },
-        "external": {
-          "$ref": "#/$defs/externalMap"
-        }
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "type": { "const": "MAP" },
+        "rank": { "$ref": "#/$defs/rank" },
+        "relations": { "$ref": "#/$defs/relationsMap" },
+        "media": { "$ref": "#/$defs/mediaMap" }
       },
-      "required": [
-        "id",
-        "title",
-        "type"
-      ],
+      "required": ["id", "title", "type"],
       "additionalProperties": false
-    },
-    "externalRef": {
-      "type": "object",
-      "description": "Reference to the PBI in one external tool. Written only by /speckit.sync, never by hand.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Durable id of the item in the tool (ClickUp task id, Multica issue UUID)."
-        },
-        "key": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Human-readable key shown by the tool (ClickUp custom id such as DE-14620, Multica key such as MUL-123). Display only: it can change."
-        },
-        "url": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Link to the item in the tool."
-        },
-        "hash": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "Content hash of the PBI at the last push (computed by the validator, excluding this block): tells whether the item must be updated."
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "additionalProperties": false
-    },
-    "externalMap": {
-      "type": "object",
-      "description": "Map tool name -> externalRef (e.g. clickup, multica). The PBI id stays the local one: external references never replace it.",
-      "minProperties": 1,
-      "propertyNames": {
-        "pattern": "^[a-z][a-z0-9-]*$"
-      },
-      "additionalProperties": {
-        "$ref": "#/$defs/externalRef"
-      }
     }
   }
 }

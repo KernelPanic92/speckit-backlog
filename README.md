@@ -1,138 +1,109 @@
 # speckit-backlog
 
-A [Spec Kit](https://github.com/github/spec-kit) preset that turns specifications into a **backlog**.
+A [Spec Kit](https://github.com/github/spec-kit) preset for durable backlog management and backlog-driven specifications. It is a preset, not a fork: keep using the official `specify` CLI and its upgrades.
 
-`/speckit.specify` asks how you want to work — **user story map**, **epic + user stories** or **single user story** — and writes the spec as Product Backlog Items (PBIs): INVEST user stories with Gherkin acceptance criteria, epics, spikes and walking-skeleton tasks, each in its own file with a validated YAML frontmatter. The rest of the workflow (clarify, plan, tasks, analyze, implement) understands that backlog.
+`/speckit.backlog` writes reusable Agile/BDD Product Backlog Items (PBIs) to the central `backlog/`. `/speckit.specify` accepts free text or any functional PBI (`MAP`, `EPIC`, `FEATURE`, or `US`) and produces a clean four-block `spec.md` linked to that backlog. `/speckit.tasks` idempotently reconciles implementation TASKs. `scripts/backlog.py` computes deterministic wave-based `[P]` scheduling and supports one PR/worktree per User Story.
 
-It is a preset, not a fork: you keep using the official `specify` CLI and its upgrades.
-
-- The backlog rules follow INVEST, vertical splitting, Gherkin and user story mapping after Patton, Rubin, Lawrence and Wake.
-- Constitution, plan, research and tasks merge current upstream templates with the ones of *Non-Deterministic Spec-Driven Development* (Enrico Papalini, [popoloni/non-deterministic-sdd](https://github.com/popoloni/non-deterministic-sdd)).
-- Documents are written for the people who steer the work: every reference says what it points to before it is opened and leads to the right spot. A PBI is `US [US-007] Card payment`, a scenario `US-007/AC-2 "Card declined"`, another document a relative link whose text names the section (`[the payment provider decision](research.md#payment-provider)`); no `§` notation, section numbers, coined abbreviations, bare ids or bare paths. The rule is the "Readable references" section of `knowledge/pbi-writing/rules.md`, and every command applies it.
-- No document versioning anywhere: no version numbers, "last amended" dates or changelog tables in constitution, product, design, plan or research. Git is the history.
-- The backlog can be published to **ClickUp** or **Multica** with `/speckit.sync`, and the Spec Kit commands can run inside Multica as skills.
+The backlog follows INVEST, vertical slicing, Gherkin acceptance criteria, and User Story Mapping. Documents use readable references: name a PBI with its type, ID, and title; name the scenario and section in links; avoid bare IDs and paths. Constitution, plan, research, and tasks merge upstream templates with material from *Non-Deterministic Spec-Driven Development* by Enrico Papalini. Git is the document history; the documents do not carry version or changelog metadata.
 
 ## Workflow
 
-| Step | Command | What it produces |
-|------|---------|------------------|
-| 1 | `/speckit.constitution` | `.specify/memory/constitution.md` (how we build), `.specify/memory/product.md` (vision, **personas**, journeys, constraints, **Ubiquitous Language**) and, for products with a UI, `.specify/memory/design.md` (design system in the **DESIGN.md** format) |
-| 2 | `/speckit.specify [--mode map\|epic\|story] <description>` | `specs/NNN-slug/spec.md` (root PBI + spec envelope) and `backlog/` children, `checklists/requirements.md` |
-| 3 | `/speckit.clarify` | answers Open Questions, updates PBIs, adds personas/terms to product.md |
-| 4 | `/speckit.plan` | a single `plan.md` (design, data model, contracts, delivery slices) and `research.md` (unknowns and Spikes answered) |
-| 5 | `/speckit.tasks` | one TASK PBI per task in `backlog/tasks/` and the `tasks.md` execution index |
-| 6 | `/speckit.analyze` | read-only consistency report (backlog validator, AC coverage, product.md consistency) |
-| 7 | `/speckit.implement` | executes tasks phase by phase; Gherkin scenarios become acceptance tests |
-| — | `/speckit.split <ID>` | carves an epic or story out of a spec into a new spec where it is the root |
-| — | `/speckit.merge <source> into <target>` | absorbs a spec into another container, or groups specs under a new epic/map |
-| — | `/speckit.sync <clickup\|multica> <setup\|push\|pull\|status>` | publishes the PBIs to a task manager and reads it back, following `.specify/sync/<tool>.md` |
-| — | `/speckit.checklist`, `/speckit.converge` | upstream commands, extended with the backlog's identifiers |
+| Command | Purpose |
+|---------|---------|
+| `/speckit.constitution` | Set engineering principles and write product context: personas, journeys, constraints, and Ubiquitous Language. For UI products, also establish `design.md`. |
+| `/speckit.backlog` | Create, map, refine, reorder, and retire PBIs in the central `backlog/`. |
+| `/speckit.specify` | Turn free text or a functional PBI into a scoped, four-block `spec.md`. |
+| `/speckit.clarify` | Resolve scope questions with the user and record accepted clarifications in the specification. |
+| `/speckit.plan` | Produce feature research and a modular `plan.md` with conditional `data-model.md`, `contracts/`, `quickstart.md`, and delivery slices; durable decisions go in `docs/adr/`. |
+| `/speckit.tasks` | Reconcile central TASK PBIs idempotently and render the task execution index. |
+| `/speckit.analyze` | Check consistency across product context, PBIs, acceptance criteria, and computed schedule. |
+| `/speckit.implement` | Execute scheduled work, with one PR/worktree per User Story and TASK-owned progress. |
+| `/speckit.checklist` | Generate a requirements checklist with specification and PBI traceability. |
+| `/speckit.converge` | Review outcomes and scope, record findings, and reconcile follow-up TASKs. |
 
-In skills-based agents (Claude Code by default) the commands are invoked as `/speckit-specify`, `/speckit-plan`, …
+In skills-based agents such as Claude Code, commands are invoked as `/speckit-constitution`, `/speckit-backlog`, and so on.
 
-## Spec modes
+## 7-Type PBI Hierarchy & Central Layout
 
-| Mode | `spec.md` root | Children in `backlog/` | Phases of `tasks.md` |
-|------|----------------|------------------------|----------------------|
-| `map` | MAP | one EPIC per Backbone Macro-Activity, their US, Walking Skeleton TASK/SPIKE | Setup → Walking Skeleton → one phase per Release Lane (the first is the MVP) → Polish |
-| `epic` | EPIC | its US, SPIKEs when estimation is blocked | Setup → Foundational → one phase per story → Polish |
-| `story` | US | SPIKEs if needed (TASKs come from `/speckit.tasks`) | Setup → Spikes → one phase per Acceptance Criterion → Polish |
-
-`/speckit.specify` recommends a mode from its macro-analysis (more than one user activity → map). If a `story` turns out to need several stories it proposes `epic`. A spec that grows too big can be cut with `/speckit.split` and recombined with `/speckit.merge`.
+The functional hierarchy is `MAP → EPIC → FEATURE → US → TASK/SPIKE`. `BUG` is also tolerated for Spec Kit's bug extension. Each PBI has a permanent project-wide ID and a file in its type directory; moving it in the hierarchy changes its `PARENT`, not its path.
 
 ```text
+backlog/
+├── index.md
+├── maps/
+├── epics/
+├── features/
+├── stories/
+├── spikes/
+├── tasks/
+└── bugs/                 # optional; used by the bug extension
+
 specs/003-online-purchase/
-├── spec.md                         # root PBI (frontmatter type: MAP | EPIC | US) + spec envelope
-├── backlog/
-│   ├── epics/EPIC-002-checkout.md
-│   ├── stories/US-007-card-payment.md
-│   ├── spikes/SPIKE-001-payment-provider.md
-│   └── tasks/TASK-014-card-payment-acceptance.md
-├── checklists/requirements.md
+├── spec.md               # Header, Backlog, Key Entities, Success Criteria
 ├── research.md
 ├── plan.md
-└── tasks.md                        # - [ ] TASK-014 [P] [US-007] Title → backlog/tasks/TASK-014-….md
+├── data-model.md         # when entities or state change
+├── contracts/            # when external interfaces change
+├── quickstart.md         # runnable verification runbook
+├── tasks.md              # rendered schedule and TASK links
+└── checklists/
+    └── requirements.md
+
+docs/adr/                  # durable, atomic project-wide architecture decisions
+└── 0001-example-decision.md
 ```
 
-PBI ids (`US-007`, `EPIC-002`, …) are unique across the whole project, so specs can be split and merged without renaming, and relations (`PARENT`, `BLOCKED_BY`, `RELATED`) keep resolving across specs.
+The `spec.md` **Scope** selects functional PBIs; its `## Backlog` block is rendered from the central `backlog/`. PBI files stay in the repository-wide backlog and can be referenced by multiple specifications.
+
+## Modular Plan, Research & ADRs
+
+`research.md` holds feature-scoped facts and, only for genuine architectural forks, a trade-off matrix with 10x stress tests and poison-pill analysis. `docs/adr/` holds durable, atomic project-wide decisions and their supersession history. The modular `plan.md`, conditional `data-model.md` and `contracts/`, and runnable `quickstart.md` keep feature execution zero-fluff, human-reviewable, and progressively loadable by parallel sub-agents.
+
+## Ordering, Waves & Parallel Execution
+
+Declare three scheduling inputs: sibling `rank` (lower ranks first), `BLOCKED_BY` dependencies, and exact touched paths in each TASK's `## Files`. `scripts/backlog.py` combines them into one computed schedule. It respects dependencies and avoids placing items with conflicting file paths in the same wave. Every item in a wave with two or more independent items receives the computed `[P]` marker; authors do not hand-maintain wave assignments or `[P]`.
+
+Deliver one PR/worktree per `US`. The `Story isolation` convention controls whether to use a worktree, branch, or ask first. TASK files own completion checkboxes under `## Actions to complete` and `## Definition of Done`; `tasks.md` is a rendered index, not a second source of progress state.
 
 ## Design system: design.md
 
-For products with a user interface, `/speckit.constitution` also writes `.specify/memory/design.md` in the [DESIGN.md format](https://github.com/google-labs-code/design.md) (Google Labs, open-sourced from Stitch; spec version `alpha`): design tokens in the YAML front matter (`colors`, `typography`, `rounded`, `spacing`, `components`) and the visual rules in eight sections in a fixed order (Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts), plus extension sections (Responsive Behavior, Motion, Accessibility, Sources & Sync, Known Gaps).
+For products with a user interface, `/speckit.constitution` writes `.specify/memory/design.md` in the [DESIGN.md format](https://github.com/google-labs-code/design.md) (Google Labs, format version `alpha`). It contains YAML design tokens (`colors`, `typography`, `rounded`, `spacing`, `components`) and the eight canonical visual sections in a fixed order, plus extension sections for responsive behavior, motion, accessibility, sources, and known gaps.
 
-- `version: alpha` in its front matter is the version of the **format**, required by its tooling: it is not a version of the document.
-- Figma does not export DESIGN.md natively. The command fills the tokens from code (CSS variables, Tailwind theme, `tokens.json`), from a Figma file through a Figma connector, from a DESIGN.md exported by Stitch or by a Figma plugin, or from an interview; with no design system yet it proposes a provisional set and lists it under Known Gaps.
-- `/speckit.plan`, `/speckit.tasks`, `/speckit.implement` and `/speckit.analyze` use it for UI work: tokens instead of literal values, component rules, the accessibility target.
-- Check it with the format's linter: `npx @google/design.md lint .specify/memory/design.md`.
-
-## Task managers: ClickUp and Multica
-
-`/speckit.sync <tool> <action>` publishes the PBIs of a spec to a task manager. The repository stays the source of truth for the content; the tool stays the source of truth for the workflow (status, assignees, comments).
-
-```text
-/speckit.sync clickup setup      # writes .specify/sync/clickup.md: settings + mapping rules
-/speckit.sync clickup status     # what a push would create or update
-/speckit.sync clickup push       # creates/updates items, parents first, then dependencies and links
-/speckit.sync clickup pull       # reads statuses and edits made in the tool back (applied on confirmation)
-```
-
-- **Mapping documents.** `.specify/sync/<tool>.md` has the settings in its front matter and the mapping in prose (types, hierarchy, names, relations, description, language). The default is native nesting (Epic → User Story → Task); edit the prose to change it, e.g. to the one-level Epic → subtask convention described in the document.
-- **Ids.** PBI ids never change. The tool's references are stored in each PBI's frontmatter, written only by the command through the validator:
-
-  ```yaml
-  external:
-      clickup:
-          id: "86c1x2abc"
-          key: "DE-14620"
-          url: "https://app.clickup.com/t/86c1x2abc"
-          hash: "sha256:…"
-  ```
-
-  `hash` is the content hash at the last push: `sync-plan` compares it to tell what must be updated.
-- **ClickUp** is reached through the agent's ClickUp connector (MCP): BLOCKED_BY becomes a native dependency, RELATED a task link.
-- **Multica** is reached through its `multica` CLI: every PBI becomes an issue (the MAP too), nested by PARENT; `PBI Type` and `Backlog ID` custom properties make pushes idempotent; BLOCKED_BY/RELATED go in issue metadata and in the description until Multica ships issue relations. Issues are created in `backlog` with no assignee, so a push never starts an agent run.
-- **Start from an item.** `/speckit.specify DE-14620` or `/speckit.specify MUL-42` reads the item as the feature description and links the spec's root PBI to it: the next push nests the backlog under it.
-- **Content language** in the tool is a setting of the mapping document (default English); the repository is never translated.
-
-### Running Spec Kit inside Multica
-
-A Multica agent running Claude Code can run `/speckit.specify`, `/speckit.plan` and `/speckit.tasks` on an issue, as skills: give the project the repository as a local-directory resource in worktree mode (so `.specify/` and `.claude/skills/speckit-*` are in the run's working directory), paste the agent instructions from `.specify/sync/multica.md`, and disable the git extension's branch hook for those runs. Multica runs agents without permission prompts: every command of the run executes unattended.
+- `version: alpha` identifies the format, not a document version.
+- The command can derive tokens and rules from code, a design file through a connector, an exported DESIGN.md, or an interview. For a new system it proposes provisional values and records gaps.
+- Plan, tasks, implementation, and analysis use the design system for UI work, including tokens, component rules, and accessibility targets.
+- Check the file with `npx @google/design.md lint .specify/memory/design.md`.
 
 ## Installation
 
-Prerequisites:
+Prerequisites: Spec Kit `>= 1.2.5`, [uv](https://docs.astral.sh/uv/), and PyYAML for the Python interpreter used by Spec Kit's template resolver. Install PyYAML for `python3` or set `SPECKIT_PYTHON_EXECUTABLE` to an interpreter that has it.
 
-- Spec Kit `>= 1.2.5` and [uv](https://docs.astral.sh/uv/).
-- **PyYAML for the Python that Spec Kit's template resolver uses.** With any preset installed, `.specify/scripts/bash/resolve-template.sh` needs PyYAML. Install it for your `python3` (`python3 -m pip install pyyaml`), or point Spec Kit to an interpreter that has it with `SPECKIT_PYTHON_EXECUTABLE`.
-
-New project, preset installed at init (the preset's constitution template is used for the first seed):
+Initialize a project with the preset (its constitution template seeds the project):
 
 ```bash
 specify init my-project --integration claude --extension git --preset /path/to/speckit-backlog
 ```
 
-Existing project, from a release archive:
+Install into an existing project from a release archive:
 
 ```bash
 specify preset add --from https://github.com/KernelPanic92/speckit-backlog/archive/refs/tags/v0.1.0.zip
 ```
 
-From the self-hosted catalog, which also enables `specify init --preset backlog`:
+Or add the catalog, which also makes `specify init --preset backlog` available:
 
 ```bash
 specify preset catalog add https://raw.githubusercontent.com/KernelPanic92/speckit-backlog/main/catalog.json --name backlog --install-allowed
 specify preset add backlog
 ```
 
-The preset is copied to `.specify/presets/backlog/`. Commit it with the project so the team shares the same rules.
-
-In Claude Code you can allow the validator once for the project, so the commands run it without a permission prompt (`.claude/settings.json`):
+The preset is copied to `.specify/presets/backlog/`; commit that directory so the team shares the same rules. In Claude Code, allow the backlog CLI in `.claude/settings.json` if desired:
 
 ```json
 {
   "permissions": {
     "allow": [
-      "Bash(uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py:*)"
+      "Bash(uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/backlog.py:*)"
     ]
   }
 }
@@ -140,67 +111,66 @@ In Claude Code you can allow the validator once for the project, so the commands
 
 ## Configuration
 
-`/speckit.constitution` writes a **Delivery Conventions** section that the commands read:
+`/speckit.constitution` writes **Delivery Conventions** for the workflow to follow:
 
 | Convention | Values | Default |
 |------------|--------|---------|
-| Acceptance tests from Gherkin | `on`: every scenario `US-xxx/AC-n` gets an acceptance-test task written before the story's implementation; `off`: tests only on request | `on` |
-| Default specify mode | `ask`, `map`, `epic`, `story` | `ask` |
-| Task manager | `none`, `clickup` or `multica`: the tool `/speckit.sync` publishes the backlog to. PBI ids stay local (`US-007`); the tool's ids go in each PBI's `external` block | `none` |
+| Acceptance tests from Gherkin | `on` or `off` | `on` |
+| Story isolation | `worktree`, `branch`, or `ask` | `worktree` |
 
-Templates can be overridden per project as usual in Spec Kit: put a file with the template's name in `.specify/templates/overrides/` (e.g. `pbi-story-template.md`).
+Templates can be overridden in `.specify/templates/overrides/` using their template filenames, such as `pbi-story-template.md`.
 
 ## What the preset changes
 
-| Upstream artifact | In this preset |
-|-------------------|----------------|
-| `speckit.specify` | Replaced: mode selection, product context check, PBI-writing phases, PBI files, validator, rules-based quality checklist. Upstream hooks (git branch creation) kept verbatim |
-| `speckit.clarify`, `speckit.plan`, `speckit.analyze` | Upstream text with targeted changes: PBIs instead of FR-###, single plan + research template, backlog validator |
-| `speckit.tasks` | Replaced: TASK PBI files + execution index, phases by spec mode, Gherkin-driven test tasks |
-| `speckit.constitution` | Upstream flow without semver/dates/Sync Impact Report; also writes product.md |
-| `speckit.implement`, `speckit.checklist`, `speckit.converge` | Upstream command + an appended addendum (`strategy: append`) |
-| `speckit.split`, `speckit.merge`, `speckit.sync` | New |
-| templates | constitution, plan, tasks and spec envelope merged from upstream and Papalini; product, research and the five PBI templates added |
+| Upstream artifact | Preset behavior |
+|-------------------|-----------------|
+| `speckit.constitution` | Keeps the upstream flow without document versioning and adds product context and delivery conventions. |
+| `speckit.specify` | Replaces the flow with free-text/PBI selection, central backlog references, and a rendered four-block specification. |
+| `speckit.backlog` | Adds central PBI lifecycle management, ID allocation, rendering, and validation through `scripts/backlog.py`. |
+| `speckit.clarify`, `speckit.plan`, `speckit.analyze` | Adapts the upstream commands to central PBIs, research, and computed scheduling. |
+| `speckit.tasks` | Reconciles TASK PBIs and renders an idempotent, wave-based execution index. |
+| `speckit.implement`, `speckit.checklist`, `speckit.converge` | Adds PBI traceability and delivery guidance to the upstream commands. |
+| Templates | Supplies 14 templates for project context, specifications, modular plans, research, ADRs, tasks, and the six PBI types. |
 
-`NOTICE.md` lists, for every template, where each section comes from.
+`NOTICE.md` documents template provenance and third-party licenses.
 
-## The validator
+## `scripts/backlog.py` CLI
 
-`scripts/validate_backlog.py` makes the structural checks deterministic. The commands call it; you can too:
+Run the CLI from the repository root, or use the installed copy shown here:
 
 ```bash
 uv run --no-project --quiet --with pyyaml --with jsonschema \
-  python .specify/presets/backlog/scripts/validate_backlog.py check --all
+  python .specify/presets/backlog/scripts/backlog.py <command> [arguments]
 ```
 
-- `check <feature-dir> | --all` — frontmatter against `schemas/pbi-frontmatter.schema.json`, hierarchy (at most one PARENT, allowed parent types), unknown ids, cycles, canonical relation order, duplicate ids, leftover placeholders, Out of Scope and `AC-n` ids, Backlog Index links, Release Lane order vs `BLOCKED_BY`, `tasks.md` lines vs TASK files.
-- `next-id <TYPE> [--count N]` — first free project-wide id.
-- `locate <ID> [--descendants]` — file, spec, references and descendants of a PBI.
+| Command | Purpose |
+|---------|---------|
+| `next-id <TYPE>` | Allocate the next available permanent PBI ID. |
+| `locate <ID> [--descendants]` | Find a PBI, its references, affected specs, and optionally descendants. |
+| `schedule` | Compute the dependency- and file-aware delivery schedule. |
+| `render-index` | Rebuild the central `backlog/index.md`. |
+| `render-spec <spec-dir>` | Render a specification's central backlog block. |
+| `render-tasks <spec-dir>` | Reconcile the rendered task schedule and `[P]` markers. |
+| `check` | Validate PBI structure, relations, links, and generated artifacts. |
 
-JSON on stdout; exit code 1 when errors are found.
+The CLI emits JSON and returns a non-zero exit status when a command cannot complete or validation finds errors.
 
 ## Development
 
-```bash
-# unit tests of the validator
-uv run --no-project --with pytest --with pyyaml --with jsonschema pytest tests
+Run unit tests and try a real installation in a scratch project:
 
-# try the preset in a scratch project
+```bash
+uv run --no-project --with pytest --with pyyaml --with jsonschema pytest tests
 specify init /tmp/try --integration claude --extension git --preset "$PWD"
-# after editing the preset, reinstall it (a --dev install is a copy, not a link)
-cd /tmp/try && specify preset add --dev /path/to/speckit-backlog
+bash tests/check_install.sh /tmp/try
 ```
+
+`specify init` copies the preset; after editing it, reinstall it in the scratch project to test the latest files.
 
 ### Keeping up with Spec Kit
 
-The replaced commands were derived from Spec Kit **v1.2.5** and keep upstream's wording wherever possible. When a new Spec Kit version ships:
-
-```bash
-tools/upstream-diff.sh v1.3.0     # diff of the upstream files this preset replaces or composes, v1.2.5 → v1.3.0
-```
-
-Port the relevant changes (new hook wording, new placeholders, new steps) into `commands/` and `templates/`, bump `BASE` in the script and `requires.speckit_version` in `preset.yml`.
+The replaced commands derive from Spec Kit **v1.2.5** and retain upstream wording where possible. When a new version ships, compare the upstream files and port relevant hook, placeholder, and workflow changes into `commands/` and `templates/`, then update the required Spec Kit version.
 
 ## License
 
-MIT — see `LICENSE`. Third-party material (Spec Kit, Non-Deterministic SDD templates) is credited in `NOTICE.md`.
+MIT — see `LICENSE`. Third-party material from Spec Kit and Non-Deterministic SDD is credited in `NOTICE.md`.

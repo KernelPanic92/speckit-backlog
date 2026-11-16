@@ -1,5 +1,5 @@
 ---
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, the backlog PBIs, product.md, plan.md, research.md and tasks.md after task generation.
+description: Perform read-only cross-artifact analysis of modular spec artifacts, backlog PBIs, ADRs, schedules, and task coverage.
 scripts:
   sh: scripts/bash/check-prerequisites.sh --json --require-spec --require-tasks --include-tasks
   ps: scripts/powershell/check-prerequisites.ps1 -Json -RequireSpec -RequireTasks -IncludeTasks
@@ -51,7 +51,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Goal
 
-Identify inconsistencies, duplications, ambiguities, and underspecified items across the core artifacts (`spec.md` with the root PBI, the child PBIs under `backlog/`, `plan.md`, `research.md`, `tasks.md`) and the product context (`.specify/memory/product.md`) before implementation. This command MUST run only after `__SPECKIT_COMMAND_TASKS__` has successfully produced a complete `tasks.md`.
+Identify inconsistencies, duplication, ambiguity and underspecification across the 4-block `spec.md` (`**Scope**:` + rendered `## Backlog`, optional Key Entities, Success Criteria), permanent PBIs in repository-root `backlog/`, `plan.md`, optional `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, generated `tasks.md`, Accepted ADRs in `docs/adr/`, and product/governance context before implementation. This command MUST run only after `__SPECKIT_COMMAND_TASKS__` has produced `tasks.md`; validation may still expose defects. Never treat spec.md as a PBI file.
 
 ## Operating Constraints
 
@@ -69,18 +69,21 @@ Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_
 - PLAN = FEATURE_DIR/plan.md
 - TASKS = FEATURE_DIR/tasks.md
 
-- BACKLOG = FEATURE_DIR/backlog/ (epics/, stories/, spikes/, tasks/)
+- BACKLOG = repository-root `backlog/` (`maps/`, `epics/`, `features/`, `stories/`, `spikes/`, `tasks/`, `bugs/`), never FEATURE_DIR/backlog/
 - RESEARCH = FEATURE_DIR/research.md (if present)
+- DATA_MODEL = FEATURE_DIR/data-model.md (if present)
+- CONTRACTS = FEATURE_DIR/contracts/ (if present; inspect per boundary/story file)
+- QUICKSTART = FEATURE_DIR/quickstart.md (if present)
+- ADRs = Accepted decisions under `docs/adr/` (plus recognized legacy archives)
 - PRODUCT = `.specify/memory/product.md` (if present)
 - REFERENCES = the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: what a readable reference is, for detection pass G and for this report
+- DELIVERY_RULES = `.specify/presets/backlog/knowledge/delivery/rules.md`: rank/blockers/files, computed wave scheduling, one PR/MR per US and default worktree isolation
+- SCHEMA = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json`: `MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`, `TASK` (BUG creation is outside these commands)
+- BACKLOG_TOOL = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/backlog.py`
 
 Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
 
-Then run the structural validator once (read-only):
-
-`uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py check FEATURE_DIR`
-
-Keep its JSON errors for detection pass G. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions. If `uv` is not available, perform pass G by hand against `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` and say so in the report.
+Run `BACKLOG_TOOL check --spec FEATURE_DIR` once (read-only), then `BACKLOG_TOOL schedule --spec FEATURE_DIR` (read-only). Keep JSON validator errors and `story_waves`, `task_waves`, `critical_path`, `parallel` booleans for detection pass G. Every BACKLOG_TOOL operation expands to the full invocation above as a **standalone command**, never chained with `;`, `&&`, or `|`, so permissions can allow-list it. If tooling cannot run, report the analysis as incomplete; do not fabricate a passing check or computed schedule. **Never run render-index, render-spec or render-tasks here**: stale output is a finding, not permission to write.
 For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 ### 2. Load Artifacts (Progressive Disclosure)
@@ -89,21 +92,22 @@ Load only the minimal necessary context from each artifact:
 
 **From spec.md:**
 
-- Root PBI: type (MAP / EPIC / US), Connextra, Outcome, Out of Scope; for a MAP: Backbone, Walking Skeleton, Release Lanes, DoR Check
-- Spec Context (mode, status) and Backlog Index
+- Header: `**Scope**:` selectors (only MAP / EPIC / FEATURE / US), Status and Input
+- Rendered `## Backlog` block between `<!-- BEGIN BACKLOG -->` / `<!-- END BACKLOG -->`, with central PBI links and computed Story Waves / `[P]`
 - Success Criteria (measurable outcomes — e.g., performance, security, availability, user success, business impact)
-- Key Entities, Non-Functional Requirements, Security & Compliance Checklist (if present)
-- Open Questions and Clarifications
+- Key Entities (if applicable); Clarifications session log if present (only spec.md may hold Q&A)
 
-**From the PBIs under backlog/:**
+**From the PBIs under root backlog/:**
 
-- Frontmatter (id, title, type, relations)
+- Run `BACKLOG_TOOL locate <ID> --descendants` for every Scope ID. Read scoped PBIs, their FEATURE/EPIC/MAP ancestors, blocking SPIKEs and related TASKs, even when references cross the current spec. The locator returns file, rank, referenced_by, specs and descendants.
+- Frontmatter (id, title, type, rank, relations); hierarchy and canonical relation order
 - Stories: Connextra, Acceptance Criteria (`AC-n` ids, Given/When/Then), Out of Scope, INVEST & DoR Check
-- Epics: Scope Boundaries; Spikes: question, Exit Criteria; TASKs: Covers, Files, relations
+- Features: bounded capability, Outcome, cross-story Constraints, Out of Scope; Epics: Scope Boundaries; MAPs: Backbone, Walking Skeleton, Outcome-titled Release Lanes, DoR Check
+- Spikes: question, timebox and Exit Criteria; TASKs: Covers, exact Files, Actions / DoD checkboxes (the sole completion source), parent and blockers
 
 **From research.md (if present):**
 
-- Research Questions and Decisions; Spikes answered or still open
+- Research Questions, Fact-finding/Technical Findings, Architectural Trade-offs and Verdicts; Spikes answered or still open. Flag durable cross-feature decisions buried here without an ADR.
 
 **From product.md (if present):**
 
@@ -113,21 +117,23 @@ Load only the minimal necessary context from each artifact:
 
 - Token groups and component names (front matter), Do's and Don'ts, accessibility target
 
-**From plan.md:**
+**From plan.md and modular design artifacts:**
 
-- Architecture/stack choices
-- Data Model references
-- Phases
-- Technical constraints
+- `plan.md`: feature-specific architecture/stack deltas, Constitution Check, Project Structure, delivery slices, and technical constraints; flag copied constitution boilerplate/filler.
+- `data-model.md`: entities, fields, validation constraints, relations, state transitions and migration details when present.
+- `contracts/`: boundary contracts per story slice when present.
+- `quickstart.md`: runnable acceptance-suite and smoke verification commands when present.
+- Accepted ADRs in `docs/adr/`: governing cross-feature decisions and supersession status; flag contradictions with artifacts or constitution.
 
 **From tasks.md:**
 
 - Task IDs, story labels and links to TASK files
 - Titles
-- Phase grouping (Walking Skeleton / Release Lanes / stories / ACs)
+- Phase grouping (Setup, Walking Skeleton / Foundational, Story Waves or map Release Lanes, Polish)
 - Parallel markers [P]
 - Traceability Matrix
 - Referenced file paths (from the TASK files' Files sections)
+- Compare against `backlog/index.md` (functional hierarchy, story waves, tasks: done/total counters without exploding implementation tasks)
 
 **From constitution:**
 
@@ -137,8 +143,9 @@ Load only the minimal necessary context from each artifact:
 
 Create internal representations (do not include raw artifacts in output):
 
-- **Requirements inventory**: In this project the requirements are the Gherkin scenarios of the stories: record one stable key per scenario, `US-xxx/AC-n`. Add one key per Success Criterion (SC-###) and per Non-Functional Requirement that requires buildable work (e.g., load-testing infrastructure, security audit tooling); exclude post-launch outcome metrics and business KPIs (e.g., "Reduce support tickets by 50%").
-- **User story/action inventory**: Discrete user actions (one per story) with their acceptance criteria, PARENT, BLOCKED_BY and lane/order
+- **Requirements inventory**: one stable key per Gherkin scenario (`US-xxx/AC-n`), plus Success Criteria (`SC-###`) and Feature/ancestor Constraints requiring buildable work (load testing, security audit tooling). Do not demand implementation TASKs for post-launch outcome metrics/business KPIs such as "Reduce support tickets by 50%". Human-facing rows include titles beside every traceability ID.
+- **User story/action inventory**: one discrete behavior per US, with ACs, FEATURE/EPIC/MAP ancestry, rank, real BLOCKED_BY, lane and computed Story Wave
+- **Schedule model**: tool-computed Story Waves, Task Waves, critical path and file conflicts; aggregate descendant TASK Files to each US, do not invent a separate author-maintained schedule
 - **Task coverage mapping**: Map each task to stories and scenarios through its PARENT relation, its `Covers:` line and its story label in tasks.md; use keyword inference only as a fallback
 - **Product model**: personas and Ubiquitous Language terms from product.md
 - **Constitution rule set**: Extract principle names and MUST/SHOULD normative statements
@@ -165,7 +172,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 
 #### D. Constitution Alignment
 
-- Any requirement or plan element conflicting with a MUST principle
+- Any requirement or plan element conflicting with a MUST principle or Accepted ADR
 - Missing mandated sections or quality gates from constitution
 
 #### E. Coverage Gaps
@@ -179,18 +186,24 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 #### F. Inconsistency
 
 - Terminology drift (same concept named differently across files)
-- Data entities referenced in plan but absent in spec (or vice versa)
+- Data entities referenced in plan/data-model but absent in spec (or vice versa)
+- Contract, story, data-model and `quickstart.md` verification inconsistencies
+- Contradictions with Accepted ADRs, unrecorded cross-feature decisions hidden in `research.md`, or constitution boilerplate filler in `plan.md`
 - Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note; a task listed before a task it is BLOCKED_BY)
-- Phase order contradicting the spec: phases not following the Release Lanes (map) or the stories' BLOCKED_BY / release order (epic)
+- Phase order contradicting computed Story/Task Waves, `rank` / `BLOCKED_BY`, or map Release Lane / Backbone order
 - Conflicting requirements (e.g., one requires Next.js while other specifies Vue)
 
-#### G. Backlog Structure
+#### G. Backlog & Schedule Structure
 
-- Every error reported by the validator (schema, more than one PARENT or a forbidden hierarchy, unknown ids, inverse relations, relation order, duplicate ids, leftover placeholders, a story in a lane earlier than its blocker, tasks.md lines without a TASK file or TASK files missing from tasks.md)
-- Child PBIs missing from the Backlog Index, or listed there but missing on disk
+- Every validator error: schema, forbidden hierarchy/multiple PARENTs, unknown/duplicate IDs, cycles, inverse or out-of-order relations, required sections, placeholders, map lanes, relative links and AC coverage
+- **rank vs BLOCKED_BY inversions**, including sibling priority that places a dependent ahead of its blocker; artificial dependencies that undermine INVEST
+- **Stale rendered blocks** in `spec.md`, generated `tasks.md`, or root `backlog/index.md`; missing/extra scoped PBIs, manual generated-line edits, incorrect task counters or `[X]` inconsistent with TASK Actions/DoD
+- **`ac-uncovered`**: when Acceptance tests from Gherkin is on (default), every `US-xxx/AC-n "title"` needs an acceptance-test TASK Covers entry before implementation; titles alone do not count
+- Scheduling claims inconsistent with `schedule`: `[P]` outside a computed multi-item wave, overlapping exact TASK `## Files`, blockers not satisfied, or an attempt to start a story before its blocking story's PR is merged
+- Missing task parent (including Setup/Foundational/Polish), invalid container ownership, Polish without real blockers, or prototype closing TASKs absent / ordered after the story work they must unblock
 - PBIs without an Out of Scope section (EPIC: Scope Boundaries); Out of Scope items without where they go; scenarios without `AC-n` ids
-- References a reader cannot follow without the generation context, in any artifact (PBIs, spec envelope, plan.md, research.md, tasks.md, TASK files, checklists): a PBI or a scenario cited by its bare id (outside the labels REFERENCES allows), the `§` notation, coined abbreviations or numbering ("R2", "Q3"), section numbers without their title, bare URLs or paths, links whose text does not name the topic, local files as the only source of a PBI, constitution principles cited by number
-- Stories that break the rules of `.specify/presets/backlog/knowledge/pbi-writing/rules.md` in an evident way: conjunctions in the "I want" clause, more than 5 scenarios without justification, Read and Write in the same story, phantom UI
+- **Readable References violations** in PBIs, spec, plan, research, tasks and checklists: bare PBI/scenario IDs outside allowed labels, `§` notation, coined labels, untitled section numbers, bare URLs/paths, non-topical links, wrong relative traversal/anchors, spec-local files as the only explanation of a central PBI, or numbered constitution principles
+- **INVEST / splitting violations**: conjunctions in I want, >5 scenarios without value-atomicity justification, Read/Write or List/Detail combined, horizontal slices, phantom UI, unbounded Features or more than one Feature Outcome
 - Spikes neither answered in research.md nor scheduled as tasks
 
 #### H. Product Consistency
@@ -251,11 +264,13 @@ At end of report, output a concise Next Actions block:
 
 - If CRITICAL issues exist: Recommend resolving before `__SPECKIT_COMMAND_IMPLEMENT__`
 - If only LOW/MEDIUM: User may proceed, but provide improvement suggestions
-- Provide explicit command suggestions: e.g., "Run __SPECKIT_COMMAND_CLARIFY__ to resolve the open questions", "Run __SPECKIT_COMMAND_PLAN__ to adjust architecture", "Run __SPECKIT_COMMAND_TASKS__ to cover the Card declined scenario of the card payment story (US-004/AC-2)", "Run __SPECKIT_COMMAND_SPLIT__ to carve the Checkout epic out of this map"
+- Provide explicit suggestions: `__SPECKIT_COMMAND_CLARIFY__` for ambiguity, `__SPECKIT_COMMAND_PLAN__` for architecture, `__SPECKIT_COMMAND_TASKS__` for AC coverage/task reconciliation, `__SPECKIT_COMMAND_BACKLOG__` for PBI splitting/reordering, or `__SPECKIT_COMMAND_SPECIFY__` to select a smaller Feature/Release Lane. Name the affected PBIs/scenarios with titles.
 
 ### 8. Offer Remediation
 
 Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply them automatically.)
+
+## Mandatory Post-Execution Hooks
 
 ### 9. Check for extension hooks
 

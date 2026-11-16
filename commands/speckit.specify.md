@@ -1,5 +1,5 @@
 ---
-description: Turn a feature description into a backlog-driven specification - asks the working mode (user story map, epic + user stories, single user story) and writes the root PBI plus its children with the PBI-writing rules.
+description: Turn free-text feature descriptions or existing MAP, EPIC, FEATURE or US PBIs into a focused 4-block specification linked to the central root backlog/.
 handoffs:
   - label: Build Technical Plan
     agent: speckit.plan
@@ -59,88 +59,60 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-The text the user typed after `__SPECKIT_COMMAND_SPECIFY__` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `{ARGS}` appears literally below. Do not ask the user to repeat it unless they provided an empty command. An optional leading `--mode map|epic|story` selects the working mode.
+The text the user typed after `__SPECKIT_COMMAND_SPECIFY__` **is** `$ARGUMENTS`. Use it even if `{ARGS}` appears literally below. Do not ask the user to repeat non-empty input. This command creates one clean spec referencing permanent PBIs; it never embeds a root PBI in `spec.md`.
 
-**Paths used by this command** (preset `backlog`):
+**Paths and tools** (repository root unless otherwise stated):
 
-- `RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — the rules for writing PBIs. Its "Examples and references: when to read what" table tells you when to open `examples.md` and `references/*.md` (same folder). Its "Readable references" section applies to everything this command writes or prints: the PBIs, the spec envelope, the checklist and the conversation blocks.
-- `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` — the binding frontmatter schema.
-- `VALIDATOR` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/validate_backlog.py` — subcommands `next-id <TYPE>` and `check <feature-dir>`; JSON output, non-zero exit code on errors. If `uv` is not available, do the same checks by hand against `SCHEMA` and the rules, and say so in the Completion Report. Run it as a standalone command (not chained with `;`, `&&` or pipes) so that it can be allow-listed in the agent's permissions.
+- `PBI_RULES` = `.specify/presets/backlog/knowledge/pbi-writing/rules.md` — writing rules, conditional references and Readable References.
+- `DELIVERY_RULES` = `.specify/presets/backlog/knowledge/delivery/rules.md` — central placement, rank, computed waves / `[P]`, one PR/MR per US and worktree isolation by default.
+- `SCHEMA` = `.specify/presets/backlog/schemas/pbi-frontmatter.schema.json` — seven types: `MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`, `TASK` (BUG creation belongs to the bug extension).
 - `PRODUCT` = `.specify/memory/product.md` — Personas and Ubiquitous Language.
-- `CONSTITUTION` = `/memory/constitution.md` — its Delivery Conventions set the default mode and the task manager.
+- `CONSTITUTION` = `/memory/constitution.md` (the project's `.specify/memory/constitution.md`) — principles and Delivery Conventions.
+- `BACKLOG_TOOL` = `uv run --no-project --quiet --with pyyaml --with jsonschema python .specify/presets/backlog/scripts/backlog.py`.
 
-Given that feature description, do this:
+Every `BACKLOG_TOOL` operation below means this full invocation as a **standalone command**, never chained with `;`, `&&`, or `|`, so permissions can allow-list it. Parse JSON results; stop and report unavailable tooling rather than silently bypassing deterministic generation or checks.
 
-1. **Load the rules and the context**:
-   - Read `RULES` in full before writing anything. The workflow below decides *which* phases of the rules run and *where* each PBI is written; the rules decide *how* every PBI is written. When this command and `RULES` seem to conflict on how to write a PBI, `RULES` wins.
-   - **IF EXISTS**: Load `PRODUCT` and `CONSTITUTION`.
-   - If `PRODUCT` does not exist, tell the user that personas and domain terms normally come from it and suggest `__SPECKIT_COMMAND_CONSTITUTION__`. You may continue only with personas the user gives you in this conversation; record "product.md missing" in the spec's Open Questions.
-   - If the description is empty: ERROR "No feature description provided".
-   - **Starting from a task-manager item**: if the description is only a reference to an item of a tool configured in `.specify/sync/` — a ClickUp task id, custom id or URL (`.specify/sync/clickup.md`), a Multica issue key or URL (`.specify/sync/multica.md`) — read that item (ClickUp connector; `multica issue get <key> --output json`) and use its title, description and comments as the feature description. Remember the item: after writing `SPEC_FILE`, link the root PBI to it with `VALIDATOR set-external <root id> <tool> --id <item id> --key <display key> --url <url>` (no `--hash-current`: the item still holds the original request, so the next `__SPECKIT_COMMAND_SYNC__ <tool> push` updates it and nests the children under it). If no mapping exists for that tool, say so and ask the user to paste the description or to run `__SPECKIT_COMMAND_SYNC__ <tool> setup` first.
+1. **Parse input**: accept a free-text feature description **or one or more existing PBI IDs** (`MAP-xxx`, `EPIC-xxx`, `FEATURE-xxx`, `US-xxx`). If empty, ERROR "No feature description or PBI scope provided". Reject `TASK-xxx` and `SPIKE-xxx` as spec scope: **TASK and SPIKE have no functional requirements**. SPIKEs are resolved in `__SPECKIT_COMMAND_PLAN__` or via the story they block; TASKs are managed by `__SPECKIT_COMMAND_TASKS__`. Ask for a functional PBI or description instead.
 
-2. **MACRO-ANALYSIS** (Phase 1 of `RULES`), printed in the conversation: restate the request briefly, count the distinct user activities it covers (e.g. search, choose, pay) and state the working criteria you have internalized.
+2. **Load rules and context**: read `PBI_RULES`, `DELIVERY_RULES`, `SCHEMA`, `PRODUCT`, and `CONSTITUTION`. Writing rules govern how PBIs are written; this workflow governs placement. If product context is missing, warn and suggest `__SPECKIT_COMMAND_CONSTITUTION__`; proceed only with user-confirmed personas and domain context.
 
-3. **Choose the working mode.** Resolution order:
-   1. `--mode` in the user input;
-   2. otherwise the constitution's Delivery Conventions "Default specify mode", unless it is `ask` or missing;
-   3. otherwise **ask the user and wait for the answer**. Recommend one option based on the macro-analysis: more than one user activity → `map`; one activity that splits into several stories → `epic`; one small behaviour that passes INVEST as it is → `story`. If the agent has a native question tool, use it; otherwise present:
-
-   ```markdown
-   ## Working mode
-
-   **Recommended**: [option] — [one-line reason from the macro-analysis]
-
-   | Option | Mode | spec.md (root PBI) | Children written in backlog/ |
-   |--------|------|--------------------|------------------------------|
-   | A | User Story Map (`map`) | MAP | one EPIC per Backbone Macro-Activity, their US, Walking Skeleton TASK/SPIKE |
-   | B | Epic + User Stories (`epic`) | EPIC | its US (+ SPIKE when estimation is blocked) |
-   | C | Single User Story (`story`) | US | SPIKE only if needed (its TASKs come from __SPECKIT_COMMAND_TASKS__) |
-
-   **Your choice**: _[Wait for user response]_
-   ```
-
-   Mode rules:
-   - `map` runs the phases of `RULES` in the order Phase 1 → Phase 3a → Phase 2 → Phase 3b. `epic` and `story` run Phase 1 → Phase 2 and skip Phase 3.
-   - If the user picks `story` or `epic` but the request covers more than one user activity, say that `RULES` makes the map mandatory in that case and ask once whether to switch to `map`. Respect the user's final answer.
-   - If the user picks `story` and the splitting in Phase 2 produces more than one story, **stop before writing** and propose switching to `epic` (a split requirement needs a container). If the user insists on `story`, keep only the first story in release order and list the others in the root US's Out of Scope as `- <capability> — candidate for a new __SPECKIT_COMMAND_SPECIFY__`.
-
-4. **Context check** (Constraint 0 of `RULES`):
-   - Take personas and domain terms from `PRODUCT`. Ask the user only for business context, personas or system constraints that are missing there and critical for the backlog. **Do not invent them.**
-   - A persona or a domain term that is not in `PRODUCT` is proposed to the user; when approved, add it to `PRODUCT` (Personas / Ubiquitous Language) and mention the change in the Completion Report.
-   - Ask at most 5 questions at a time, numbered, each in this format (or with the agent's native question tool):
-
-     ```markdown
-     ## Question [N]: [Topic]
-
-     **Context**: [Quote the relevant part of the description]
-
-     **What we need to know**: [Specific question]
+3. **Constraint 0 and clarification discipline**:
+   - Check Personas, business context, system constraints and Ubiquitous Language. Never invent actors or critical business facts. Propose new personas/terms for approval and add approved entries to `PRODUCT`.
+   - Ask at most **3 blocking questions total**, prioritized scope > security/privacy > UX. Present each with context, a full interrogative, and a structured options table; wait for answers and apply them immediately before generation:
 
      | Option | Answer | Implications |
-     |--------|--------|--------------|
-     | A      | [First suggested answer] | [What this means for the backlog] |
-     | B      | [Second suggested answer] | [What this means for the backlog] |
-     | Custom | Provide your own answer | [How to provide custom input] |
+     | --- | --- | --- |
+     | A | Recommended answer | Effect on scope or acceptance |
+     | B | Alternative answer | Different effect |
+     | Custom | User-provided answer | Describe the choice |
 
-     **Your choice**: _[Wait for user response]_
-     ```
+   - Use reasonable defaults for non-blocking details and record them in the affected PBI's `## Assumptions`, not in a spec-level question list. **Zero `[NEEDS CLARIFICATION]` markers or unanswered question lists remain at completion.** If a genuinely blocking decision is still missing, stop instead of claiming a finished spec.
 
-   - Markdown tables must be well formed: spaces around cell content, header separators of at least 3 dashes.
-   - Questions that are not blocking for writing the backlog go to the spec's Open Questions instead.
+4. **Prepare PBIs in central root `backlog/`**:
+   - For each referenced PBI, run `BACKLOG_TOOL locate <ID> --descendants`. Read target, ancestors, descendants, `referenced_by` and impacted `specs`. **Reuse existing US slices as-is** when complete and compliant with INVEST and `PBI_RULES`; do not rewrite or renumber valid PBIs simply to attach a spec.
+   - For free text, an unsliced MAP/EPIC/FEATURE, or an oversized US, execute the same splitting/mapping phases as `__SPECKIT_COMMAND_BACKLOG__` within this workflow. Resolve every required `pbi-*-template` via the template resolver (same resolver as `{SCRIPT}`, replacing `spec-template` with `pbi-story-template`, `pbi-feature-template`, `pbi-epic-template`, `pbi-map-template`, `pbi-spike-template`, or `pbi-task-template`). Parse `TEMPLATE_CONTENT`; honor composition and overrides, and stop on failure.
+   - Allocate each permanent ID with `BACKLOG_TOOL next-id <TYPE>` (or reserve a batch with `--count N`, using each returned ID once); save files before further allocation of that type. Assign sibling `rank` `10, 20, 30...` without contradicting real `BLOCKED_BY` relations.
+   - **Phase 1 Macro-Analysis**: print Request, Container decision and Working criteria. **Container rule**: if free text without a map splits into multiple User Stories, always create a `FEATURE` as their `PARENT`. A single story needs no new container.
+   - **Phase 3a** when more than one user activity or a map is requested: read the map rules reference, write MAP, one EPIC per Backbone activity, Walking Skeleton TASK/SPIKE items parented to the Epics, and exactly one FEATURE per populated Epic × Release Lane intersection, **printing Feature Check before each Feature**. The first lane is the MVP but its title is its Outcome, not a generic release label.
+   - **Phase 2 Iterative Drafting**: print a **Feature Check before each Feature** and **Micro-Scope Reasoning before each US**, as concise decision summaries, never private deliberation. Apply Connextra, INVEST, separate Read/Write and List/Detail, vertical value slices, ~2–5 `AC-n` Gherkin scenarios, one `When`, binary outcomes, complete asynchronous cycles and required Out of Scope. If estimation is blocked, create a timeboxed SPIKE and have the blocked PBI declare `BLOCKED_BY` it. Never create story implementation TASKs here; only map Walking Skeleton TASKs belong to this phase.
+   - **Phase 3b** if mapped: complete lanes with Features and stories in lane/Backbone order, Metrics and justified DoR. **Final Check & Summary**: re-split violations and summarize readable PBIs in release order, never Epic by Epic.
+   - Write **every PBI**, including MAP/EPIC/FEATURE containers and a standalone US, to its own `backlog/{maps,epics,features,stories,spikes,tasks}/<ID>-<slug>.md` file. Slug: lowercase ASCII kebab-case, max 6 words. Metadata is schema-valid frontmatter; omit empty optional keys, comments and placeholders. Relations are child/blocked-side only, ordered `PARENT`, `BLOCKED_BY`, `RELATED`, then type (`MAP`, `EPIC`, `FEATURE`, `US`, `SPIKE`, `BUG`, `TASK`), then ID. Existing paths never change on re-parenting.
 
-5. **Generate a concise short name** (2-4 words) for the feature:
+5. **Scope size guardrail before writing `spec.md`**: if the resulting candidate scope spans **more than one Release Lane or more than 7 User Stories**, warn that all generated PBIs are already saved in `backlog/`. Recommend scoping this spec to the **first Feature or first Release Lane (MVP)** to keep planning/review/implementation focused, with subsequent slices in later `__SPECKIT_COMMAND_SPECIFY__` runs. Ask whether to narrow `**Scope**:` to that slice (recommended) or keep the entire scope; wait for the answer. When choosing only a lane, list the Feature/US IDs that select it, not the whole MAP/EPIC. Preserve all out-of-spec PBIs in `backlog/`.
+
+6. **Generate a concise short name** (2-4 words) for the feature:
    - Analyze the feature description and extract the most meaningful keywords
    - Use action-noun format when possible (e.g., "add-user-auth", "online-checkout")
    - Preserve technical terms and acronyms (OAuth2, API, JWT, etc.)
    - Examples: "I want customers to buy from the catalog" → "online-purchase"; "Create a dashboard for analytics" → "analytics-dashboard"
 
-6. **Branch creation** (optional, via hook):
+7. **Branch creation** (optional, via hook):
 
    If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
 
    If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
 
-7. **Create the spec feature directory**:
+8. **Create the spec feature directory**:
 
    Specs live under the default `specs/` directory unless the user explicitly provides `SPECIFY_FEATURE_DIRECTORY`.
 
@@ -155,13 +127,8 @@ Given that feature description, do this:
       - If `branch_numbering` was used (and `feature_numbering` was absent), emit a one-line warning: "⚠️ `branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
 
    **Resolve the templates and create the directory**:
-   - Run `{SCRIPT}` from the repository root and parse `TEMPLATE_CONTENT` as the active `spec-template` (the **spec envelope**: the sections that exist only in `spec.md`). If it fails, stop and report the resolution error; do not continue with only one contributing template layer.
-   - Run the same resolver again, replacing `spec-template` with each PBI template this mode needs, and parse each `TEMPLATE_CONTENT`:
-     - `map`: `pbi-map-template`, `pbi-epic-template`, `pbi-story-template`, `pbi-task-template`, `pbi-spike-template`
-     - `epic`: `pbi-epic-template`, `pbi-story-template`, `pbi-spike-template`
-     - `story`: `pbi-story-template`, `pbi-spike-template`
-     Always use the resolved content, never a template file read from disk: a preset or project override may compose it.
-   - `mkdir -p SPECIFY_FEATURE_DIRECTORY` and the `backlog/` subfolders the mode needs (`epics/`, `stories/`, `spikes/`, `tasks/`).
+   - Run `{SCRIPT}` from the repository root and parse `TEMPLATE_CONTENT` as the active 4-block `spec-template`. If it fails, stop and report the resolution error; do not continue with only one contributing template layer.
+   - `mkdir -p SPECIFY_FEATURE_DIRECTORY`. The PBI folders already live under repository-root `backlog/`, never inside the spec directory.
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
    - Persist the resolved path to `.specify/feature.json`:
      ```json
@@ -173,29 +140,24 @@ Given that feature description, do this:
      This allows downstream commands (`__SPECKIT_COMMAND_PLAN__`, `__SPECKIT_COMMAND_TASKS__`, etc.) to locate the feature directory without relying on git branch name conventions.
 
    **IMPORTANT**:
-   - You must only create one feature per `__SPECKIT_COMMAND_SPECIFY__` invocation. To refine an existing spec use `__SPECKIT_COMMAND_CLARIFY__`; to carve a spec out of another or combine specs use `__SPECKIT_COMMAND_SPLIT__` / `__SPECKIT_COMMAND_MERGE__`.
+   - You must only create one feature per `__SPECKIT_COMMAND_SPECIFY__` invocation. To refine an existing spec use `__SPECKIT_COMMAND_CLARIFY__`; to manage the reusable PBIs use `__SPECKIT_COMMAND_BACKLOG__`.
    - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
    - The spec directory and file are always created by this command, never by the hook
 
-8. **PBI ids**: ids are local, project-wide unique and permanent. Get the first free id of a type with `VALIDATOR next-id <TYPE>` (e.g. `US`), then continue the sequence yourself for the PBIs you create in this run. Ids of a task manager never replace them: `__SPECKIT_COMMAND_SYNC__` stores them in each PBI's `external` block.
+9. **Write `SPEC_FILE` from the resolved template**, with only these four blocks (no PBI frontmatter or embedded PBI body):
+   - **Header**: feature name, branch (if any), Status `Draft`, Input and `**Scope**:` containing comma-separated MAP/EPIC/FEATURE/US IDs selected above. The Scope IDs are machine-readable selectors, not a replacement for readable titled links in prose.
+   - **`## Backlog`** with `<!-- BEGIN BACKLOG -->` / `<!-- END BACKLOG -->` markers. The tool renders linked PBIs, hierarchy, computed waves and `[P]`; never hand-edit the block.
+   - **`## Key Entities`**, only when data is involved: use exact Ubiquitous Language terms, no implementation recipes.
+   - **`## Success Criteria` → `### Measurable Outcomes`**: `SC-###` plus short name, measurable technology-agnostic outcomes derived from the scoped Outcome. No FR list, duplicate Gherkin, assumptions or unanswered-question section; those functional details live in the PBIs.
 
-9. **Write the backlog** following the phases of `RULES` for the chosen mode. Every PBI is written with its resolved template and validated against `SCHEMA`:
-   - **File layout**:
-     - The **root PBI** goes to `SPEC_FILE`: its full template (frontmatter + body), followed by the spec envelope (`TEMPLATE_CONTENT` of `spec-template`). The root is the MAP (`map`), the EPIC (`epic`) or the US (`story`).
-     - Every other PBI gets its own file: `backlog/epics/`, `backlog/stories/`, `backlog/spikes/`, `backlog/tasks/`, named `<ID>-<slug>.md` where `<slug>` is the title in lowercase ASCII kebab-case, at most 6 words (e.g. `backlog/stories/US-007-card-payment.md`).
-   - **`map`**: Phase 3a writes the MAP root (Connextra with the global goal, Outcome as elevator pitch, Backbone, Walking Skeleton), one EPIC file per Macro-Activity (PARENT: the MAP) and one TASK/SPIKE file per Walking Skeleton item (PARENT: the Epic of its Macro-Activity). Start the Backbone from the Key User Journeys of `PRODUCT` when one matches. Phase 2 writes the US files (PARENT: their Epic), in lane order and left to right along the Backbone, never all the stories of one Epic in a row. Phase 3b completes the MAP: Release Lanes titled with Outcomes, Out of Scope, DoR Check.
-   - **`epic`**: the EPIC root, then Phase 2 writes the US files with the EPIC as PARENT, in BLOCKED_BY / release order.
-   - **`story`**: Phase 2 runs once and its story is the root US (it has no PARENT unless the user names an existing Epic).
-   - **Spikes**: when uncertainty prevents estimating a story, write a SPIKE (PARENT: the story it serves) and declare it on the story with `BLOCKED_BY`. `__SPECKIT_COMMAND_PLAN__` answers spikes in research.md.
-   - **The iterative discipline of Phase 2 applies**: print the Micro-Scope Reasoning block in the conversation before writing each story file; never write two stories in a row without it.
-   - **Fill the spec envelope**: Spec Context (mode, root PBI, status `Draft`), Backlog Index (every child with a relative link whose text is `type [id] title`, in the order the rules require), Success Criteria (`SC-###` with a short name, measurable and technology-agnostic), Key Entities with Ubiquitous Language terms (if data is involved), and — only when relevant — Non-Functional Requirements, External Dependencies, Security & Compliance Checklist, References (each a link whose text says what the source is). Open Questions lists what is still unknown, each a full question, without numbering, naming the PBIs it affects as `type [id] title`. Remove the envelope's guidance comment block and every optional section that does not apply.
-   - Never leave `{{...}}` or `[...]` placeholders, template comments that no longer guide anything, or empty optional keys.
+10. **Render and validate**, each as a standalone invocation:
+    - `BACKLOG_TOOL render-spec SPECIFY_FEATURE_DIRECTORY`
+    - `BACKLOG_TOOL render-index`
+    - If shared PBIs changed, refresh every other affected spec from `locate` `specs`, and existing affected task indices with `render-tasks <spec-dir>`.
+    - `BACKLOG_TOOL check --spec SPECIFY_FEATURE_DIRECTORY`
+    Fix structural errors and re-render as necessary, up to **3 iterations**, then report any remaining errors without claiming readiness. Apply the Readable References self-check to all written files and reports: readable type/ID/title, titled scenarios and topic links to exact headings.
 
-10. **FINAL CHECK and SUMMARY** (end of Phase 2 of `RULES`), printed in the conversation: re-read every story against INVEST and the constraints and re-split where needed; re-read every reference in the PBIs, the relation `reason`s, the spec envelope and the conversation blocks with the self-check of the "Readable references" section of `RULES` and rewrite bare ids, coined abbreviations, section numbers without their title, bare URLs or paths and files the reader cannot open (the feature's `spec.md` or `plan.md` is not a reference a task-manager reader can open); then list the final PBIs in release order (`type [id] title`) and — in `epic` mode with more than 5 stories — suggest the map in one line.
-
-11. **Structural validation**: run `VALIDATOR check SPECIFY_FEATURE_DIRECTORY`. Fix every error it reports and run it again until it passes (max 3 iterations; then report the remaining errors).
-
-12. **Specification Quality Validation**:
+11. **Specification Quality Validation**:
 
    a. **Create the Spec Quality Checklist** at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` with these items:
 
@@ -204,17 +166,17 @@ Given that feature description, do this:
 
       **Purpose**: Validate the backlog before proceeding to planning
       **Feature**: [[Feature name] specification](../spec.md)
-      **Mode**: [map | epic | story]
 
       ## Structure
 
-      - [ ] The validator passes (schema, relations, ids, no placeholders)
-      - [ ] Every PBI has an Out of Scope section (EPIC: Scope Boundaries) that lists only what a reader could assume is included, each item with where it goes
-      - [ ] Every reference in the PBIs and the envelope is readable without the generation context: other PBIs as `type [id] title`, scenarios as `US-001/AC-1 "title"`, documents and sections as links whose text names the topic, no `§` notation, bare ids, coined abbreviations, untitled section numbers, bare URLs or paths, or local files as the only source
-      - [ ] The Backlog Index lists every child PBI in release order
+      - [ ] backlog.py check --spec passes (schema, hierarchy, relations, ids, rendered blocks, applicable coverage)
+      - [ ] spec.md has the 4-block structure, valid Scope and rendered Backlog linked to central backlog/
+      - [ ] Zero [NEEDS CLARIFICATION] markers or unanswered question lists remain
+      - [ ] Required Out of Scope (EPIC: Scope Boundaries) names exclusions and their destinations
+      - [ ] Readable References everywhere: type/id/title, titled scenarios, topic links and correct anchors; no bare references
       - [ ] Success Criteria are measurable and technology-agnostic
 
-      ## User Stories
+      ## User Stories & Features
 
       - [ ] Every story uses the Connextra format with a persona defined in product.md
       - [ ] The "so that" clause states a real benefit and does not repeat the action
@@ -222,7 +184,8 @@ Given that feature description, do this:
       - [ ] No conjunctions in the "I want" clause; no vague adjectives; no prescriptive UI; no application layers
       - [ ] Read and Write are separate stories; List and Detail are separate stories
       - [ ] Vertical slices only, no horizontal slicing by architectural layer; no phantom UI
-      - [ ] Only real dependencies, declared with BLOCKED_BY
+      - [ ] Features have one Outcome, cross-story Constraints and bounded reviewable scope
+      - [ ] Only real dependencies, declared with BLOCKED_BY, consistent with sibling rank
 
       ## Acceptance Criteria
 
@@ -232,11 +195,12 @@ Given that feature description, do this:
       - [ ] Asynchronous operations describe the full cycle (trigger, loading indicator, outcome, error, retry)
       - [ ] Ubiquitous Language terms from product.md are used, one term per concept
 
-      ## Map *(map mode only)*
+      ## Map *(only when a MAP is involved)*
 
       - [ ] Every Backbone Macro-Activity is an Epic; every Release Lane crosses all the Epics
       - [ ] Lanes are titled with Outcomes, not labels; no two items with the same priority
       - [ ] The Walking Skeleton is TASK/SPIKE items and differs from the MVP
+      - [ ] Every populated Epic × Release Lane intersection has exactly one Feature parenting its stories
       - [ ] No story sits in a lane earlier than a story that blocks it
 
       ## Notes
@@ -244,7 +208,7 @@ Given that feature description, do this:
       - Items marked incomplete require spec updates before `__SPECKIT_COMMAND_CLARIFY__` or `__SPECKIT_COMMAND_PLAN__`
       ```
 
-      Remove the Map section in `epic` and `story` mode.
+      Remove the Map section when no MAP is involved.
 
    b. **Run Validation Check**: review the backlog against each checklist item; for each failing item document the specific issue, naming the PBI as `type [id] title` and the section by its heading, and quoting the text at fault.
 
@@ -252,7 +216,7 @@ Given that feature description, do this:
 
       - **If all items pass**: mark the checklist complete and proceed to the Mandatory Post-Execution Hooks section.
       - **If items fail**: list the failing items and issues, update the PBIs (re-splitting stories when needed), re-run the validator and the checklist until all items pass (max 3 iterations). If still failing after 3 iterations, document the remaining issues in the checklist notes and warn the user.
-      - **If Open Questions remain**: keep the 3 most critical (by scope > security/privacy > user experience > technical details), present them together in the question format of step 4 and wait for the answers. Update the affected PBIs, move each answered question to the envelope's Clarifications section (`### Session YYYY-MM-DD`, `- Q: … → A: …`) and re-run validation. The other questions stay in Open Questions for `__SPECKIT_COMMAND_CLARIFY__`.
+      - **If a blocking ambiguity remains**: do not leave it as a marker or unanswered list. Use the remaining allowance of the 3 blocking questions from step 3; wait and apply the answer to the affected PBI. If that allowance is exhausted, stop and report that the specification is not ready. Q&A session logs are owned by `__SPECKIT_COMMAND_CLARIFY__`, not embedded in PBIs.
 
    d. **Update Checklist**: after each validation iteration, update the checklist file with the current pass/fail status.
 
@@ -293,11 +257,11 @@ Check if `.specify/extensions.yml` exists in the project root.
 ## Completion Report
 
 Report completion to the user with:
-- `SPECIFY_FEATURE_DIRECTORY` — the feature directory path, the mode and the root PBI (`type [id] title`)
-- `SPEC_FILE` and the number of child PBIs written, per type
+- `SPECIFY_FEATURE_DIRECTORY` — the feature directory path and selected Scope PBIs (`type [id] title`)
+- `SPEC_FILE` and the PBIs created vs reused in root `backlog/`, per type
 - Validator result and checklist results summary
 - Changes made to `.specify/memory/product.md` (personas, terms), if any
-- Open Questions left for `__SPECKIT_COMMAND_CLARIFY__`, if any
+- Scope-size warning and the user's narrow/keep decision, if applicable; any validation blockers (never claim ready if unresolved)
 - Readiness for the next phase (`__SPECKIT_COMMAND_CLARIFY__` or `__SPECKIT_COMMAND_PLAN__`)
 
 **NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
@@ -306,12 +270,12 @@ Report completion to the user with:
 
 - Focus on **WHAT** users need and **WHY**; the backlog must be understandable by a non-technical person.
 - Avoid HOW to implement (no tech stack, APIs, code structure, application layers). Technical work appears only as Walking Skeleton TASK/SPIKE items.
-- Every PBI's metadata lives in its frontmatter, never in the body; `spec.md`'s envelope sections are spec-level context, not PBI metadata.
+- Every PBI's metadata lives in its own root-backlog file's frontmatter; `spec.md` contains spec-level context and rendered references only.
 - DO NOT create checklists embedded in the PBIs other than the ones their templates define (INVEST & DoR, map DoR). Other checklists are a separate command.
 
 ### Section Requirements
 
-- **Mandatory sections**: every section of a PBI template that is not marked optional, plus the envelope's Spec Context, Backlog Index, Success Criteria and Open Questions
+- **Mandatory sections**: each PBI template's required sections; the spec's Header with Scope, rendered Backlog and Success Criteria
 - **Optional sections**: include only when relevant
 - When a section doesn't apply, remove it entirely (don't leave as "N/A")
 
@@ -330,7 +294,8 @@ Success criteria must be:
 
 ## Done When
 
-- [ ] Mode chosen (or confirmed) by the user, root PBI written to `SPEC_FILE` and every child PBI written to `backlog/`
+- [ ] Functional PBIs prepared/reused in root `backlog/`; selected Scope confirmed when large; clean 4-block `SPEC_FILE` written
+- [ ] No unanswered question lists or [NEEDS CLARIFICATION] markers remain
 - [ ] Validator passing (or remaining errors reported) and quality checklist written
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with feature directory, mode, root PBI, PBI counts and checklist results
+- [ ] Completion reported with feature directory, Scope, created/reused PBI counts and checklist results

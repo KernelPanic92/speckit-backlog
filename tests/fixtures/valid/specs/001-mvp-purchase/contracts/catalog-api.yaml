@@ -1,0 +1,11 @@
+openapi: 3.1.0
+info:
+  title: Catalog API
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      summary: List available products
+      responses:
+        "200":
+          description: Current products with names and store-currency prices

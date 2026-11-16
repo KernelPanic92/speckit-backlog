@@ -22,7 +22,7 @@ The Backbone (the top row) **must** tell a chronological story.
 
 ### 2. The Slice Constraint (The "Hamburger Rule")
 
-A Release Lane (the horizontal slice) must be a "complete hamburger", not a stack of bread.
+A Release Lane (the horizontal slice) must be a "complete hamburger", not a stack of bread. Each populated Epic × lane intersection is represented by a Feature, with its stories listed beneath it.
 
 * **The Rule:** Every release must cross **the entire** Backbone, from left to right. The user must be able to complete their journey, even if in a crude way.
 * **The Prohibition:** You cannot make a Release 1 that contains "All the Perfect Search" and "All the Perfect Selection" but zero Checkout. A hamburger made only of three layers of excellent bread and zero meat (the value) is not edible.
@@ -31,7 +31,7 @@ A Release Lane (the horizontal slice) must be a "complete hamburger", not a stac
 
 The further down you go vertically in the map, the less fundamental things are.
 
-* **The Rule:** Within the same column (under a macro-activity), the stories at the top are the "Must Have", those at the bottom are the "Nice to Have". If time or budget runs out, you cut from the bottom.
+* **The Rule:** Within the same column (under a macro-activity), the stories at the top are the "Must Have", those at the bottom are the "Nice to Have". If time or budget runs out, you cut from the bottom. The stories in a lane are grouped under their Feature for that Epic × lane intersection.
 * **The Prohibition:** There can be no two stories with the exact same priority. The Story Map forces you to make a ruthless choice: which one goes above and which one goes below.
 
 ### 4. The Architectural Prohibition
@@ -90,16 +90,21 @@ The Epic is an artifact, a "what" to build; the Story Map is the visual tool to 
 
 | Dimension | The Epic | The User Story Map |
 | --- | --- | --- |
-| **Nature** | Logical container of requirements, a giant "folder". | Two-dimensional X-ray of the entire product. |
+| **Nature** | Logical container of open-ended requirements, a macro-goal. | Two-dimensional X-ray of the entire product. |
 | **Focus** | Vertical: a single business macro-goal. | Horizontal and vertical: the entire user journey and the releases. |
-| **Structure** | One-dimensional: a list of User Stories from top to bottom. | Two-dimensional: X axis for time, Y axis for priority. |
-| **Problem it solves** | Avoids 500 micro-stories scattered across the backlog without a parent. | Avoids losing the big picture ("we can't see the forest for the trees"). |
+| **Structure** | Epic → Features → User Stories, where bounded release capabilities are useful. | Two-dimensional: X axis for time, Y axis for priority. |
+| **Problem it solves** | Keeps the macro-goal and bounded capabilities connected to their stories. | Avoids losing the big picture ("we can't see the forest for the trees"). |
 
-They coexist in three ways:
+They coexist in four ways:
 
 * **The Backbone generates the Epics.** The top row of the map, the Macro-Activities, represents the big blocks of the user's journey. **These Macro-Activities become exactly the Epics in the backlog**, with the same title: *[Search] → [Configuration] → [Checkout]* on the map, three Epics in the tracker.
 * **The Release Lanes slice the Epics.** The flaw of an Epic is the temptation to say "let's finish all of Search before starting Checkout": that is waterfall. The slice (Release 1, MVP) cuts horizontally across all the Epics: in the same sprint two Search stories, one Configuration story, two Checkout stories. The Epics stay open in parallel and a complete hamburger is released.
+* **Every Epic × Release Lane intersection with work is a Feature.** In Phase 3a, create one Feature for each populated intersection and declare its Epic as `PARENT`. In Phase 3b, list that Feature under the Epic in its lane and list its User Stories beneath it. Each story declares its Feature as `PARENT`; work in the next lane of the same Epic normally belongs to a different Feature.
 * **The Epic as zoom.** When the product is too big for a single map (it would take a ten-meter wall), the process is reversed: you start from a macro-Epic and the team creates a Story Map dedicated to it alone, to break it down into releases and smaller stories. The Macro-Activities of that map are sub-Epics.
+
+### Feature size and review capacity
+
+A Feature is the right size when one person can carefully review its specification in one session, roughly an hour. If splitting it produces only one User Story, the Feature was likely just a story and should be combined with other work in the same lane. If it contains multiple Outcomes or cannot be reviewed in one session, split it across lanes by Outcome, never by technical layer. The number of stories is a consequence of the capability, not a sizing target.
 
 > **Jeff Patton's golden rule:** "An Epic is just a User Story too big to be printed on a single post-it. The Story Map is the table we lay it on to break it into pieces and make sense of it."
 

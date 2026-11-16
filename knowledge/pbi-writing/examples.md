@@ -2,9 +2,63 @@
 
 Complete, high-fidelity examples adapted from real cases and anonymized: names, vendors and domains have been changed. Each example reports the user's input exactly as it arrived and the full output expected from the skill: macro-analysis, Micro-Scope Reasoning blocks, stories, final check and summary. They are the concrete reference for how to apply the rules in `rules.md`. Wherever the original output violated a rule now in force (multiple actions chained in the `When`, prescriptive UI, a persona outside the Connextra format, references to application layers), it has been corrected, so the examples teach only permitted behaviours.
 
-PBIs follow the PBI templates (here `pbi-story-template`): metadata (`id`, `title`, `type`, `relations`, ...) in the YAML frontmatter, a body that starts with the Connextra sentence. The `US-00x` ids are mocked and valid only within the single example. A dependency between two stories is declared with `BLOCKED_BY` in the `relations` of the blocked story, never as an inverse property on the blocking story.
+The seven PBI types are `MAP`, `EPIC`, `FEATURE`, `US`, `TASK`, `SPIKE`, and `BUG`. PBIs follow their matching templates: metadata (`id`, `title`, `type`, `relations`, ...) in YAML frontmatter, with a body that starts with the Connextra sentence where the type calls for one. A bounded capability with one Outcome is a `FEATURE`; an open-ended area is an `EPIC`; a story-sized request needs no container. In a map, each populated Epic × Release Lane intersection is a Feature and the stories under it are its children. The `US-00x` ids are mocked and valid only within each example. A dependency is declared with `BLOCKED_BY` in the `relations` of the blocked PBI, never as an inverse property on the blocking PBI.
 
 The input is shown in a `text` block, the expected output in a four-backtick `markdown` block, which in turn contains the three-backtick blocks of the individual stories.
+
+---
+
+## Feature Container Example — Bounded Capability
+
+What it teaches: choose a Feature for a bounded capability, check the Feature before drafting its stories, and declare the Feature as the stories' `PARENT`. The Feature captures intent and shared constraints, not acceptance scenarios or implementation choices.
+
+### Phase 1: MACRO-ANALYSIS
+
+- **Request:** Let a customer save a delivery address for later orders. This is a bounded capability with one Outcome, not an open-ended Epic.
+- **Container:** Create a Feature for saved delivery addresses; its User Stories are children of that Feature.
+
+### Phase 2: ITERATIVE DRAFTING
+
+#### Feature Check for FEATURE [FEATURE-001] Saved Delivery Address
+
+- **Capability:** Save and reuse one delivery address. This is one capability, without a compound "and".
+- **Outcome:** Customers spend less time entering delivery details on repeat orders.
+- **Constraints:** No cross-story constraint is known; scenario-level behavior belongs in the User Stories.
+- **Out of Scope:** Editing a saved address is not planned in this capability.
+- **Size:** The capability is bounded and its specification can be reviewed in one session.
+
+```markdown
+---
+id: FEATURE-001
+title: Saved Delivery Address
+type: FEATURE
+---
+
+As a Customer, I want to save a delivery address for later orders, so that I can place repeat orders with less effort.
+
+## Outcome
+
+Customers spend less time entering delivery details on repeat orders.
+
+## Constraints
+
+## Out of Scope
+- Editing a saved address: not planned in this capability
+```
+
+One child story declares the Feature as its parent:
+
+```yaml
+id: US-001
+title: Save a Delivery Address
+type: US
+relations:
+  "FEATURE-001":
+    title: Saved Delivery Address
+    type: FEATURE
+    relationType: PARENT
+    reason: "the address-saving behavior is part of this bounded capability"
+```
 
 ---
 
@@ -625,7 +679,7 @@ All the requirements of the draft (Buttons, Menu, List fields, Role assumptions,
 
 ### [SUMMARY]
 
-The 7 User Stories listed in the final check, in that order, are ready for the backlog and can be developed in parallel or sequentially in the same sprint, respecting the declared `BLOCKED_BY` relations: first the Course and Lesson archiving, then the two deletion confirmations, then the Trash view, the restore and the permanent deletion. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
+The 7 User Stories listed in the final check, in that order, are ready for the backlog, respecting the declared `BLOCKED_BY` relations: first the Course and Lesson archiving, then the two deletion confirmations, then the Trash view, the restore and the permanent deletion. The `US-00x` ids are local and permanent within this example.
 ````
 
 ---
@@ -927,7 +981,7 @@ I broke down a dense, ambiguous requirement with temporal variables into 4 highl
 
 ### [SUMMARY]
 
-The following 4 User Stories are ready for technical refinement and insertion into the backlog. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
+The following 4 User Stories are ready for technical refinement and insertion into the backlog. The `US-00x` ids are local and permanent within this example.
 
 1. US [US-001] Store-Rep Assignments View
 2. US [US-002] Store Reassignment with Effective Date (Area Manager)
@@ -1100,7 +1154,7 @@ The stories respect the INVEST and BDD criteria, sharply separating the update a
 
 ### [SUMMARY]
 
-The following 2 User Stories are structured, deterministic and ready for the sprint backlog. The `US-00x` ids are local and permanent; the ids of the task manager are linked to them by `/speckit.sync`.
+The following 2 User Stories are structured, deterministic and ready for the sprint backlog. The `US-00x` ids are local and permanent within this example.
 
 1. US [US-001] Manual Offline Data Synchronization
 2. US [US-002] Operations Block for Stale Data (Over 3 Days)
@@ -1234,7 +1288,7 @@ This split avoids creating a pure "technical User Story" (horizontal slicing) an
 
 ### [SUMMARY]
 
-The final stories ready for the development cycle are (local id; the task manager's id is linked by `/speckit.sync`):
+The final stories ready for the development cycle use local ids that remain permanent within this example:
 
 1. US [US-001] Newsletter Subscription on the Homepage (UX Focus and Business Value)
 ````
@@ -1378,5 +1432,5 @@ The story exceeds the 2-5 scenario rule but is not split: every split tried prod
 
 ### [SUMMARY]
 
-1. US [US-001] Subscription to "Notify Me" with Marketing Metadata Synchronization (local id; the task manager's id is linked by `/speckit.sync`)
+1. US [US-001] Subscription to "Notify Me" with Marketing Metadata Synchronization
 ````

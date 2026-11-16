@@ -1,5 +1,5 @@
 # [PRODUCT_NAME] — Product
-<!-- WHAT we build and for WHOM. HOW we build it lives in [the constitution](constitution.md). History of changes is git history: no version numbers or change tables in this file. Other documents cite this one by section name, e.g. [the Personas of the product](../../.specify/memory/product.md#personas). -->
+<!-- WHAT we build and for WHOM. HOW we build it lives in [the constitution](constitution.md). History of changes is git history: no version numbers or change tables in this file. Use TODO(<FIELD>): ... only during the initial `/speckit.constitution` interview when a value is unknown. Other documents cite this one by section name, e.g. [the Personas of the product](product.md#personas). -->
 
 ## Vision
 
@@ -16,7 +16,7 @@
 <!--
   The ONLY personas allowed in the Connextra sentence of every PBI ("As a <Persona>, …").
   A real human or a distinct system actor (e.g. "external invoicing system"), never a technical role
-  ("Frontend developer", "Database"). New personas are proposed by the commands and added here only after approval.
+  ("Frontend developer", "Database"). `/speckit.backlog` and `/speckit.specify` may propose new personas; add them here only after approval.
 -->
 
 ### [PERSONA_1_NAME]
@@ -47,7 +47,7 @@
 
 <!--
   The main journeys, each as an ordered list of user activities (left to right, in time order).
-  They are the natural starting point of a User Story Map's Backbone.
+  They are a natural input to `/speckit.backlog` when shaping a User Story Map's Backbone and to `/speckit.specify` when defining a feature's scope.
 -->
 
 ### [JOURNEY_1_NAME] — [PERSONA]
@@ -70,14 +70,10 @@
 
 <!--
   One term per concept, used identically by business, PBIs and code. No synonyms of the same object.
-  The commands propose new terms when a spec introduces them and add them here only after approval.
+  `/speckit.backlog` and `/speckit.specify` may propose new terms when a feature introduces them; add them here only after approval.
 -->
 
 | Term | Business definition | Dev definition |
 |------|---------------------|----------------|
 | [TERM] | [BUSINESS_DEFINITION] | [DEV_DEFINITION] |
 <!-- Example: | Order | A customer's confirmed request to buy one or more products | Aggregate root `Order` with `OrderLine[]`, created when payment is authorised | -->
-
-## Open Questions
-
-- [ ] [QUESTION]

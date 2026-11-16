@@ -1,20 +1,22 @@
 ---
-# id: the next free project-wide id from the validator (e.g. US-001); it never changes. Tool ids are added in `external` by /speckit.sync
+# id: the next free project-wide id from scripts/backlog.py next-id US (e.g. US-001); it never changes
 id: {{id}}
 title: {{title}}
 # PBI type, fixed for this template
 type: US
+# optional: priority rank among siblings (10, 20, 30...; lower = higher priority)
+rank: {{rank}}
 # optional, relations with other PBIs, declared only from this side (e.g. the parent epic as PARENT)
 # BLOCKED_BY: the referenced PBI blocks this one | PARENT: the referenced PBI is the parent, at most one | RELATED: link without constraints
 relations:
     "{{related id}}":
         title: "{{PBI title}}"
-        type: US|TASK|BUG|EPIC|SPIKE|MAP
+        type: US|FEATURE|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
     "{{related id}}":
         title: "{{PBI title}}"
-        type: US|TASK|BUG|EPIC|SPIKE|MAP
+        type: US|FEATURE|TASK|BUG|EPIC|SPIKE|MAP
         relationType: BLOCKED_BY|PARENT|RELATED
         reason: "{{reason for the relation}}"
 # optional: Figma mockups, screenshots or other attachments useful for development. Only links really supplied by the user
