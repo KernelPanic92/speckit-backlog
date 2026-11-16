@@ -87,7 +87,7 @@ specify init my-project --integration claude --extension git --preset /path/to/s
 Install into an existing project from a release archive:
 
 ```bash
-specify preset add --from https://github.com/KernelPanic92/speckit-backlog/archive/refs/tags/v0.1.0.zip
+specify preset add --from https://github.com/KernelPanic92/speckit-backlog/archive/refs/tags/v0.2.0.zip
 ```
 
 Or add the catalog, which also makes `specify init --preset backlog` available:

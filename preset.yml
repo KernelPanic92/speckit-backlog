@@ -3,7 +3,7 @@ schema_version: "1.0"
 preset:
   id: "backlog"
   name: "Backlog-Driven SDD"
-  version: "0.1.0"
+  version: "0.2.0"
   description: "Manage reusable Agile/BDD PBIs and plan feature delivery with deterministic waves, modular Spec Kit artifacts, feature research, and durable ADRs."
   author: "Iacopo Ciao"
   repository: "https://github.com/KernelPanic92/speckit-backlog"
