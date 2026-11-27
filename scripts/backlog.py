@@ -699,7 +699,7 @@ def validate_links(project, path, text):
             project.report.add("broken-link", project.rel(path), f"Missing local target: {target}")
 
 
-ADR_DIRS = ("docs/adr", "docs/decisions", "doc/adr", "adr")
+ADR_DIRS = ("docs/architecture/adr", "docs/adr", "docs/decisions", "doc/adr", "adr")
 ADR_FILENAME_RE = re.compile(r"^\d{4}-[a-z0-9-]+\.md$")
 ADR_STATUS_RE = re.compile(r"^\|\s*\*\*Status\*\*\s*\|\s*(.*?)\s*\|\s*$", re.M)
 ADR_SUPERSEDES_RE = re.compile(r"^Superseded by \[ADR-(\d{4}):[^\]]+\]\(([^)]+)\)$")

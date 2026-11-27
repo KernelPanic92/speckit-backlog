@@ -9,7 +9,7 @@
 ### Payment Provider
 
 - Stripe Payment Intents supports idempotent authorization requests.
-- [ADR-0001: Use Stripe Payment Intents for card authorization](../../docs/adr/0001-use-stripe-payment-intents.md) records the durable provider choice.
+- [ADR-0001: Use Stripe Payment Intents for card authorization](../../docs/architecture/adr/0001-use-stripe-payment-intents.md) records the durable provider choice.
 
 ## Validity
 

@@ -14,7 +14,7 @@ The backlog follows INVEST, vertical slicing, Gherkin acceptance criteria, and U
 | `/speckit.backlog` | Create, map, refine, reorder, and retire PBIs in the central `backlog/`. |
 | `/speckit.specify` | Turn free text or a functional PBI into a scoped, four-block `spec.md`. |
 | `/speckit.clarify` | Resolve scope questions with the user and record accepted clarifications in the specification. |
-| `/speckit.plan` | Produce feature research and a modular `plan.md` with conditional `data-model.md`, `contracts/`, `quickstart.md`, and delivery slices; durable decisions go in `docs/adr/`. |
+| `/speckit.plan` | Produce feature research and a modular `plan.md` with conditional `data-model.md`, `contracts/`, `quickstart.md`, and delivery slices; durable decisions go in `docs/architecture/adr/`. |
 | `/speckit.tasks` | Reconcile central TASK PBIs idempotently and render the task execution index. |
 | `/speckit.analyze` | Check consistency across product context, PBIs, acceptance criteria, and computed schedule. |
 | `/speckit.implement` | Execute scheduled work, with one PR/worktree per User Story and TASK-owned progress. |
@@ -49,7 +49,7 @@ specs/003-online-purchase/
 └── checklists/
     └── requirements.md
 
-docs/adr/                  # durable, atomic project-wide architecture decisions
+docs/architecture/adr/     # durable, atomic project-wide architecture decisions
 └── 0001-example-decision.md
 ```
 
@@ -57,7 +57,7 @@ The `spec.md` **Scope** selects functional PBIs; its `## Backlog` block is rende
 
 ## Modular Plan, Research & ADRs
 
-`research.md` holds feature-scoped facts and, only for genuine architectural forks, a trade-off matrix with 10x stress tests and poison-pill analysis. `docs/adr/` holds durable, atomic project-wide decisions and their supersession history. The modular `plan.md`, conditional `data-model.md` and `contracts/`, and runnable `quickstart.md` keep feature execution zero-fluff, human-reviewable, and progressively loadable by parallel sub-agents.
+`research.md` holds feature-scoped facts and, only for genuine architectural forks, a trade-off matrix with 10x stress tests and poison-pill analysis. `docs/architecture/adr/` holds durable, atomic project-wide decisions and their supersession history. The modular `plan.md`, conditional `data-model.md` and `contracts/`, and runnable `quickstart.md` keep feature execution zero-fluff, human-reviewable, and progressively loadable by parallel sub-agents.
 
 ## Ordering, Waves & Parallel Execution
 

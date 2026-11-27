@@ -51,7 +51,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Goal
 
-Identify inconsistencies, duplication, ambiguity and underspecification across the 4-block `spec.md` (`**Scope**:` + rendered `## Backlog`, optional Key Entities, Success Criteria), permanent PBIs in repository-root `backlog/`, `plan.md`, optional `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, generated `tasks.md`, Accepted ADRs in `docs/adr/`, and product/governance context before implementation. This command MUST run only after `__SPECKIT_COMMAND_TASKS__` has produced `tasks.md`; validation may still expose defects. Never treat spec.md as a PBI file.
+Identify inconsistencies, duplication, ambiguity and underspecification across the 4-block `spec.md` (`**Scope**:` + rendered `## Backlog`, optional Key Entities, Success Criteria), permanent PBIs in repository-root `backlog/`, `plan.md`, optional `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, generated `tasks.md`, Accepted ADRs in `docs/architecture/adr/`, and product/governance context before implementation. This command MUST run only after `__SPECKIT_COMMAND_TASKS__` has produced `tasks.md`; validation may still expose defects. Never treat spec.md as a PBI file.
 
 ## Operating Constraints
 
@@ -74,7 +74,7 @@ Run `{SCRIPT}` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_
 - DATA_MODEL = FEATURE_DIR/data-model.md (if present)
 - CONTRACTS = FEATURE_DIR/contracts/ (if present; inspect per boundary/story file)
 - QUICKSTART = FEATURE_DIR/quickstart.md (if present)
-- ADRs = Accepted decisions under `docs/adr/` (plus recognized legacy archives)
+- ADRs = Accepted decisions under `docs/architecture/adr/` (plus recognized legacy archives)
 - PRODUCT = `.specify/memory/product.md` (if present)
 - REFERENCES = the "Readable references" section of `.specify/presets/backlog/knowledge/pbi-writing/rules.md`: what a readable reference is, for detection pass G and for this report
 - DELIVERY_RULES = `.specify/presets/backlog/knowledge/delivery/rules.md`: rank/blockers/files, computed wave scheduling, one PR/MR per US and default worktree isolation
@@ -123,7 +123,7 @@ Load only the minimal necessary context from each artifact:
 - `data-model.md`: entities, fields, validation constraints, relations, state transitions and migration details when present.
 - `contracts/`: boundary contracts per story slice when present.
 - `quickstart.md`: runnable acceptance-suite and smoke verification commands when present.
-- Accepted ADRs in `docs/adr/`: governing cross-feature decisions and supersession status; flag contradictions with artifacts or constitution.
+- Accepted ADRs in `docs/architecture/adr/`: governing cross-feature decisions and supersession status; flag contradictions with artifacts or constitution.
 
 **From tasks.md:**
 

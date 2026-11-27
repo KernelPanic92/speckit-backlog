@@ -2,7 +2,7 @@
 
 | **Status** | Accepted |
 | **Supersedes** | None |
-| **Origin** | [Payment provider research](../../specs/001-mvp-purchase/research.md#payment-provider) |
+| **Origin** | [Payment provider research](../../../specs/001-mvp-purchase/research.md#payment-provider) |
 | **Tags** | payments, provider |
 
 ## Context
@@ -31,4 +31,4 @@ Use Stripe Payment Intents for card authorization and persist the provider inten
 
 ## References
 
-- [Payment plan](../../specs/001-mvp-purchase/plan.md#technical-context)
+- [Payment plan](../../../specs/001-mvp-purchase/plan.md#technical-context)

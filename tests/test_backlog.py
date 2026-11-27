@@ -125,12 +125,25 @@ def test_contract_links_in_modular_spec_are_checked(project, cli):
 
 
 def test_adr_file_name_validation(project, cli):
-    (project / "docs/adr/not-an-adr.md").write_text("# Not an ADR\n")
+    (project / "docs/architecture/adr/not-an-adr.md").write_text("# Not an ADR\n")
     check_code(cli, project, "adr-file-name")
 
 
+def test_legacy_adr_directory_is_still_validated(project, cli):
+    legacy = project / "docs/adr"
+    legacy.mkdir()
+    (legacy / "not-an-adr.md").write_text("# Not an ADR\n")
+    result = check_code(cli, project, "adr-file-name")
+    assert any(entry["file"] == "docs/adr/not-an-adr.md" for entry in result["errors"])
+
+
+def test_adr_links_resolve_from_the_architecture_directory(project, cli):
+    path = project / "docs/architecture/adr/0001-use-stripe-payment-intents.md"
+    path.write_text(path.read_text().replace("../../../specs/", "../../specs/"))
+    check_code(cli, project, "broken-link")
+
 def test_adr_duplicate_id_validation(project, cli):
-    source = project / "docs/adr/0001-use-stripe-payment-intents.md"
+    source = project / "docs/architecture/adr/0001-use-stripe-payment-intents.md"
     (source.parent / "0001-another-choice.md").write_text(source.read_text())
     check_code(cli, project, "adr-duplicate-id")
 
@@ -140,15 +153,15 @@ def test_adr_duplicate_id_validation(project, cli):
     "Superseded by [ADR-0002: Replace provider](0002-replace-provider.md)",
 ])
 def test_adr_status_validation(project, cli, status):
-    path = project / "docs/adr/0001-use-stripe-payment-intents.md"
+    path = project / "docs/architecture/adr/0001-use-stripe-payment-intents.md"
     path.write_text(re.sub(r"(?m)^\| \*\*Status\*\* \|.*$", f"| **Status** | {status} |", path.read_text()))
     result = check_code(cli, project, "adr-status")
-    assert any(entry["file"] == "docs/adr/0001-use-stripe-payment-intents.md"
+    assert any(entry["file"] == "docs/architecture/adr/0001-use-stripe-payment-intents.md"
                for entry in result["errors"])
 
 
 def test_adr_requires_two_negative_consequences(project, cli):
-    path = project / "docs/adr/0001-use-stripe-payment-intents.md"
+    path = project / "docs/architecture/adr/0001-use-stripe-payment-intents.md"
     path.write_text(path.read_text().replace(
         "- Payment behavior depends on Stripe's API and account availability.\n", ""))
     check_code(cli, project, "adr-consequences")

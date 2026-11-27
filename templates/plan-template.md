@@ -1,7 +1,7 @@
 # Implementation Plan: [FEATURE]
 
 **Branch**: `[###-feature-name]` | **Spec**: [[Feature name] specification](spec.md) | **Scope**: [scoped PBIs as type [id](../../backlog/...) title]\
-**Research**: [[Feature name] research](research.md) | **ADRs**: [governing ADRs as [ADR-NNNN: title](../../docs/adr/...) or none] | **Product**: [personas and Ubiquitous Language](../../.specify/memory/product.md)
+**Research**: [[Feature name] research](research.md) | **ADRs**: [governing ADRs as [ADR-NNNN: title](../../docs/architecture/adr/...) or none] | **Product**: [personas and Ubiquitous Language](../../.specify/memory/product.md)
 
 ## Summary
 
@@ -33,7 +33,7 @@
 | Gate | Check |
 |------|-------|
 | [Named constitution principle](../../.specify/memory/constitution.md#principle-heading) | PASS / VIOLATION |
-| [Accepted governing ADR](../../docs/adr/NNNN-slug.md) | PASS / VIOLATION |
+| [Accepted governing ADR](../../docs/architecture/adr/NNNN-slug.md) | PASS / VIOLATION |
 
 ## Architecture & Project Structure
 
@@ -48,7 +48,7 @@ specs/[###-feature-name]/
 ├── contracts/          # only when external interfaces change
 ├── quickstart.md
 └── tasks.md
-docs/adr/                # durable project-wide decisions, when needed
+docs/architecture/adr/   # durable project-wide decisions, when needed
 backlog/                 # central PBIs
 ```
 
