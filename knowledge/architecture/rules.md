@@ -28,7 +28,7 @@ Put the matrix, stress test, and verdict in `research.md`. Link the feature rese
 
 Create an ADR only when a feature introduces or changes a durable, cross-feature architectural, technology, protocol, data-boundary, or pattern choice not already governed by `constitution.md` or an existing ADR. Do not record local implementation details as ADRs.
 
-- **Discovery and numbering:** search `docs/architecture/adr/` first; if absent, search `docs/adr/` (the former default), `docs/decisions/`, `doc/adr/`, then `adr/`. Default new records to `docs/architecture/adr/`. Use continuous four-digit numbering (`0001`, `0002`, …) and `NNNN-kebab-slug.md` names of at most six words.
+- **Discovery and numbering:** search `docs/architecture/adr/` first; if absent, search `docs/decisions/`, `doc/adr/`, then `adr/`. Default new records to `docs/architecture/adr/`. Use continuous four-digit numbering (`0001`, `0002`, …) and `NNNN-kebab-slug.md` names of at most six words.
 - **Atomicity and title:** one decision per ADR. If the title needs “and”, split it. Use a decision verb, such as “Adopt X for Y” or “Use X instead of Y”.
 - **Trade-offs:** keep an ADR concise (at most two pages). List 2–4 options in 2–4 lines each and link to `research.md` for the full matrix and stress tests. Include at least two concrete negative consequences and neutral re-evaluation triggers.
 - **Statuses:** `Proposed`, `Accepted`, `Rejected`, `Deprecated`, or `Superseded by [ADR-NNNN: title](NNNN-slug.md)`.

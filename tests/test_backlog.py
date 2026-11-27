@@ -129,13 +129,6 @@ def test_adr_file_name_validation(project, cli):
     check_code(cli, project, "adr-file-name")
 
 
-def test_legacy_adr_directory_is_still_validated(project, cli):
-    legacy = project / "docs/adr"
-    legacy.mkdir()
-    (legacy / "not-an-adr.md").write_text("# Not an ADR\n")
-    result = check_code(cli, project, "adr-file-name")
-    assert any(entry["file"] == "docs/adr/not-an-adr.md" for entry in result["errors"])
-
 
 def test_adr_links_resolve_from_the_architecture_directory(project, cli):
     path = project / "docs/architecture/adr/0001-use-stripe-payment-intents.md"
