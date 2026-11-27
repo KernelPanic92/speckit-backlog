@@ -5,7 +5,7 @@
 Keep evidence, durable decisions, and execution design separate:
 
 - `specs/NNN-slug/research.md` is feature-scoped empirical research and option evaluation: facts, constraints, benchmarks, Spike findings, and trade-offs. Do not silently bury durable project-wide governance in a feature folder.
-- `docs/adr/NNNN-slug.md` records one durable, project-wide architectural decision and why it was made.
+- `docs/architecture/adr/NNNN-slug.md` records one durable, project-wide architectural decision and why it was made.
 - `specs/NNN-slug/plan.md`, `data-model.md`, `contracts/`, and `quickstart.md` describe how to execute the feature. Keep them modular and aligned with upstream Spec Kit `AVAILABLE_DOCS`, enabling progressive disclosure for reviewers and parallel sub-agents. Do not create a separate `docs/tdd/TDD-*.md`: this modular spec folder is the execution design.
 
 ## Research Modes
@@ -28,7 +28,7 @@ Put the matrix, stress test, and verdict in `research.md`. Link the feature rese
 
 Create an ADR only when a feature introduces or changes a durable, cross-feature architectural, technology, protocol, data-boundary, or pattern choice not already governed by `constitution.md` or an existing ADR. Do not record local implementation details as ADRs.
 
-- **Discovery and numbering:** search `docs/adr/` first; if absent, search `docs/decisions/`, `doc/adr/`, then `adr/`. Default new records to `docs/adr/`. Use continuous four-digit numbering (`0001`, `0002`, …) and `NNNN-kebab-slug.md` names of at most six words.
+- **Discovery and numbering:** search `docs/architecture/adr/` first; if absent, search `docs/decisions/`, `doc/adr/`, then `adr/`. Default new records to `docs/architecture/adr/`. Use continuous four-digit numbering (`0001`, `0002`, …) and `NNNN-kebab-slug.md` names of at most six words.
 - **Atomicity and title:** one decision per ADR. If the title needs “and”, split it. Use a decision verb, such as “Adopt X for Y” or “Use X instead of Y”.
 - **Trade-offs:** keep an ADR concise (at most two pages). List 2–4 options in 2–4 lines each and link to `research.md` for the full matrix and stress tests. Include at least two concrete negative consequences and neutral re-evaluation triggers.
 - **Statuses:** `Proposed`, `Accepted`, `Rejected`, `Deprecated`, or `Superseded by [ADR-NNNN: title](NNNN-slug.md)`.
@@ -38,7 +38,7 @@ Create an ADR only when a feature introduces or changes a durable, cross-feature
 
 Use tables and bullets over prose. Define no standard terms. Omit document versions, dates, authors, and changelogs: Git owns history; ADRs carry lifecycle status, not revision logs.
 
-Never repeat `constitution.md` or `docs/adr/` in `plan.md`, `data-model.md`, `contracts/`, or `quickstart.md`. Omit generic security, logging, and testing boilerplate. Document only feature-specific deltas, such as idempotency keys, network-boundary retry/backpressure, migration reversibility, and an explicit point of no return.
+Never repeat `constitution.md` or `docs/architecture/adr/` in `plan.md`, `data-model.md`, `contracts/`, or `quickstart.md`. Omit generic security, logging, and testing boilerplate. Document only feature-specific deltas, such as idempotency keys, network-boundary retry/backpressure, migration reversibility, and an explicit point of no return.
 
 - **`plan.md` (~80–130 lines):** Summary, Technical Context, Constitution Check, Architecture & Project Structure, Delivery Slices, and Complexity Tracking only when there are violations.
 - **`data-model.md` (only when entities or state are added or changed):** Ubiquitous Language entities, fields, validation rules from `AC-n`, relationships, state transitions, indexes, and migration strategy.
@@ -47,4 +47,4 @@ Never repeat `constitution.md` or `docs/adr/` in `plan.md`, `data-model.md`, `co
 
 ## Readable References
 
-Every reference must tell a reader what it is and land at the relevant source. Link to the named topic and heading, for example `[ADR-0001: Adopt Stripe PaymentIntents](../../docs/adr/0001-stripe-payment-intents.md)` or `[the Order entity](data-model.md#order)`. For local sections, use the actual heading anchor. Avoid bare IDs, paths, URLs, invented abbreviations, and section numbers without titles. Apply the full [Readable references rules](../pbi-writing/rules.md#readable-references) throughout these artifacts.
+Every reference must tell a reader what it is and land at the relevant source. Link to the named topic and heading, for example `[ADR-0001: Adopt Stripe PaymentIntents](../../docs/architecture/adr/0001-stripe-payment-intents.md)` or `[the Order entity](data-model.md#order)`. For local sections, use the actual heading anchor. Avoid bare IDs, paths, URLs, invented abbreviations, and section numbers without titles. Apply the full [Readable references rules](../pbi-writing/rules.md#readable-references) throughout these artifacts.

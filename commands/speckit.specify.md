@@ -189,7 +189,7 @@ Every `BACKLOG_TOOL` operation below means this full invocation as a **standalon
 
       ## Acceptance Criteria
 
-      - [ ] Every scenario has an id (AC-n), Given/When/Then, a single When and a binary outcome
+      - [ ] Every scenario has an id (`### AC-n: Title`) followed by one fenced `gherkin` block with one Scenario (or Scenario Outline with Examples) tagged `@US-xxx @AC-n`, Given/When/Then steps, a single When and a binary outcome
       - [ ] 2-5 scenarios per story (or the atomicity exception is justified)
       - [ ] Every scenario is pertinent to the "I want" clause (no scope creep from "so that")
       - [ ] Asynchronous operations describe the full cycle (trigger, loading indicator, outcome, error, retry)

@@ -1,6 +1,6 @@
 # Research: [FEATURE]
 
-**Spec**: [[Feature name] specification](spec.md) | **Plan**: [[Feature name] implementation plan](plan.md) | **ADRs**: [crystallized decisions as [ADR-NNNN: title](../../docs/adr/...) or none]
+**Spec**: [[Feature name] specification](spec.md) | **Plan**: [[Feature name] implementation plan](plan.md) | **ADRs**: [crystallized decisions as [ADR-NNNN: title](../../docs/architecture/adr/...) or none]
 
 <!-- Git owns history; do not add dates, authors, versions, or changelogs for this document. Follow the [Readable references rules](../../knowledge/pbi-writing/rules.md#readable-references). -->
 
@@ -8,7 +8,7 @@
 
 | Question | Mode | Source | Outcome |
 |----------|------|--------|---------|
-| [Question] | Fact-finding / Trade-off | [Technical Context](plan.md#technical-context) or SPIKE [id](../../backlog/spikes/...) title | [Finding](research.md#topic) and [ADR-NNNN: title](../../docs/adr/NNNN-slug.md), if applicable |
+| [Question] | Fact-finding / Trade-off | [Technical Context](plan.md#technical-context) or SPIKE [id](../../backlog/spikes/...) title | [Finding](research.md#topic) and [ADR-NNNN: title](../../docs/architecture/adr/NNNN-slug.md), if applicable |
 
 ## Technical Findings
 
@@ -50,7 +50,7 @@
 
 #### Verdict
 
-**Choose [one option].** [Explain why it beats the runner-up and name the assumption that would flip the verdict and the expected alternative.] For a durable project-wide choice, record [ADR-NNNN: title](../../docs/adr/NNNN-slug.md).
+**Choose [one option].** [Explain why it beats the runner-up and name the assumption that would flip the verdict and the expected alternative.] For a durable project-wide choice, record [ADR-NNNN: title](../../docs/architecture/adr/NNNN-slug.md).
 
 ## Validity & Refresh Triggers
 

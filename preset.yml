@@ -40,13 +40,13 @@ provides:
     - type: "template"
       name: "plan-template"
       file: "templates/plan-template.md"
-      description: "Concise upstream-compatible modular plan with data-model.md, contracts/, quickstart.md, delivery slices, and feature-specific deltas; durable decisions live in docs/adr/"
+      description: "Concise upstream-compatible modular plan with data-model.md, contracts/, quickstart.md, delivery slices, and feature-specific deltas; durable decisions live in docs/architecture/adr/"
       replaces: "plan-template"
 
     - type: "template"
       name: "research-template"
       file: "templates/research-template.md"
-      description: "Feature research separates empirical findings from conditional architectural trade-off matrices; durable project-wide decisions live in docs/adr/"
+      description: "Feature research separates empirical findings from conditional architectural trade-off matrices; durable project-wide decisions live in docs/architecture/adr/"
 
     - type: "template"
       name: "adr-template"

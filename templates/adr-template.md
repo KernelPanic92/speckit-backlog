@@ -4,7 +4,7 @@
 |-------|-------|
 | **Status** | {{Proposed | Accepted | Rejected | Deprecated | Superseded by [ADR-NNNN: title](NNNN-slug.md)}} |
 | **Supersedes** | {{[ADR-MMMM: title](MMMM-slug.md) or —}} |
-| **Origin** | {{[Feature research: topic](../../specs/NNN-slug/research.md#topic-anchor) or —}} |
+| **Origin** | {{[Feature research: topic](../../../specs/NNN-slug/research.md#topic-anchor) or —}} |
 | **Tags** | {{e.g. storage, messaging, payments, security}} |
 
 ## Context and Problem
@@ -17,7 +17,7 @@
 
 ## Considered Options
 
-1. **{{Option}}** — {{2–4 concise lines: fit and drawback. Link to [the full decision matrix and stress tests](../../specs/NNN-slug/research.md#topic) when available.}}
+1. **{{Option}}** — {{2–4 concise lines: fit and drawback. Link to [the full decision matrix and stress tests](../../../specs/NNN-slug/research.md#topic) when available.}}
 2. **{{Option}}** — {{2–4 concise lines.}}
 
 ## Decision

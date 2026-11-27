@@ -49,7 +49,7 @@ Legend: **U** = Spec Kit v1.2.5, **P** = Papalini, **N** = new in this preset.
 | Section | From |
 |---------|------|
 | Feature-scoped empirical findings, questions, validity/refresh triggers, and conditional TDD trade-off matrix with stress tests and poison pills | N |
-| Separation of empirical research and architectural evaluation from durable atomic ADRs in `docs/adr/` | N |
+| Separation of empirical research and architectural evaluation from durable atomic ADRs in `docs/architecture/adr/` | N |
 | Removed: decisions-as-ADR substitutes, routine-feature alternative theater, dates, authors, and changelogs | N |
 
 ### adr-template.md

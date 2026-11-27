@@ -16,6 +16,7 @@ from pathlib import Path
 import posixpath
 import re
 import sys
+import textwrap
 from urllib.parse import unquote, urlsplit
 
 try:
@@ -77,6 +78,92 @@ def sections(body):
 
 def checkboxes(text):
     return re.findall(r"^\s*-\s*\[([ xX])\]", clean_markdown(text), re.M)
+
+
+FENCE_RE = re.compile(r"^\s{0,3}(`{3,}|~{3,})(.*)$")
+SCENARIO_RE = re.compile(r"^(Scenario Outline|Scenario Template|Scenario|Example)\s*:\s*(.*)$")
+STEP_RE = re.compile(r"^(Given|When|Then|And|But|\*)(?:\s|$)")
+
+
+def acceptance_blocks(body):
+    """Return each `### AC-n: Title` of ## Acceptance Criteria with its fenced blocks."""
+    text = re.sub(r"<!--.*?(?:-->|\Z)", "", body, flags=re.S)
+    result, in_section, current, fence, info, lines = [], False, None, None, "", []
+    for line in text.splitlines():
+        match = FENCE_RE.match(line)
+        if fence:
+            if match and match[1][0] == fence[0] and len(match[1]) >= len(fence) and not match[2].strip():
+                if current is not None:
+                    current["blocks"].append((info, "\n".join(lines)))
+                fence = None
+            else:
+                lines.append(line)
+        elif match:
+            fence, info, lines = match[1], (match[2].split() or [""])[0].lower(), []
+        elif heading := re.match(r"^(#{2,3})\s+(.+?)\s*#*\s*$", line):
+            if heading[1] == "##":
+                in_section, current = heading[2] == "Acceptance Criteria", None
+            elif in_section:
+                criterion = re.match(r"AC-(\d+):\s*(.+)$", heading[2])
+                current = {"number": int(criterion[1]), "title": criterion[2].strip(),
+                           "blocks": []} if criterion else None
+                if current:
+                    result.append(current)
+    return result
+
+
+def gherkin_issues(story_id, criterion):
+    """Validate the single fenced gherkin block of one acceptance criterion."""
+    label = f"AC-{criterion['number']}"
+    blocks = [content for info, content in criterion["blocks"] if info == "gherkin"]
+    if not blocks:
+        return [("ac-gherkin-missing", f"{label} needs one fenced ```gherkin block", False)]
+    if len(blocks) > 1:
+        return [("ac-gherkin-scenario", f"{label} must hold exactly one ```gherkin block", False)]
+    tags, headers, containers, steps, examples, docstring = [], [], [], set(), 0, None
+    for line in (raw.strip() for raw in blocks[0].splitlines()):
+        if docstring:
+            docstring = None if line.startswith(docstring) else docstring
+            continue
+        if line.startswith(('"""', "```")):
+            docstring = line[:3]
+        elif line.startswith("@"):
+            if not headers:
+                tags.extend(token for token in line.split() if token.startswith("@"))
+        elif scenario := SCENARIO_RE.match(line):
+            headers.append(scenario)
+        elif re.match(r"^(Feature|Rule|Background)\s*:", line):
+            containers.append(line.split(":")[0])
+        elif re.match(r"^(Examples|Scenarios)\s*:", line):
+            examples += 1
+        elif step := STEP_RE.match(line):
+            steps.add(step[1])
+    issues = []
+    if len(headers) != 1 or containers:
+        found = ", ".join([h[1] for h in headers] + containers) or "none"
+        issues.append(("ac-gherkin-scenario", f"{label} must hold exactly one Scenario or Scenario Outline (found: {found})", False))
+    elif headers[0][1] in ("Scenario Outline", "Scenario Template") and not examples:
+        issues.append(("ac-gherkin-scenario", f"{label} Scenario Outline needs Examples", False))
+    elif headers[0][1] not in ("Scenario Outline", "Scenario Template") and examples:
+        issues.append(("ac-gherkin-scenario", f"{label} Examples require a Scenario Outline", False))
+    if not {"When", "Then"} <= steps:
+        issues.append(("ac-gherkin-steps", f"{label} needs at least a When and a Then step", False))
+    expected = {f"@{story_id}", f"@{label}"}
+    trace = {tag for tag in tags if re.fullmatch(rf"@(?:{ID_PATTERN}|AC-\d+)", tag)}
+    if trace != expected:
+        issues.append(("ac-gherkin-tags", f"{label} scenario tags must be @{story_id} @{label} (found: {' '.join(sorted(trace)) or 'none'})", False))
+    if len(headers) == 1 and headers[0][2].strip() != criterion["title"]:
+        issues.append(("ac-gherkin-title", f"{label} scenario title differs from its heading: {criterion['title']}", True))
+    return issues
+
+
+def feature_text(pbi):
+    """Render a story's acceptance scenarios as one Gherkin .feature document."""
+    scenarios = []
+    for criterion in acceptance_blocks(pbi.body):
+        content = next(content for info, content in criterion["blocks"] if info == "gherkin")
+        scenarios.append(textwrap.indent(textwrap.dedent(content).strip("\n"), "  "))
+    return f"Feature: {pbi.title}\n\n" + "\n\n".join(scenarios) + "\n"
 
 
 @dataclass
@@ -612,7 +699,7 @@ def validate_links(project, path, text):
             project.report.add("broken-link", project.rel(path), f"Missing local target: {target}")
 
 
-ADR_DIRS = ("docs/adr", "docs/decisions", "doc/adr", "adr")
+ADR_DIRS = ("docs/architecture/adr", "docs/decisions", "doc/adr", "adr")
 ADR_FILENAME_RE = re.compile(r"^\d{4}-[a-z0-9-]+\.md$")
 ADR_STATUS_RE = re.compile(r"^\|\s*\*\*Status\*\*\s*\|\s*(.*?)\s*\|\s*$", re.M)
 ADR_SUPERSEDES_RE = re.compile(r"^Superseded by \[ADR-(\d{4}):[^\]]+\]\(([^)]+)\)$")
@@ -744,6 +831,10 @@ def validate_pbis(project):
                 add("ac-id", "Each acceptance scenario needs ### AC-n: Title")
             if criteria and [int(number) for number, _ in criteria] != list(range(1, len(criteria) + 1)):
                 add("ac-sequence", "Acceptance criteria must be numbered from AC-1 without gaps")
+            if pbi.type == "US":
+                for criterion in acceptance_blocks(pbi.body):
+                    for code, message, warning in gherkin_issues(pbi.id, criterion):
+                        add(code, message, warning)
         if pbi.type in ("MAP", "EPIC", "FEATURE", "US") and not re.match(r"As (?:a|an) ", clean_markdown(pbi.body).lstrip()):
             add("connextra", "Body should start with As a / As an", True)
     parent_graph = {p.id: {p.parent} if p.parent else set() for p in pbis.values()}
@@ -847,6 +938,34 @@ def check_project(project, spec=None):
             "errors": report.errors, "warnings": report.warnings}
 
 
+def export_features(project, spec_dir, out_dir):
+    """Write one .feature file per scoped US; write nothing while any scenario is invalid."""
+    _, _, scope, _ = project.read_spec(spec_dir)
+    if not scope:
+        raise UsageError("spec.md requires a **Scope**: line containing PBI IDs")
+    stories = sorted((project.pbis[i] for i in project.scoped_ids(scope) if project.pbis[i].type == "US"),
+                     key=lambda pbi: (numeric_id(pbi.id), pbi.id))
+    errors = []
+    for pbi in stories:
+        criteria = acceptance_blocks(pbi.body)
+        if not criteria:
+            errors.append({"code": "ac-id", "file": project.rel(pbi.path), "message": "No ### AC-n: Title scenarios"})
+        for criterion in criteria:
+            errors.extend({"code": code, "file": project.rel(pbi.path), "message": message}
+                          for code, message, warning in gherkin_issues(pbi.id, criterion) if not warning)
+    if errors:
+        return {"ok": False, "errors": errors, "files": []}
+    out = Path(out_dir)
+    out = (out if out.is_absolute() else project.root / out).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    files = []
+    for pbi in stories:
+        path = out / (pbi.path.stem + ".feature")
+        path.write_text(feature_text(pbi), encoding="utf-8")
+        files.append(project.rel(path))
+    return {"ok": True, "files": files, "stories": len(files)}
+
+
 class JsonParser(argparse.ArgumentParser):
     def error(self, message):
         raise UsageError(message)
@@ -883,6 +1002,9 @@ def main(argv=None):
     sub.add_parser("render-index")
     for name in ("render-spec", "render-tasks"):
         sub.add_parser(name).add_argument("spec_dir")
+    export = sub.add_parser("export-features")
+    export.add_argument("spec_dir")
+    export.add_argument("out_dir")
     try:
         args = parser.parse_args(argv)
         project = Project(find_root(args.root))
@@ -928,6 +1050,8 @@ def main(argv=None):
             (directory / "tasks.md").write_text(text, encoding="utf-8")
             result = {"ok": True, "file": project.rel(directory / "tasks.md"), "tasks": len(tasks),
                       "done": sum(is_task_done(p) for p in tasks), "waves": len(waves)}
+        elif args.command == "export-features":
+            result = export_features(project, args.spec_dir, args.out_dir)
         else:
             result = check_project(project, args.spec)
         print(json.dumps(result, ensure_ascii=False, indent=2))

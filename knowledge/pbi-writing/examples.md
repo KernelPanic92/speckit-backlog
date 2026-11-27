@@ -103,7 +103,7 @@ Future tracking of user behaviour on courses or lessons must be preserved
 
 ### Expected output
 
-````markdown
+`````markdown
 # Phase 1: MACRO-ANALYSIS
 
 * **Request:** Implementation of a "Trash" (Trash Bin) system for the `Course` and `Lesson` entities. The system must handle the complete lifecycle: moving to the trash (Soft delete), Viewing, Restore and permanent deletion. These capabilities are enabled for Editors, Managers and Admins, with more or fewer capabilities depending on the specific role.
@@ -132,7 +132,7 @@ Future tracking of user behaviour on courses or lessons must be preserved
 
 *In spec-kit this block is written to its own file under `backlog/` (or to `spec.md` when it is the root PBI); it is shown inline here for readability.*
 
-```markdown
+````markdown
 ---
 id: US-001
 title: Course Archiving (Move to Trash)
@@ -148,31 +148,46 @@ Implementation of the "Soft Delete" logic on Courses. The action changes the ent
 ## Acceptance Criteria
 
 ### AC-1: Deletion
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they are editing a Course
-**When** they perform the deletion
-**Then** a loading indicator is shown
-**And** editing is disabled while the operation is in progress
-**And** when processing finishes the indicator disappears
-**And** the successful deletion is notified
-**And** the user leaves editing mode
-**And** the Course disappears from the catalogue, from the associated Lessons and from the dropdowns of the related forms.
+
+```gherkin
+@US-001 @AC-1
+Scenario: Deletion
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they are editing a Course
+  When they perform the deletion
+  Then a loading indicator is shown
+  And editing is disabled while the operation is in progress
+  And when processing finishes the indicator disappears
+  And the successful deletion is notified
+  And the user leaves editing mode
+  And the Course disappears from the catalogue, from the associated Lessons and from the dropdowns of the related forms
+```
 
 ### AC-2: Missing permissions
-**Given** a user WITHOUT advanced content management permissions
-**When** they edit a Course
-**Then** the deletion capability is not available
+
+```gherkin
+@US-001 @AC-2
+Scenario: Missing permissions
+  Given a user WITHOUT advanced content management permissions
+  When they edit a Course
+  Then the deletion capability is not available
+```
 
 ### AC-3: Error while moving to the trash
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they are editing a Course
-**And** the system is unable to delete it
-**When** they perform the deletion
-**Then** a loading indicator is shown
-**And** editing is disabled while the operation is in progress
-**And** when the attempt finishes the indicator disappears
-**And** the error that occurred is notified
-**And** editing is re-enabled and deletion is available again.
+
+```gherkin
+@US-001 @AC-3
+Scenario: Error while moving to the trash
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they are editing a Course
+  And the system is unable to delete it
+  When they perform the deletion
+  Then a loading indicator is shown
+  And editing is disabled while the operation is in progress
+  And when the attempt finishes the indicator disappears
+  And the error that occurred is notified
+  And editing is re-enabled and deletion is available again
+```
 
 ## Out of Scope
 - Viewing the deleted items in the Trash page — US [US-005] Trash View (Browsing Interface)
@@ -187,7 +202,7 @@ Implementation of the "Soft Delete" logic on Courses. The action changes the ent
 
 ## Risks
 - Risk that the entity remains selectable in old forms if the selection queries do not filter it out explicitly.
-```
+````
 
 **[END USER STORY ITERATION 1]**
 
@@ -211,7 +226,7 @@ Implementation of the "Soft Delete" logic on Courses. The action changes the ent
   * avoids generic conjunctions ("and", "or") in the `I want` clause: the user story handles only the `Lesson` entity and moves the further actions (blocking operations on active enrollments) to other user stories.
   * avoids criteria that prescribe the UI: it does not prescribe whether deletion will be a button, an icon or a menu item, it does not prescribe how the user is notified of the operation's success/failure, it does not prescribe how the user leaves editing.
 
-```markdown
+````markdown
 ---
 id: US-002
 title: Lesson Archiving (Move to Trash)
@@ -227,26 +242,36 @@ Implementation of the "Soft Delete" logic on Lessons. The action changes the ent
 ## Acceptance Criteria
 
 ### AC-1: Deletion
-**Given** a user with content management permissions (Editor, Manager, Admin)
-**And** they are editing a Lesson
-**When** they perform the deletion
-**Then** a loading indicator is shown
-**And** editing is disabled while the operation is in progress
-**And** when processing finishes the indicator disappears
-**And** the successful deletion is notified
-**And** the user leaves editing mode
-**And** the Lesson disappears from the catalogue, from the Courses and from the dropdowns of the related forms.
+
+```gherkin
+@US-002 @AC-1
+Scenario: Deletion
+  Given a user with content management permissions (Editor, Manager, Admin)
+  And they are editing a Lesson
+  When they perform the deletion
+  Then a loading indicator is shown
+  And editing is disabled while the operation is in progress
+  And when processing finishes the indicator disappears
+  And the successful deletion is notified
+  And the user leaves editing mode
+  And the Lesson disappears from the catalogue, from the Courses and from the dropdowns of the related forms
+```
 
 ### AC-2: Error while moving to the trash
-**Given** a user with content management permissions (Editor, Manager, Admin)
-**And** they are editing a Lesson
-**And** the system is unable to delete it
-**When** they perform the deletion
-**Then** a loading indicator is shown
-**And** editing is disabled while the operation is in progress
-**And** when the attempt finishes the indicator disappears
-**And** the error that occurred is notified
-**And** editing is re-enabled and deletion is available again.
+
+```gherkin
+@US-002 @AC-2
+Scenario: Error while moving to the trash
+  Given a user with content management permissions (Editor, Manager, Admin)
+  And they are editing a Lesson
+  And the system is unable to delete it
+  When they perform the deletion
+  Then a loading indicator is shown
+  And editing is disabled while the operation is in progress
+  And when the attempt finishes the indicator disappears
+  And the error that occurred is notified
+  And editing is re-enabled and deletion is available again
+```
 
 ## Out of Scope
 - Viewing the deleted items in the Trash page — US [US-005] Trash View (Browsing Interface)
@@ -261,7 +286,7 @@ Implementation of the "Soft Delete" logic on Lessons. The action changes the ent
 
 ## Risks
 - Risk that the entity remains selectable in old forms if the selection queries do not filter it out explicitly.
-```
+````
 
 **[END USER STORY ITERATION 2]**
 
@@ -282,7 +307,7 @@ Implementation of the "Soft Delete" logic on Lessons. The action changes the ent
   * **Testable:** Yes, by enrolling a user in a course it is possible to verify that the check appears during the deletion phase.
 * **Constraints check:** Handles the critical "active enrollments" rule for the enabled roles (Manager/Admin), who are shown a warning.
 
-```markdown
+````markdown
 ---
 id: US-003
 title: Deletion Confirmation for a Course in Use
@@ -304,24 +329,39 @@ Implementation of the check logic for Courses currently in use. The action preve
 ## Acceptance Criteria
 
 ### AC-1: Warning
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they are editing a Course with active enrollments
-**When** they perform the deletion
-**Then** a warning asking whether to proceed is shown
+
+```gherkin
+@US-003 @AC-1
+Scenario: Warning
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they are editing a Course with active enrollments
+  When they perform the deletion
+  Then a warning asking whether to proceed is shown
+```
 
 ### AC-2: Confirmation
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they have requested the deletion of a Course with active enrollments
-**And** the warning asking whether to proceed is displayed
-**When** they confirm the operation
-**Then** the deletion workflow proceeds
+
+```gherkin
+@US-003 @AC-2
+Scenario: Confirmation
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they have requested the deletion of a Course with active enrollments
+  And the warning asking whether to proceed is displayed
+  When they confirm the operation
+  Then the deletion workflow proceeds
+```
 
 ### AC-3: Refusal
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they have requested the deletion of a Course with active enrollments
-**And** the warning asking whether to proceed is displayed
-**When** they cancel the operation
-**Then** the deletion workflow is interrupted
+
+```gherkin
+@US-003 @AC-3
+Scenario: Refusal
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they have requested the deletion of a Course with active enrollments
+  And the warning asking whether to proceed is displayed
+  When they cancel the operation
+  Then the deletion workflow is interrupted
+```
 
 ## Out of Scope
 - Moving the Course to the trash (loading, success and error of the deletion) — US [US-001] Course Archiving (Move to Trash)
@@ -332,7 +372,7 @@ Implementation of the check logic for Courses currently in use. The action preve
 
 ## Additional Notes
 - The authorization constraints for using deletion are not altered
-```
+````
 
 **[END USER STORY ITERATION 3]**
 
@@ -353,7 +393,7 @@ Implementation of the check logic for Courses currently in use. The action preve
   * **Testable:** Yes, by enrolling a user in a lesson or in a course that references the lesson it is possible to verify that the check appears during the deletion phase.
 * **Constraints check:** Handles the critical "active enrollments" rule, differentiating between Editor (block) and Manager/Admin (alert).
 
-```markdown
+````markdown
 ---
 id: US-004
 title: Deletion Confirmation for a Lesson in Use
@@ -375,30 +415,50 @@ Implementation of the check logic for Lessons currently in use. The action preve
 ## Acceptance Criteria
 
 ### AC-1: Warning
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they are editing a Lesson with active enrollments
-**When** they perform the deletion
-**Then** a warning asking whether to proceed is shown
+
+```gherkin
+@US-004 @AC-1
+Scenario: Warning
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they are editing a Lesson with active enrollments
+  When they perform the deletion
+  Then a warning asking whether to proceed is shown
+```
 
 ### AC-2: Confirmation
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they have requested the deletion of a Lesson with active enrollments
-**And** the warning asking whether to proceed is displayed
-**When** they confirm the operation
-**Then** the deletion workflow proceeds
+
+```gherkin
+@US-004 @AC-2
+Scenario: Confirmation
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they have requested the deletion of a Lesson with active enrollments
+  And the warning asking whether to proceed is displayed
+  When they confirm the operation
+  Then the deletion workflow proceeds
+```
 
 ### AC-3: Refusal
-**Given** a user with advanced content management permissions (Manager, Admin)
-**And** they have requested the deletion of a Lesson with active enrollments
-**And** the warning asking whether to proceed is displayed
-**When** they cancel the operation
-**Then** the deletion workflow is interrupted
+
+```gherkin
+@US-004 @AC-3
+Scenario: Refusal
+  Given a user with advanced content management permissions (Manager, Admin)
+  And they have requested the deletion of a Lesson with active enrollments
+  And the warning asking whether to proceed is displayed
+  When they cancel the operation
+  Then the deletion workflow is interrupted
+```
 
 ### AC-4: Low-privilege handling
-**Given** a user without advanced content management permissions (Editor)
-**And** they are editing a Lesson with active enrollments
-**When** they perform the deletion
-**Then** a warning is shown without the possibility to proceed
+
+```gherkin
+@US-004 @AC-4
+Scenario: Low-privilege handling
+  Given a user without advanced content management permissions (Editor)
+  And they are editing a Lesson with active enrollments
+  When they perform the deletion
+  Then a warning is shown without the possibility to proceed
+```
 
 ## Out of Scope
 - Moving the Lesson to the trash (loading, success and error of the deletion) — US [US-002] Lesson Archiving (Move to Trash)
@@ -409,7 +469,7 @@ Implementation of the check logic for Lessons currently in use. The action preve
 
 ## Additional Notes
 - The authorization constraints for using deletion are not altered
-```
+````
 
 **[END USER STORY ITERATION 4]**
 
@@ -429,7 +489,7 @@ Implementation of the check logic for Lessons currently in use. The action preve
   * **Testable:** Yes (verify the list rendering).
 * **Constraints check:** Respects the read/write separation so as not to create a giant story. Does not impose the type of display (card, table, etc).
 
-```markdown
+````markdown
 ---
 id: US-005
 title: Trash View (Browsing Interface)
@@ -456,41 +516,66 @@ Creation of the "Trash" page, containing a list filtered according to the permis
 ## Acceptance Criteria
 
 ### AC-1: Access and Navigation
-**Given** a content manager user (Editor/Manager/Admin)
-**When** they open the application
-**Then** the "Trash" entry is available in the navigation
-**And** it leads to the list page of the deleted content.
+
+```gherkin
+@US-005 @AC-1
+Scenario: Access and Navigation
+  Given a content manager user (Editor/Manager/Admin)
+  When they open the application
+  Then the "Trash" entry is available in the navigation
+  And it leads to the list page of the deleted content
+```
 
 ### AC-2: Loading and List Filtered by Role (Data Privacy)
-**Given** a content manager user (Editor/Manager/Admin)
-**When** they access the Trash page
-**Then** a loading indicator is shown in place of the list
-**And** when data retrieval finishes the indicator disappears
-**And** the **Editor** sees only the deleted Lessons under their responsibility
-**And** the **Manager** sees the deleted Courses and Lessons under their responsibility (including those of their editors)
-**And** the **Admin** sees all the deleted entities in the system.
+
+```gherkin
+@US-005 @AC-2
+Scenario: Loading and List Filtered by Role (Data Privacy)
+  Given a content manager user (Editor/Manager/Admin)
+  When they access the Trash page
+  Then a loading indicator is shown in place of the list
+  And when data retrieval finishes the indicator disappears
+  And the **Editor** sees only the deleted Lessons under their responsibility
+  And the **Manager** sees the deleted Courses and Lessons under their responsibility (including those of their editors)
+  And the **Admin** sees all the deleted entities in the system
+```
 
 ### AC-3: Empty State
-**Given** a user who has no items in the trash
-**When** they access the Trash page
-**Then** a loading indicator is shown in place of the list
-**And** when data retrieval finishes the indicator disappears
-**And** they see an empty-state illustration or text: "The trash is empty".
+
+```gherkin
+@US-005 @AC-3
+Scenario: Empty State
+  Given a user who has no items in the trash
+  When they access the Trash page
+  Then a loading indicator is shown in place of the list
+  And when data retrieval finishes the indicator disappears
+  And they see an empty-state illustration or text: "The trash is empty"
+```
 
 ### AC-4: Loading error
-**Given** a content manager user (Editor/Manager/Admin)
-**And** the system is unable to retrieve the deleted content
-**When** they access the Trash page
-**Then** a loading indicator is shown in place of the list
-**And** when the attempt finishes the indicator disappears
-**And** an error message is shown in place of the list
-**And** an action to retry the loading is available.
+
+```gherkin
+@US-005 @AC-4
+Scenario: Loading error
+  Given a content manager user (Editor/Manager/Admin)
+  And the system is unable to retrieve the deleted content
+  When they access the Trash page
+  Then a loading indicator is shown in place of the list
+  And when the attempt finishes the indicator disappears
+  And an error message is shown in place of the list
+  And an action to retry the loading is available
+```
 
 ### AC-5: Loading retry
-**Given** a user viewing the Trash loading error
-**When** they retry the loading
-**Then** the system starts a new attempt
-**And** the loading indicator is shown again in place of the error.
+
+```gherkin
+@US-005 @AC-5
+Scenario: Loading retry
+  Given a user viewing the Trash loading error
+  When they retry the loading
+  Then the system starts a new attempt
+  And the loading indicator is shown again in place of the error
+```
 
 ## Out of Scope
 - Restoring an item from the Trash — US [US-006] Entity and Relation Restore (Un-delete)
@@ -502,7 +587,7 @@ Creation of the "Trash" page, containing a list filtered according to the permis
   - Type (distinctive Course/Lesson icon)
   - Deletion Date
   - **Enrollments**: Icon/Indicator if there are enrollments.
-```
+````
 
 **[END USER STORY ITERATION 5]**
 
@@ -522,7 +607,7 @@ Creation of the "Trash" page, containing a list filtered according to the permis
   * **Testable:** Yes.
 * **Constraints check:** Must handle restoring the relations.
 
-```markdown
+````markdown
 ---
 id: US-006
 title: Entity and Relation Restore (Un-delete)
@@ -544,24 +629,34 @@ Implementation of the "Restore" action in the Trash list. Handles the inverse st
 ## Acceptance Criteria
 
 ### AC-1: Restore
-**Given** an item in the Trash
-**When** the user restores the item
-**Then** a loading indicator is shown on the item
-**And** the user cannot interact with the item while the operation is in progress
-**And** when processing finishes the indicator disappears
-**And** the item is removed from the Trash list
-**And** it becomes visible again in the lists of the state it had before deletion
-**And** the system notifies the successful restore
+
+```gherkin
+@US-006 @AC-1
+Scenario: Restore
+  Given an item in the Trash
+  When the user restores the item
+  Then a loading indicator is shown on the item
+  And the user cannot interact with the item while the operation is in progress
+  And when processing finishes the indicator disappears
+  And the item is removed from the Trash list
+  And it becomes visible again in the lists of the state it had before deletion
+  And the system notifies the successful restore
+```
 
 ### AC-2: Restore error
-**Given** an item in the Trash
-**And** the system is unable to restore it
-**When** the user restores the item
-**Then** a loading indicator is shown on the item
-**And** the user cannot interact with the item while the operation is in progress
-**And** when the attempt finishes the indicator disappears
-**And** error feedback is shown
-**And** the user can interact with the item again and repeat the restore
+
+```gherkin
+@US-006 @AC-2
+Scenario: Restore error
+  Given an item in the Trash
+  And the system is unable to restore it
+  When the user restores the item
+  Then a loading indicator is shown on the item
+  And the user cannot interact with the item while the operation is in progress
+  And when the attempt finishes the indicator disappears
+  And error feedback is shown
+  And the user can interact with the item again and repeat the restore
+```
 
 ## Out of Scope
 - Browsing the Trash list the restore starts from — US [US-005] Trash View (Browsing Interface)
@@ -570,7 +665,7 @@ Implementation of the "Restore" action in the Trash list. Handles the inverse st
 
 ## Additional Notes
 - it is assumed that the state before deletion can be recovered
-```
+````
 
 **[END USER STORY ITERATION 6]**
 
@@ -590,7 +685,7 @@ Implementation of the "Restore" action in the Trash list. Handles the inverse st
   * **Testable:** Yes (the record must no longer exist either in the public lists or in the trash).
 * **Constraints check:** "Allows permanent removal... depending on the role". I assume the Editor can do it on their own items (as per the draft: "An editor user can delete a lesson...").
 
-```markdown
+````markdown
 ---
 id: US-007
 title: Permanent Deletion (Hard Delete)
@@ -612,25 +707,45 @@ Implementation of the final destructive action. The removed data will no longer 
 ## Acceptance Criteria
 
 ### AC-1: Irreversibility Warning (Safety Net)
-**Given** an item in the Trash list
-**When** the user requests the permanent deletion
-**Then** the system asks for an explicit confirmation that flags the operation as irreversible
+
+```gherkin
+@US-007 @AC-1
+Scenario: Irreversibility Warning (Safety Net)
+  Given an item in the Trash list
+  When the user requests the permanent deletion
+  Then the system asks for an explicit confirmation that flags the operation as irreversible
+```
 
 ### AC-2: Deletion Execution
-**Given** the user has confirmed the permanent deletion of an item
-**When** the process completes successfully
-**Then** the item is permanently removed
-**And** it disappears from the Trash list.
+
+```gherkin
+@US-007 @AC-2
+Scenario: Deletion Execution
+  Given the user has confirmed the permanent deletion of an item
+  When the process completes successfully
+  Then the item is permanently removed
+  And it disappears from the Trash list
+```
 
 ### AC-3: Visibility for Editor
-**Given** an Editor user
-**When** they access the trash
-**Then** they can permanently delete ONLY the Lessons under their responsibility.
+
+```gherkin
+@US-007 @AC-3
+Scenario: Visibility for Editor
+  Given an Editor user
+  When they access the trash
+  Then they can permanently delete ONLY the Lessons under their responsibility
+```
 
 ### AC-4: Visibility for Manager
-**Given** a Manager user
-**When** they access the trash
-**Then** they can permanently delete their own Courses and Lessons and those of their Editors.
+
+```gherkin
+@US-007 @AC-4
+Scenario: Visibility for Manager
+  Given a Manager user
+  When they access the trash
+  Then they can permanently delete their own Courses and Lessons and those of their Editors
+```
 
 ## Out of Scope
 - Browsing the Trash list the deletion starts from — US [US-005] Trash View (Browsing Interface)
@@ -643,7 +758,7 @@ Implementation of the final destructive action. The removed data will no longer 
 
 ## Risks
 - **Relation Integrity:** If a Course is permanently deleted, make sure the associated Lessons are not left with broken references.
-```
+````
 
 **[END USER STORY ITERATION 7]**
 
@@ -680,7 +795,7 @@ All the requirements of the draft (Buttons, Menu, List fields, Role assumptions,
 ### [SUMMARY]
 
 The 7 User Stories listed in the final check, in that order, are ready for the backlog, respecting the declared `BLOCKED_BY` relations: first the Course and Lesson archiving, then the two deletion confirmations, then the Trash view, the restore and the permanent deletion. The `US-00x` ids are local and permanent within this example.
-````
+`````
 
 ---
 
@@ -696,7 +811,7 @@ as an area manager user, I want to be able to change the assignments of the stor
 
 ### Expected output
 
-````markdown
+`````markdown
 # Phase 1: MACRO-ANALYSIS
 
 * **Request:** An "Area Manager" user must be able to reassign "Stores" (retail outlets) among their own "Reps" (sales representatives), specifying a start-of-validity date for the new assignment. Following this reassignment, the original Rep must keep read-only access to the history of the visits made to that store, but the system must prevent them from recording new visits from the effective date of the reassignment.
@@ -721,7 +836,7 @@ as an area manager user, I want to be able to change the assignments of the stor
   * Is it testable? Yes.
 * **Constraints check:** Respects the rule of isolating the View from the Action.
 
-```markdown
+````markdown
 ---
 id: US-001
 title: Store-Rep Assignments View
@@ -737,40 +852,60 @@ Creation of an interface that lists the active relations between the Reps manage
 ## Acceptance Criteria
 
 ### AC-1: List Browsing
-**Given** an Area Manager user
-**When** they access the territory management section
-**Then** a loading indicator is shown
-**And** when data retrieval finishes the indicator disappears
-**And** they see the list of the Reps under their responsibility
-**And** for each Rep, they can see the Stores currently assigned.
+
+```gherkin
+@US-001 @AC-1
+Scenario: List Browsing
+  Given an Area Manager user
+  When they access the territory management section
+  Then a loading indicator is shown
+  And when data retrieval finishes the indicator disappears
+  And they see the list of the Reps under their responsibility
+  And for each Rep, they can see the Stores currently assigned
+```
 
 ### AC-2: No Data (Empty State)
-**Given** an Area Manager user
-**And** there are no assignments between Reps and Stores
-**When** they access the territory management section
-**Then** a loading indicator is shown
-**And** when data retrieval finishes the indicator disappears
-**And** they see an empty-state message indicating the absence of data ("No assignments found").
+
+```gherkin
+@US-001 @AC-2
+Scenario: No Data (Empty State)
+  Given an Area Manager user
+  And there are no assignments between Reps and Stores
+  When they access the territory management section
+  Then a loading indicator is shown
+  And when data retrieval finishes the indicator disappears
+  And they see an empty-state message indicating the absence of data ("No assignments found")
+```
 
 ### AC-3: Loading Error
-**Given** an Area Manager user
-**And** the system is unable to retrieve the assignment matrix
-**When** they access the territory management section
-**Then** a loading indicator is shown
-**And** when the attempt finishes the indicator disappears
-**And** an error message is shown ("Unable to load the assignments")
-**And** an action to retry the loading is present.
+
+```gherkin
+@US-001 @AC-3
+Scenario: Loading Error
+  Given an Area Manager user
+  And the system is unable to retrieve the assignment matrix
+  When they access the territory management section
+  Then a loading indicator is shown
+  And when the attempt finishes the indicator disappears
+  And an error message is shown ("Unable to load the assignments")
+  And an action to retry the loading is present
+```
 
 ### AC-4: Loading retry
-**Given** an Area Manager user viewing the assignments loading error
-**When** they retry the loading
-**Then** the system starts a new attempt
-**And** the loading indicator is shown again in place of the error.
+
+```gherkin
+@US-001 @AC-4
+Scenario: Loading retry
+  Given an Area Manager user viewing the assignments loading error
+  When they retry the loading
+  Then the system starts a new attempt
+  And the loading indicator is shown again in place of the error
+```
 
 ## Out of Scope
 - Reassigning a Store to another Rep — US [US-002] Store Reassignment with Effective Date (Area Manager)
 - Deleting an assignment — not planned
-```
+````
 
 **[END USER STORY ITERATION 1]**
 
@@ -789,7 +924,7 @@ Creation of an interface that lists the active relations between the Reps manage
   * Is it testable? Yes, the time limits can be simulated in the tests.
 * **Constraints check:** The BDD criteria explicitly map success, error and loading, as well as the temporal validation.
 
-```markdown
+````markdown
 ---
 id: US-002
 title: Store Reassignment with Effective Date (Area Manager)
@@ -811,45 +946,65 @@ Implementation of the transactional logic that historically closes the previous 
 ## Acceptance Criteria
 
 ### AC-1: Reassignment Entry
-**Given** an Area Manager user
-**When** they choose to reassign a Store in the assignments list
-**Then** the system requires the selection of the new destination Rep
-**And** requires entering a "New visibility start date".
+
+```gherkin
+@US-002 @AC-1
+Scenario: Reassignment Entry
+  Given an Area Manager user
+  When they choose to reassign a Store in the assignments list
+  Then the system requires the selection of the new destination Rep
+  And requires entering a "New visibility start date"
+```
 
 ### AC-2: Date Validation
-**Given** an Area Manager user
-**When** they enter a "Start date" earlier than today's date
-**Then** the system blocks the operation
-**And** shows a validation error ("The start date cannot be in the past").
+
+```gherkin
+@US-002 @AC-2
+Scenario: Date Validation
+  Given an Area Manager user
+  When they enter a "Start date" earlier than today's date
+  Then the system blocks the operation
+  And shows a validation error ("The start date cannot be in the past")
+```
 
 ### AC-3: Transaction Success
-**Given** an Area Manager user
-**And** the reassignment form is filled in correctly
-**When** they confirm the save
-**Then** the system shows a loading indicator
-**And** the form controls are disabled to prevent double submissions
-**And** when processing finishes the indicator disappears
-**And** the successful reassignment is notified
-**And** the interface leaves edit mode
-**And** the assignments list updates to reflect the future/current state.
+
+```gherkin
+@US-002 @AC-3
+Scenario: Transaction Success
+  Given an Area Manager user
+  And the reassignment form is filled in correctly
+  When they confirm the save
+  Then the system shows a loading indicator
+  And the form controls are disabled to prevent double submissions
+  And when processing finishes the indicator disappears
+  And the successful reassignment is notified
+  And the interface leaves edit mode
+  And the assignments list updates to reflect the future/current state
+```
 
 ### AC-4: Save error
-**Given** an Area Manager user
-**And** the reassignment form is filled in correctly
-**And** the system is unable to save the reassignment
-**When** they confirm the save
-**Then** the system shows a loading indicator
-**And** the form controls are disabled to prevent double submissions
-**And** when the attempt finishes the indicator disappears
-**And** an error notification is shown
-**And** the form controls are re-enabled with the entered data, so that the Area Manager can correct them and confirm again.
+
+```gherkin
+@US-002 @AC-4
+Scenario: Save error
+  Given an Area Manager user
+  And the reassignment form is filled in correctly
+  And the system is unable to save the reassignment
+  When they confirm the save
+  Then the system shows a loading indicator
+  And the form controls are disabled to prevent double submissions
+  And when the attempt finishes the indicator disappears
+  And an error notification is shown
+  And the form controls are re-enabled with the entered data, so that the Area Manager can correct them and confirm again
+```
 
 ## Out of Scope
 - Browsing the current assignments the reassignment starts from — US [US-001] Store-Rep Assignments View
 - The former Rep's access to the past visits to the reassigned Store — US [US-003] Visit History for Previously Assigned Stores (Rep)
 - Blocking the former Rep from entering new visits after the effective date — US [US-004] Block on New Visits to Reassigned Stores (Rep)
 - Notifying the Rep when a Store is reassigned — not planned (raised as an open question in the summary)
-```
+````
 
 **[END USER STORY ITERATION 2]**
 
@@ -867,7 +1022,7 @@ Implementation of the transactional logic that historically closes the previous 
   * Is it testable? Yes, by logging in with a Rep account.
 * **Constraints check:** Avoids describing *how* the UI is built, describes only the behaviour.
 
-```markdown
+````markdown
 ---
 id: US-003
 title: Visit History for Previously Assigned Stores (Rep)
@@ -883,15 +1038,25 @@ Adjustment of the Rep's visit filters and searches, ensuring that the history li
 ## Acceptance Criteria
 
 ### AC-1: History Access
-**Given** a Rep user
-**When** they access their own visit archive or history
-**Then** the list includes the visits made to the Stores currently assigned
-**And** includes the visits made in the past to the Stores no longer assigned.
+
+```gherkin
+@US-003 @AC-1
+Scenario: History Access
+  Given a Rep user
+  When they access their own visit archive or history
+  Then the list includes the visits made to the Stores currently assigned
+  And includes the visits made in the past to the Stores no longer assigned
+```
 
 ### AC-2: Search for Former Stores
-**Given** a Rep user
-**When** they use the history search or filters
-**Then** they can search for and find the visits by the Store's name, even if the Store has been reassigned to someone else.
+
+```gherkin
+@US-003 @AC-2
+Scenario: Search for Former Stores
+  Given a Rep user
+  When they use the history search or filters
+  Then they can search for and find the visits by the Store's name, even if the Store has been reassigned to someone else
+```
 
 ## Out of Scope
 - Opening the detail of a historical visit from the list — not planned (the visit detail already exists and this request does not change it)
@@ -901,7 +1066,7 @@ Adjustment of the Rep's visit filters and searches, ensuring that the history li
 ## Assumptions
 - It is assumed that the Rep must see only the visits made *by them* in the past, not those made by the new Rep who took over the Store.
 - The detail of the single visit already exists and does not change with this request: opening a historical visit from the list and any restriction of the commands on the detail are outside this story, which covers only browsing the list.
-```
+````
 
 **[END USER STORY ITERATION 3]**
 
@@ -919,7 +1084,7 @@ Adjustment of the Rep's visit filters and searches, ensuring that the history li
   * Is it testable? Absolutely, by testing the temporal transition.
 * **Constraints check:** Handles the key temporal variable of the request ("from the date I specify as the start"). No phantom UI: the non-selectable Store simply does not appear, it is not shown as disabled.
 
-```markdown
+````markdown
 ---
 id: US-004
 title: Block on New Visits to Reassigned Stores (Rep)
@@ -941,30 +1106,45 @@ Restriction of the Store selection when creating a new visit based on the effect
 ## Acceptance Criteria
 
 ### AC-1: Store not selectable (Effective Date Reached)
-**Given** a Rep user
-**And** a Store reassigned to another Rep with an effective date already reached
-**When** they plan a new visit
-**Then** the Store does not appear among the selectable ones.
+
+```gherkin
+@US-004 @AC-1
+Scenario: Store not selectable (Effective Date Reached)
+  Given a Rep user
+  And a Store reassigned to another Rep with an effective date already reached
+  When they plan a new visit
+  Then the Store does not appear among the selectable ones
+```
 
 ### AC-2: Store still selectable (Future Effective Date)
-**Given** a Rep user
-**And** a Store reassigned to another Rep with a future effective date
-**When** they plan a new visit
-**Then** the Store is regularly selectable
-**And** the visit can be saved.
+
+```gherkin
+@US-004 @AC-2
+Scenario: Store still selectable (Future Effective Date)
+  Given a Rep user
+  And a Store reassigned to another Rep with a future effective date
+  When they plan a new visit
+  Then the Store is regularly selectable
+  And the visit can be saved
+```
 
 ### AC-3: Block on entering a visit beyond the effective date
-**Given** a Rep user
-**And** a Store reassigned to another Rep with a future effective date
-**And** they have selected the Store for a new visit
-**When** they enter a visit date later than the effective date
-**Then** the system rejects the request
+
+```gherkin
+@US-004 @AC-3
+Scenario: Block on entering a visit beyond the effective date
+  Given a Rep user
+  And a Store reassigned to another Rep with a future effective date
+  And they have selected the Store for a new visit
+  When they enter a visit date later than the effective date
+  Then the system rejects the request
+```
 
 ## Out of Scope
 - Reassigning the Store and setting the effective date — US [US-002] Store Reassignment with Effective Date (Area Manager)
 - Browsing the past visits to the Stores no longer assigned — US [US-003] Visit History for Previously Assigned Stores (Rep)
 - Showing reassigned Stores as disabled in the selection — not planned (they simply do not appear)
-```
+````
 
 **[END USER STORY ITERATION 4]**
 
@@ -989,7 +1169,7 @@ The following 4 User Stories are ready for technical refinement and insertion in
 4. US [US-004] Block on New Visits to Reassigned Stores (Rep)
 
 Do you agree with the temporal handling (edge case) described in the block on new visits, where the future assignment lets the current Rep keep working until the day of the actual change? Do you need to extract further notification logic (e.g. sending a notification to the Rep when a store is reassigned)?
-````
+`````
 
 ---
 
@@ -1005,7 +1185,7 @@ as a salesperson, I must be able to start the synchronization of the application
 
 ### Expected output
 
-````markdown
+`````markdown
 # Phase 1: MACRO-ANALYSIS
 
 * **Request:** Implement a manual synchronization feature for the offline data for salespeople, including a business rule that blocks the application's operations if the data stored on the device turns out to be older than 3 days.
@@ -1024,7 +1204,7 @@ as a salesperson, I must be able to start the synchronization of the application
 * **INVEST Criteria Check:** Fully respects the criteria; it is a standalone feature, estimable and objectively verifiable by simulating the connection conditions.
 * **Constraints check:** Compliant. Separates the update action from the blocking rules (which will go in the next US).
 
-```markdown
+````markdown
 ---
 id: US-001
 title: Manual Offline Data Synchronization
@@ -1040,29 +1220,44 @@ Implementation of the feature for manually starting the update of the local data
 ## Acceptance Criteria
 
 ### AC-1: Synchronization Completed Successfully
-**Given** a Salesperson user
-**When** they request to start the data synchronization
-**Then** the system shows a loading indicator
-**And** temporarily disables the synchronization command to avoid multiple starts
-**And** when the update of the local database finishes the indicator disappears
-**And** updates the "Last update date and time" visible to the user
-**And** shows a success notification.
+
+```gherkin
+@US-001 @AC-1
+Scenario: Synchronization Completed Successfully
+  Given a Salesperson user
+  When they request to start the data synchronization
+  Then the system shows a loading indicator
+  And temporarily disables the synchronization command to avoid multiple starts
+  And when the update of the local database finishes the indicator disappears
+  And updates the "Last update date and time" visible to the user
+  And shows a success notification
+```
 
 ### AC-2: Synchronization error
-**Given** a Salesperson user
-**And** the system is unable to complete the synchronization
-**When** they request to start the data synchronization
-**Then** the system shows a loading indicator
-**And** temporarily disables the synchronization command to avoid multiple starts
-**And** when the attempt finishes the indicator disappears
-**And** shows an error message ("Unable to synchronize the data. Try again later.")
-**And** re-enables the synchronization command to allow a new attempt.
+
+```gherkin
+@US-001 @AC-2
+Scenario: Synchronization error
+  Given a Salesperson user
+  And the system is unable to complete the synchronization
+  When they request to start the data synchronization
+  Then the system shows a loading indicator
+  And temporarily disables the synchronization command to avoid multiple starts
+  And when the attempt finishes the indicator disappears
+  And shows an error message ("Unable to synchronize the data. Try again later.")
+  And re-enables the synchronization command to allow a new attempt
+```
 
 ### AC-3: No Connection at Start
-**Given** a Salesperson user without a connection (offline)
-**When** they try to start the data synchronization
-**Then** the system blocks the request instantly
-**And** shows a warning ("No internet connection. Connect to synchronize").
+
+```gherkin
+@US-001 @AC-3
+Scenario: No Connection at Start
+  Given a Salesperson user without a connection (offline)
+  When they try to start the data synchronization
+  Then the system blocks the request instantly
+  And shows a warning ("No internet connection. Connect to synchronize")
+```
 
 ## Out of Scope
 - Blocking the app when the local data is older than 72 hours — US [US-002] Operations Block for Stale Data (Over 3 Days)
@@ -1074,7 +1269,7 @@ Implementation of the feature for manually starting the update of the local data
 
 ## Risks
 - Possible bottlenecks if many salespeople synchronize large volumes of data at the same time (consider an incremental synchronization).
-```
+````
 
 **[END USER STORY ITERATION 1]**
 
@@ -1090,7 +1285,7 @@ Implementation of the feature for manually starting the update of the local data
 * **INVEST Criteria Check:** Independent of the manual trigger, provides compliance value, small and highly testable by manipulating the date of the last synchronization.
 * **Constraints check:** Compliant. Explicitly handles the "3 days" temporal variable stated in the request, made measurable as 72 hours.
 
-```markdown
+````markdown
 ---
 id: US-002
 title: Operations Block for Stale Data (Over 3 Days)
@@ -1112,23 +1307,38 @@ Implementation of a check, when the app is opened or resumed, that verifies the 
 ## Acceptance Criteria
 
 ### AC-1: Stale Data Detection (Hard Stop)
-**Given** a Salesperson user who opens or resumes the application
-**When** the system detects that the last data update happened more than 72 hours (3 days) ago
-**Then** the standard operational interface is blocked in a way that cannot be dismissed
-**And** a blocking message is shown ("Stale data. You must synchronize to keep working")
-**And** a single possible action is offered: "Sync Now".
+
+```gherkin
+@US-002 @AC-1
+Scenario: Stale Data Detection (Hard Stop)
+  Given a Salesperson user who opens or resumes the application
+  When the system detects that the last data update happened more than 72 hours (3 days) ago
+  Then the standard operational interface is blocked in a way that cannot be dismissed
+  And a blocking message is shown ("Stale data. You must synchronize to keep working")
+  And a single possible action is offered: "Sync Now"
+```
 
 ### AC-2: Unblock After Synchronization
-**Given** a Salesperson user
-**And** the application is blocked because of stale data
-**When** they successfully perform the mandatory synchronization
-**Then** the operational block is removed
-**And** the user is redirected to the dashboard or to the standard workflow.
+
+```gherkin
+@US-002 @AC-2
+Scenario: Unblock After Synchronization
+  Given a Salesperson user
+  And the application is blocked because of stale data
+  When they successfully perform the mandatory synchronization
+  Then the operational block is removed
+  And the user is redirected to the dashboard or to the standard workflow
+```
 
 ### AC-3: Valid Data (No Block)
-**Given** a Salesperson user who opens the application
-**When** the system detects that the last update happened within 72 hours
-**Then** the user regularly accesses all the operational features without interruptions.
+
+```gherkin
+@US-002 @AC-3
+Scenario: Valid Data (No Block)
+  Given a Salesperson user who opens the application
+  When the system detects that the last update happened within 72 hours
+  Then the user regularly accesses all the operational features without interruptions
+```
 
 ## Out of Scope
 - The synchronization itself (trigger, loading, success, error and offline handling) — US [US-001] Manual Offline Data Synchronization
@@ -1137,7 +1347,7 @@ Implementation of a check, when the app is opened or resumed, that verifies the 
 ## Assumptions
 - The calculation of the 3 days (72 hours) is based on the device's system time, which is assumed to be aligned with the network.
 - The blocked state inhibits entering new orders/customers, but does not destroy any drafts previously saved locally.
-```
+````
 
 **[END USER STORY ITERATION 2]**
 
@@ -1158,7 +1368,7 @@ The following 2 User Stories are structured, deterministic and ready for the spr
 
 1. US [US-001] Manual Offline Data Synchronization
 2. US [US-002] Operations Block for Stale Data (Over 3 Days)
-````
+`````
 
 ---
 
@@ -1183,12 +1393,12 @@ The configuration (API Key, List ID) must be retrieved through environment varia
 
 ### Expected output (turn 1) — DO NOT generate
 
-````markdown
+`````markdown
 This request is a Horizontal Slicing strongly oriented towards architecture. Answer these questions so that I can proceed:
 
 1. What is the functional value for which this technical solution was described?
 2. Who is the User Persona? The Visitor User (for the subscription) or someone else?
-````
+`````
 
 ### User input (turn 2)
 
@@ -1199,7 +1409,7 @@ This request is a Horizontal Slicing strongly oriented towards architecture. Ans
 
 ### Expected output (turn 2)
 
-````markdown
+`````markdown
 # Phase 1: MACRO-ANALYSIS
 
 * **Request:** Implementation of a specific section in the Homepage that allows subscribing to the newsletter. The feature must be accessible both to logged-in users and to anonymous visitors. The business goal is lead acquisition for commercial purposes.
@@ -1222,7 +1432,7 @@ This request is a Horizontal Slicing strongly oriented towards architecture. Ans
   * **Testable:** Yes, by entering an email in the form and checking the response.
 * **Constraints check:** Avoids prescriptive UI but defines the asynchronous behaviours.
 
-```markdown
+````markdown
 ---
 id: US-001
 title: Newsletter Subscription on the Homepage
@@ -1238,27 +1448,42 @@ Implementation of the "Newsletter" section on the Homepage.
 ## Acceptance Criteria
 
 ### AC-1: Display and Access
-**Given** a user browsing the Homepage
-**When** they scroll the page down to the newsletter section
-**Then** they see a field for entering the email and a confirmation command.
+
+```gherkin
+@US-001 @AC-1
+Scenario: Display and Access
+  Given a user browsing the Homepage
+  When they scroll the page down to the newsletter section
+  Then they see a field for entering the email and a confirmation command
+```
 
 ### AC-2: Successful subscription
-**Given** a user who has entered a valid email address
-**When** they confirm the subscription
-**Then** the system shows a loading indicator
-**And** the confirmation command cannot be triggered again while the operation is in progress
-**And** when processing finishes the indicator disappears
-**And** a success message ("Thanks for subscribing!") is shown in place of the form.
+
+```gherkin
+@US-001 @AC-2
+Scenario: Successful subscription
+  Given a user who has entered a valid email address
+  When they confirm the subscription
+  Then the system shows a loading indicator
+  And the confirmation command cannot be triggered again while the operation is in progress
+  And when processing finishes the indicator disappears
+  And a success message ("Thanks for subscribing!") is shown in place of the form
+```
 
 ### AC-3: Error handling
-**Given** a user who has entered a valid email address
-**And** the system is unable to register the subscription
-**When** they confirm the subscription
-**Then** the system shows a loading indicator
-**And** the confirmation command cannot be triggered again while the operation is in progress
-**And** when the attempt finishes the indicator disappears
-**And** a temporary error notification is shown
-**And** the confirmation command is available again, with the entered email, without reloading the page.
+
+```gherkin
+@US-001 @AC-3
+Scenario: Error handling
+  Given a user who has entered a valid email address
+  And the system is unable to register the subscription
+  When they confirm the subscription
+  Then the system shows a loading indicator
+  And the confirmation command cannot be triggered again while the operation is in progress
+  And when the attempt finishes the indicator disappears
+  And a temporary error notification is shown
+  And the confirmation command is available again, with the entered email, without reloading the page
+```
 
 ## Out of Scope
 - A standalone technical story for the newsletter library (Provider/Adapter) — not planned (its architectural constraints live in the Additional Notes of this story)
@@ -1272,7 +1497,7 @@ The configuration (API Key, List ID) of the concrete provider must be retrieved 
 
 ## Assumptions
 - It is assumed that the user must explicitly accept the privacy terms through a control (checkbox) before submitting.
-```
+````
 
 **[END USER STORY ITERATION 1]**
 
@@ -1291,7 +1516,7 @@ This split avoids creating a pure "technical User Story" (horizontal slicing) an
 The final stories ready for the development cycle use local ids that remain permanent within this example:
 
 1. US [US-001] Newsletter Subscription on the Homepage (UX Focus and Business Value)
-````
+`````
 
 ---
 
@@ -1339,7 +1564,7 @@ Then the system must register the user's interest in that specific product in th
 
 ### Expected output
 
-````markdown
+`````markdown
 # Phase 1: MACRO-ANALYSIS
 
 ... (omitted for brevity: Request and Working criterion as in the previous examples) ...
@@ -1356,7 +1581,7 @@ Then the system must register the user's interest in that specific product in th
 * **INVEST Criteria Check:** Respects independence and value.
 * **Constraints check:** Despite the number of scenarios (7), the story is not split in order to preserve atomic integrity: separating the display of the form from the submission of the metadata would leave the story without releasable value.
 
-```markdown
+````markdown
 ---
 id: US-001
 title: Subscription to "Notify Me" with Marketing Metadata Synchronization
@@ -1372,47 +1597,82 @@ Implementation of the lead capture module in the PDP with automated submission o
 ## Acceptance Criteria
 
 ### AC-1: Conditional Display
-**Given** a user on the product page
-**When** the status is "Sold Out" or "Coming Soon"
-**Then** the "Keep me updated" box appears with the Name, Email and Privacy fields.
+
+```gherkin
+@US-001 @AC-1
+Scenario: Conditional Display
+  Given a user on the product page
+  When the status is "Sold Out" or "Coming Soon"
+  Then the "Keep me updated" box appears with the Name, Email and Privacy fields
+```
 
 ### AC-2: Validation and Consent
-**Given** the filled-in module
-**When** the user confirms the submission without having accepted the Privacy Policy
-**Then** the system prevents the submission and shows a validation error.
+
+```gherkin
+@US-001 @AC-2
+Scenario: Validation and Consent
+  Given the filled-in module
+  When the user confirms the submission without having accepted the Privacy Policy
+  Then the system prevents the submission and shows a validation error
+```
 
 ### AC-3: Metadata Synchronization
-**Given** a submission in progress
-**When** the system registers the interest with the marketing provider
-**Then** it sends the email with the product Tags and the metadata: ID, Title, Image URL, Description, Category, Status and Product URL.
+
+```gherkin
+@US-001 @AC-3
+Scenario: Metadata Synchronization
+  Given a submission in progress
+  When the system registers the interest with the marketing provider
+  Then it sends the email with the product Tags and the metadata: ID, Title, Image URL, Description, Category, Status and Product URL
+```
 
 ### AC-4: Price Formatting
-**Given** the product metadata
-**When** the price field is sent
-**Then** the value must be transmitted as a pure number (without currency symbols).
+
+```gherkin
+@US-001 @AC-4
+Scenario: Price Formatting
+  Given the product metadata
+  When the price field is sent
+  Then the value must be transmitted as a pure number (without currency symbols)
+```
 
 ### AC-5: Existing User Handling (Deduplication)
-**Given** an email already present in the marketing database
-**When** the user signs up for a new product
-**Then** the system updates the existing record by adding the new Tag without overwriting the previous ones.
+
+```gherkin
+@US-001 @AC-5
+Scenario: Existing User Handling (Deduplication)
+  Given an email already present in the marketing database
+  When the user signs up for a new product
+  Then the system updates the existing record by adding the new Tag without overwriting the previous ones
+```
 
 ### AC-6: Success Feedback
-**Given** valid data
-**When** the user confirms the submission
-**Then** a loading indicator is shown
-**And** the module fields are disabled while the operation is in progress
-**And** when processing finishes the indicator disappears
-**And** the module disappears and a thank-you message appears.
+
+```gherkin
+@US-001 @AC-6
+Scenario: Success Feedback
+  Given valid data
+  When the user confirms the submission
+  Then a loading indicator is shown
+  And the module fields are disabled while the operation is in progress
+  And when processing finishes the indicator disappears
+  And the module disappears and a thank-you message appears
+```
 
 ### AC-7: Submission Error
-**Given** valid data
-**And** the system is unable to register the interest
-**When** the user confirms the submission
-**Then** a loading indicator is shown
-**And** the module fields are disabled while the operation is in progress
-**And** when the attempt finishes the indicator disappears
-**And** an error message is shown
-**And** the fields become editable again and the submission is available again.
+
+```gherkin
+@US-001 @AC-7
+Scenario: Submission Error
+  Given valid data
+  And the system is unable to register the interest
+  When the user confirms the submission
+  Then a loading indicator is shown
+  And the module fields are disabled while the operation is in progress
+  And when the attempt finishes the indicator disappears
+  And an error message is shown
+  And the fields become editable again and the submission is available again
+```
 
 ## Out of Scope
 - Sending the back-in-stock marketing email when the product becomes available again — not planned (marketing builds it from the metadata sent by this story)
@@ -1420,7 +1680,7 @@ Implementation of the lead capture module in the PDP with automated submission o
 ## Additional Notes
 - Use the existing "Newsletter" list on MailHub.
 - Verify the correct mapping of the merge fields on the MailHub side before development.
-```
+````
 
 **[END USER STORY ITERATION 1]**
 
@@ -1433,4 +1693,4 @@ The story exceeds the 2-5 scenario rule but is not split: every split tried prod
 ### [SUMMARY]
 
 1. US [US-001] Subscription to "Notify Me" with Marketing Metadata Synchronization
-````
+`````

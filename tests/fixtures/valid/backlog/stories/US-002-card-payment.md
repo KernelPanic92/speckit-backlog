@@ -26,11 +26,32 @@ An accepted payment creates exactly one confirmed order.
 
 ### AC-1: Card accepted
 
-Given a payable order and valid card, When I confirm payment, Then a loading indicator appears and confirmation is disabled until processing completes, then the indicator disappears and I see one order confirmation.
+```gherkin
+@US-002 @AC-1
+Scenario: Card accepted
+  Given a payable order
+  And a valid card
+  When I confirm payment
+  Then a loading indicator appears
+  And confirmation is disabled until processing completes
+  And the indicator disappears
+  And I see one order confirmation
+```
 
 ### AC-2: Card declined
 
-Given a card that will be declined, When I confirm payment, Then a loading indicator appears and confirmation is disabled until processing completes, then the indicator disappears and I see an error with my entries retained and confirmation enabled.
+```gherkin
+@US-002 @AC-2
+Scenario: Card declined
+  Given a card that will be declined
+  When I confirm payment
+  Then a loading indicator appears
+  And confirmation is disabled until processing completes
+  And the indicator disappears
+  And I see an error
+  And my entries are retained
+  And confirmation is enabled again
+```
 
 ## Out of Scope
 

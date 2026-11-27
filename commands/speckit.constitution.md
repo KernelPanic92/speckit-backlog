@@ -94,7 +94,7 @@ URLs or paths.
 record of changes; the rationale of a change goes in the commit message. If an existing document contains
 such fields, remove them and mention it in the summary.
 
-Durable architectural and technology choices made during delivery belong in atomic ADRs under `docs/adr/`, not in an ever-growing `constitution.md`.
+Durable architectural and technology choices made during delivery belong in atomic ADRs under `docs/architecture/adr/`, not in an ever-growing `constitution.md`.
 
 Follow this execution flow:
 
