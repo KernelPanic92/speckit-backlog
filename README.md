@@ -151,7 +151,8 @@ uv run --no-project --quiet --with pyyaml --with jsonschema \
 | `render-index` | Rebuild the central `backlog/index.md`. |
 | `render-spec <spec-dir>` | Render a specification's central backlog block. |
 | `render-tasks <spec-dir>` | Reconcile the rendered task schedule and `[P]` markers. |
-| `check` | Validate PBI structure, relations, links, and generated artifacts. |
+| `check` | Validate PBI structure, relations, links, Gherkin acceptance criteria, and generated artifacts. |
+| `export-features <spec-dir> <out-dir>` | Write one Gherkin `.feature` file per user story in the spec's scope (`<out-dir>` is relative to the project root). |
 
 The CLI emits JSON and returns a non-zero exit status when a command cannot complete or validation finds errors.
 

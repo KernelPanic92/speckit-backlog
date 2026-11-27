@@ -37,11 +37,16 @@ As a {{Persona}}, I want {{Action/Goal}}, so that {{Value}}.
 
 ## Acceptance Criteria
 
+<!-- One "### AC-n: Title" heading per scenario, numbered from AC-1 without gaps, each followed by exactly one fenced gherkin block holding one Scenario (or one Scenario Outline with its Examples). The first line of the block tags the scenario with this story's id and the heading number (@US-001 @AC-1); the Scenario title repeats the heading title. Chain extra contexts or outcomes with And/But, never a second When. Every block maps one to one onto a .feature file scenario (scripts/backlog.py export-features). -->
 ### AC-1: {{acceptance.title}}
 
-**Given** {{context or initial state}}
-**When** {{action performed}}
-**Then** {{observable or measurable result}}
+```gherkin
+@{{id}} @AC-1
+Scenario: {{acceptance.title}}
+  Given {{context or initial state}}
+  When {{action performed}}
+  Then {{observable or measurable result}}
+```
 
 ## Out of Scope
 

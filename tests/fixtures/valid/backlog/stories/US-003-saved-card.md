@@ -26,11 +26,27 @@ Returning shoppers complete a purchase without entering a card number.
 
 ### AC-1: Saved card accepted
 
-Given my saved card, When I confirm payment, Then a loading indicator appears and confirmation is disabled until processing completes, then the indicator disappears and I receive an order confirmation.
+```gherkin
+@US-003 @AC-1
+Scenario: Saved card accepted
+  Given my saved card
+  When I confirm payment
+  Then a loading indicator appears
+  And confirmation is disabled until processing completes
+  And the indicator disappears
+  And I receive an order confirmation
+```
 
 ### AC-2: Saved card expired
 
-Given my saved card has expired, When I open payment, Then I see that the saved card is unavailable and can enter a replacement.
+```gherkin
+@US-003 @AC-2
+Scenario: Saved card expired
+  Given my saved card has expired
+  When I open payment
+  Then I see that the saved card is unavailable
+  But I can enter a replacement card
+```
 
 ## Out of Scope
 

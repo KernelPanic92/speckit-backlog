@@ -195,8 +195,21 @@ FIRST look for the user personas, the business context and the domain terms in `
 
 ### 3. BDD ACCEPTANCE CRITERIA
 
-- **Strict format:** Gherkin syntax — `Given [context], When [action], Then [observable result]`. *Choice of these rules:* we ALWAYS use the Gherkin format for the Acceptance Criteria, even where the literature (e.g. Scrum Alliance) would allow bullet-point checklists for simple and linear requirements.
+- **Strict format:** real Gherkin — one step per line, `Given [context]`, `When [action]`, `Then [observable result]`, chained with `And`/`But`. *Choice of these rules:* we ALWAYS use the Gherkin format for the Acceptance Criteria, even where the literature (e.g. Scrum Alliance) would allow bullet-point checklists for simple and linear requirements.
 - **Stable scenario ids:** in the template's `## Acceptance Criteria` section every scenario has the heading `### AC-1: <title>`, numbered per PBI starting at 1; when tracing, cite a scenario as `US-001/AC-1` followed by its title, `US-001/AC-1 "Card declined"` (see "Readable references").
+- **One fenced block per scenario:** in a User Story every `### AC-n: <title>` heading is followed by exactly one fenced `gherkin` block holding exactly one `Scenario`, or one `Scenario Outline` with its `Examples` when the same behaviour only varies by data. The block starts with the tags `@<story id> @AC-n` (e.g. `@US-001 @AC-2`), matching the story id and the heading number, and the `Scenario` title repeats the heading title. No `Feature`, `Rule` or `Background` inside the block: the story is the Feature. Each block becomes one scenario of the story's `.feature` file (`scripts/backlog.py export-features`); `scripts/backlog.py check` enforces the structure (`ac-gherkin-missing`, `ac-gherkin-scenario`, `ac-gherkin-steps`, `ac-gherkin-tags`; `ac-gherkin-title` as a warning). Example and the reference rules in `references/bdd-cucumber.md` ("In a story of this backlog"):
+
+  ````markdown
+  ### AC-1: Empty catalog
+
+  ```gherkin
+  @US-001 @AC-1
+  Scenario: Empty catalog
+    Given no available products
+    When I open the catalog
+    Then I see that no products are available
+  ```
+  ````
 - **One behaviour per scenario (a single `When`):** each scenario illustrates a single rule/behaviour, ideally with a single `When` (the action under test). Use `And`/`But` to chain contexts (`Given`) or outcomes (`Then`), NEVER to append a second action. If you end up with two `When`s, you are mixing two behaviours → split them into two distinct scenarios.
 - **Behaviour, not mechanics:** describe the user-visible behaviour based on the user's intent. Do not mix business rules, prescriptive UI details and backend logic (no "When they click the red button, Then it runs `SELECT * FROM users` which returns 401").
 - **Occam's razor:** do not add useless specificity or information. Do not specify the error code, or *which* layer fails, when it adds no information (no "the server returns 404"; yes "the order creation fails").

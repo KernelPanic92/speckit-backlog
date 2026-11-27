@@ -101,7 +101,7 @@ Load only the minimal necessary context from each artifact:
 
 - Run `BACKLOG_TOOL locate <ID> --descendants` for every Scope ID. Read scoped PBIs, their FEATURE/EPIC/MAP ancestors, blocking SPIKEs and related TASKs, even when references cross the current spec. The locator returns file, rank, referenced_by, specs and descendants.
 - Frontmatter (id, title, type, rank, relations); hierarchy and canonical relation order
-- Stories: Connextra, Acceptance Criteria (`AC-n` ids, Given/When/Then), Out of Scope, INVEST & DoR Check
+- Stories: Connextra, Acceptance Criteria (`AC-n` ids, each with one fenced `gherkin` Scenario tagged `@US-xxx @AC-n`), Out of Scope, INVEST & DoR Check
 - Features: bounded capability, Outcome, cross-story Constraints, Out of Scope; Epics: Scope Boundaries; MAPs: Backbone, Walking Skeleton, Outcome-titled Release Lanes, DoR Check
 - Spikes: question, timebox and Exit Criteria; TASKs: Covers, exact Files, Actions / DoD checkboxes (the sole completion source), parent and blockers
 
@@ -201,7 +201,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - **`ac-uncovered`**: when Acceptance tests from Gherkin is on (default), every `US-xxx/AC-n "title"` needs an acceptance-test TASK Covers entry before implementation; titles alone do not count
 - Scheduling claims inconsistent with `schedule`: `[P]` outside a computed multi-item wave, overlapping exact TASK `## Files`, blockers not satisfied, or an attempt to start a story before its blocking story's PR is merged
 - Missing task parent (including Setup/Foundational/Polish), invalid container ownership, Polish without real blockers, or prototype closing TASKs absent / ordered after the story work they must unblock
-- PBIs without an Out of Scope section (EPIC: Scope Boundaries); Out of Scope items without where they go; scenarios without `AC-n` ids
+- PBIs without an Out of Scope section (EPIC: Scope Boundaries); Out of Scope items without where they go; scenarios without `AC-n` ids; story scenarios outside a single tagged `gherkin` block (`ac-gherkin-*` validator errors)
 - **Readable References violations** in PBIs, spec, plan, research, tasks and checklists: bare PBI/scenario IDs outside allowed labels, `§` notation, coined labels, untitled section numbers, bare URLs/paths, non-topical links, wrong relative traversal/anchors, spec-local files as the only explanation of a central PBI, or numbered constitution principles
 - **INVEST / splitting violations**: conjunctions in I want, >5 scenarios without value-atomicity justification, Read/Write or List/Detail combined, horizontal slices, phantom UI, unbounded Features or more than one Feature Outcome
 - Spikes neither answered in research.md nor scheduled as tasks

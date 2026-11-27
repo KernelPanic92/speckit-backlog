@@ -492,6 +492,115 @@ def test_ac_uncovered(project, cli):
     assert any("US-001/AC-2" in entry["message"] for entry in result["errors"])
 
 
+AC1_BLOCK = """```gherkin
+@US-001 @AC-1
+Scenario: Available products listed
+  Given available products
+  When I open the catalog
+  Then a loading indicator appears
+  And the indicator disappears when processing completes
+  And I see their names and prices
+```"""
+
+
+def replace_ac1(root, block):
+    change_body(root, "US-001", AC1_BLOCK, block)
+
+
+@pytest.mark.parametrize("block,code", [
+    ("Given available products, When I open the catalog, Then I see their names and prices.", "ac-gherkin-missing"),
+    ("```text\n" + AC1_BLOCK.split("\n", 1)[1], "ac-gherkin-missing"),
+    (AC1_BLOCK + "\n\n" + AC1_BLOCK, "ac-gherkin-scenario"),
+    (AC1_BLOCK.replace("  Given available products",
+                       "  Given available products\n  When I open the catalog\n  Then I see prices\n\n"
+                       "Scenario: Second behaviour\n  Given available products"), "ac-gherkin-scenario"),
+    (AC1_BLOCK.replace("@US-001 @AC-1\n", "Feature: Catalog list\n@US-001 @AC-1\n"), "ac-gherkin-scenario"),
+    (AC1_BLOCK.replace("Scenario:", "Scenario Outline:"), "ac-gherkin-scenario"),
+    (AC1_BLOCK.replace("  When I open the catalog\n", ""), "ac-gherkin-steps"),
+    (AC1_BLOCK.replace("@US-001 @AC-1", "@US-001"), "ac-gherkin-tags"),
+    (AC1_BLOCK.replace("@US-001 @AC-1", "@US-002 @AC-1"), "ac-gherkin-tags"),
+    (AC1_BLOCK.replace("@US-001 @AC-1", "@US-001 @AC-2"), "ac-gherkin-tags"),
+    (AC1_BLOCK.replace("@US-001 @AC-1", "@US-001 @AC-1 @AC-2"), "ac-gherkin-tags"),
+])
+def test_gherkin_acceptance_criteria_validation(project, cli, block, code):
+    replace_ac1(project, block)
+    result = check_code(cli, project, code)
+    assert any(entry["file"].endswith("US-001-catalog-list.md") and "AC-1" in entry["message"]
+               for entry in result["errors"] if entry["code"] == code)
+
+
+def test_gherkin_examples_without_outline_is_rejected(project, cli):
+    replace_ac1(project, AC1_BLOCK.replace("  And I see their names and prices\n",
+                                           "  And I see their names and prices\n\n  Examples:\n    | n |\n    | 1 |\n"))
+    check_code(cli, project, "ac-gherkin-scenario")
+
+
+def test_gherkin_scenario_outline_extra_tags_and_comments_are_valid(project, cli):
+    replace_ac1(project, """```gherkin
+# Prices follow the catalog currency
+@US-001 @AC-1 @smoke
+Scenario Outline: Available products listed
+  Given <count> available products
+  When I open the catalog
+  Then a loading indicator appears
+  And the indicator disappears when processing completes
+  But I see <count> names and prices
+
+  Examples:
+    | count |
+    | 1     |
+    | 20    |
+```""")
+    result = cli(project, "check")
+    assert result["errors"] == result["warnings"] == []
+
+
+def test_gherkin_scenario_title_mismatch_is_a_warning(project, cli):
+    replace_ac1(project, AC1_BLOCK.replace("Scenario: Available products listed", "Scenario: Products shown"))
+    result = cli(project, "check")
+    assert result["errors"] == []
+    assert codes(result, "warnings") == {"ac-gherkin-title"}
+
+
+def test_gherkin_headings_inside_blocks_keep_ac_ids_and_coverage(project, cli):
+    replace_ac1(project, AC1_BLOCK.replace("  Given available products",
+                                           "  Given available products\n  \"\"\"\n  ### AC-9: not a heading\n  \"\"\""))
+    result = cli(project, "check")
+    assert result["errors"] == result["warnings"] == []
+    assert [c["number"] for c in engine.acceptance_blocks(read_pbi(project, "US-001")[1])] == [1, 2]
+
+
+def test_export_features_writes_one_feature_per_story(project, cli, tmp_path):
+    result = cli(project, "export-features", SPEC, "features")
+    assert result["stories"] == 2
+    assert result["files"] == ["features/US-001-catalog-list.feature", "features/US-002-card-payment.feature"]
+    assert (project / "features/US-001-catalog-list.feature").read_text() == """Feature: Catalog list
+
+  @US-001 @AC-1
+  Scenario: Available products listed
+    Given available products
+    When I open the catalog
+    Then a loading indicator appears
+    And the indicator disappears when processing completes
+    And I see their names and prices
+
+  @US-001 @AC-2
+  Scenario: Empty catalog
+    Given no available products
+    When I open the catalog
+    Then a loading indicator appears
+    And the indicator disappears when processing completes
+    And I see that no products are available
+"""
+
+
+def test_export_features_refuses_invalid_scenarios(project, cli):
+    replace_ac1(project, AC1_BLOCK.replace("@US-001 @AC-1", "@US-001"))
+    result = cli(project, "export-features", SPEC, "features", expected=1)
+    assert codes(result) == {"ac-gherkin-tags"}
+    assert not (project / "features").exists()
+
+
 def test_acceptance_tests_can_be_disabled_in_constitution(project, cli):
     constitution = project / ".specify/memory/constitution.md"
     constitution.parent.mkdir()

@@ -21,11 +21,27 @@ Shoppers can consult current product names and prices.
 
 ### AC-1: Available products listed
 
-Given available products, When I open the catalog, Then a loading indicator appears and disappears when processing completes, and I see their names and prices.
+```gherkin
+@US-001 @AC-1
+Scenario: Available products listed
+  Given available products
+  When I open the catalog
+  Then a loading indicator appears
+  And the indicator disappears when processing completes
+  And I see their names and prices
+```
 
 ### AC-2: Empty catalog
 
-Given no available products, When I open the catalog, Then a loading indicator appears and disappears when processing completes, and I see that no products are available.
+```gherkin
+@US-001 @AC-2
+Scenario: Empty catalog
+  Given no available products
+  When I open the catalog
+  Then a loading indicator appears
+  And the indicator disappears when processing completes
+  And I see that no products are available
+```
 
 ## Out of Scope
 

@@ -66,6 +66,39 @@ Feature: Feature title
         | 3     | 27    |
 ```
 
+### In a story of this backlog
+
+A story does not hold a whole `.feature` file: each `### AC-n: Title` heading of its
+`## Acceptance Criteria` is followed by exactly one fenced `gherkin` block with exactly
+one `Scenario` (or one `Scenario Outline` with its `Examples`). No `Feature`, `Rule` or
+`Background` inside the block: the story itself is the Feature. The first line tags the
+scenario with the story id and the heading number, and the scenario title repeats the
+heading title:
+
+````markdown
+### AC-2: Empty catalog
+
+```gherkin
+@US-001 @AC-2
+Scenario: Empty catalog
+  Given no available products
+  When I open the catalog
+  Then a loading indicator appears
+  And the indicator disappears when processing completes
+  And I see that no products are available
+```
+````
+
+Further tags (`@smoke`, `@wip`) may follow the two traceability tags. The tags make every
+scenario traceable from the test report back to `US-001/AC-2 "Empty catalog"`, and
+`scripts/backlog.py export-features <spec-dir> <out-dir>` turns each story of a spec into
+one `.feature` file (`Feature: <story title>` followed by its scenarios), ready for a
+Cucumber-style runner. `scripts/backlog.py check` rejects a criterion without the block
+(`ac-gherkin-missing`), with more than one block or scenario (`ac-gherkin-scenario`),
+without a `When` and a `Then` (`ac-gherkin-steps`) or with tags that do not match the
+story and the heading (`ac-gherkin-tags`); a scenario title that differs from its heading
+is a warning (`ac-gherkin-title`).
+
 ## Keywords
 
 - **Feature**: high-level description of a piece of functionality; groups related
